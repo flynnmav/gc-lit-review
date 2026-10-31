@@ -247,7 +247,7 @@ TEMPLATE = """<!DOCTYPE html>
 <body>
 <div class="bgfx" aria-hidden="true"></div>
 <header class="top"><div class="topin">
-  <a class="brand" href="%%ROOT%%index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <a class="brand" href="%%ROOT%%index.html"><span class="logo">📖</span><span>制导·博弈·学习</span><span class="sub">文献综述</span></a>
   <nav class="menu">
     <a href="%%ROOT%%index.html"%%NAVI%%>首页</a>
     <a href="%%ROOT%%papers.html"%%NAVP%%>论文精读</a>
@@ -407,25 +407,33 @@ def main():
             ('gC', '同族文献的实锤矛盾', '03 用双侧 PMP 推翻自家 2015 年解;07 的机动目标声称被自身证明否定;11 增益下界差一倍;13 正文与表格相反;16 时间常数差 10 倍。', 'comparison.html#sec-4', '红旗清单'),
             ('gB', '最小可做实验', '以 16 的 T-A-D 场景为公共测试床:博弈最优策略(03)、保障性制导(06)、TD3(16) 同协议换边对决。', 'gaps.html#sec-10', 'G11 · 统一测试床'),
         ])
-    mq = ('<span>17 篇结构化精读</span><span>✱</span><span>12 条研究空白</span><span>✱</span>'
-          '<span>20+ 处矛盾红旗</span><span>✱</span><span>5 维方法对比</span><span>✱</span>'
-          '<span>0 外部依赖</span><span>✱</span>') * 2
     body = ('<div class="hero ghero"><div class="gleft">'
-            '<div class="eyebrow">系统性文献综述 · 2026</div>'
-            '<h1><span>多智能体协同制导</span><span>微分博弈</span><mark>强化学习</mark></h1>'
+            '<div class="eyebrow">17/17 篇精读全部完成</div>'
+            '<h1><span>多智能体协同制导,</span><span class="wg">微分博弈,</span><span>强化学习!</span></h1>'
             '<p class="sub">17 篇论文的结构化精读、五维方法对比与 12 条研究空白。所有论断可回溯:笔记 → 原文页码;推测一律标注「待验证」。</p>'
+            '<div class="ctas"><a class="cta pri" href="papers.html">开始阅读 →</a><a class="cta sec" href="gaps.html">研究空白 G1–G12</a></div>'
             '<div class="gsearch"><svg class="gsicon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>'
             '<input id="globalQ" type="search" placeholder="搜索 17 篇精读笔记…" aria-label="全局搜索">'
             '<div class="hint">回车进入「论文精读」并自动过滤 · 例:固定时间 / Garcia / 规避</div></div>'
             '</div>'
-            '<div class="heroart" aria-hidden="true"><i class="sq s1"></i><i class="sq s2"></i><i class="sq s3"></i><b>✱</b></div>'
+            '<div class="heroDemo">'
+            '<div class="stk a" aria-hidden="true">🎯</div>'
+            '<div class="stk b" aria-hidden="true">⭐</div>'
+            '<div class="stk c" aria-hidden="true">📚</div>'
+            '<div class="demoCard">'
+            '<div class="drow"><span class="dtile">▶</span><div><div class="dtitle">文献综述工程</div>'
+            '<div class="dsub">17 篇论文 · 3 个研究支柱 · 12 条空白</div></div></div>'
+            '<div class="dlabel"><span>完成进度</span><b>100%</b></div>'
+            '<div class="track"><div class="fill"></div></div>'
+            '<a class="go" href="papers.html">开始阅读笔记</a>'
             '</div>'
-            '<div class="marquee"><div class="track">' + mq + '</div></div>'
+            '</div>'
+            '</div>'
             '<div class="stats">'
             '<div class="stat"><b>17</b><span>篇论文精读</span></div>'
             '<div class="stat"><b>3</b><span>研究支柱</span></div>'
             '<div class="stat"><b>12</b><span>条研究空白</span></div>'
-            '<div class="stat hot"><b>20+</b><span>矛盾/笔误红旗</span></div>'
+            '<div class="stat"><b>20+</b><span>矛盾/笔误红旗</span></div>'
             '<div class="stat"><b>0</b><span>外部依赖</span></div>'
             '</div>'
             '<div class="grid">' + group_cards + '</div>'
