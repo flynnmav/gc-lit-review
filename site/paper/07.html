@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>07 Fixed-time Cooperative Guidance Law for Multiple Missiles in Simultaneous Attacks · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gB">多弹协同制导</span> · H. Yu, K. Dai, H. Li, Y. Zou, S. Ma, H. Zhang (NUDT) · 2021 · arXiv(疑未定稿) · arXiv:2106.02772 · <a href="../pdfs/07_Yu2021_Fixed-time-Cooperative-Guidance.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">07 | Fixed-time Cooperative Guidance Law for Multiple Missiles in Simultaneous Attacks</h1>
+<blockquote>Yu H., Dai K., Li H., Zou Y., Ma S., Zhang H. (NUDT) | arXiv:2106.02772 (2021) | 文中未标注期刊/会议信息(本 PDF 为 arXiv 预印本,13 页;p.3 残留"缺引用文献 [zuo]"编辑痕迹、参考文献 [20] 缺失、正文引用不存在的式 (43),提示该版本为未完成稿)</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>属于"通信网络 + 一致性"的同时到达路线(而非发射前装定共同打击时间的 ITCG 路线,p.1);针对已有 finite-time 分布式协同制导 [2,4,5] 收敛时间依赖初始条件、难以精确预估的缺陷(p.2),以及 time-to-go 在相对速度/距离时变时无法精确获取的问题(p.2),改以 (range-to-go r_i, LOS 向相对速度 V_r,i) 为一致性变量;用 fixed-time(收敛时间上界与初值无关,Definition 1,p.4)替代 finite-time,与作者所知唯一先行工作 14(带输入时延的 fixed-time 协同制导)相区分(p.2)。实现手段:新型快速非奇异终端滑模面(FNTSMS)+ 分布式滑模制导律 + tanh(·) 抑制抖振(p.1-2)。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li>状态量(原文符号):r_i(第 i 弹-目标距离)、V_r,i = ṙ_i(LOS 方向速度)、V_q,i = λ̇_i r_i(垂直 LOS 方向速度)、φ_i(heading error 航向误差,弹速与 LOS 夹角)、λ_i(LOS 角)、γ_i(弹道倾角)(p.4-5, Fig.2);一致性误差 ξ_r,i、ξ_Vr,i(式 7,p.5);滑模变量 s_i(式 8,p.6)。</li><li>控制量(原文符号):u^r_i、u^q_i——第 i 弹沿/垂直 LOS 方向的加速度分量(p.5);经式 (10) 映射为弹体系切向加速度 a_t,i 与法向加速度 a_n,i(p.6)。a_t,i 调速(使 r_i 达成一致),a_n,i 调向(使 V_q,i→0、减小 φ_i)(p.6)。</li><li>动力学模型:平面质点交战运动学(式 6,p.5,引自 [2,14]):<ul><li>V_r,i(t) = ṙ_i(t);V_q,i(t) = λ̇_i(t) r_i(t)</li><li>V̇_r,i(t) = V²_q,i(t)/r_i(t) − u^r_i(t) + u^r_T,i(t)</li><li>V̇_q,i(t) = −V_q,i(t)V_r,i(t)/r_i(t) − u^q_i(t) + u^q_T,i(t) 其中 u^r_T,i、u^q_T,i 为目标加速度分量(p.5)。仅运动学,无导弹动力学/自动驾驶仪模型。</li></ul></li><li>通信拓扑:加权图 𝒢=(𝒱, ε, 𝒜),邻接矩阵 a_ij(0-1 权重),Laplacian ℒ(p.3)。Assumption 仅要求"𝒢 连通,即存在涉及所有导弹的通信路径"(p.3);仿真称网络"connected and undirected"(p.11),但 Fig.3 画的是带箭头的图(p.10)。未讨论切换/持续连通条件(第四节声称考虑三种拓扑,但本版本无对应图与证明,见第 6、8 节)。</li><li>目标泛函/终端条件:未预先指定共同打击时间 Td。判据为 ξ_r,i = 0 且 ξ_Vr,i = 0 对 t ≥ T_max(Remark 1,p.5-6)——即全体导弹 range-to-go 与 LOS 向接近速度一致 ⟹ time-to-go 一致 ⟹ 同时到达;到达时刻由仿真涌现(51.0 s,p.11)。另要求 V_q,i → 0(Theorem 3,p.10)保证沿 LOS 置信。</li><li>机动目标:式 (6) 含 u^r_T,i、u^q_T,i;第 3 节标题为"against the maneuvering target"(p.5);仿真目标初始位置 (15000,15000) m、V_x=V_y=100 m/s、a_x=a_y=3.5sin(0.5t+7π/6),"time-varying and unknown to the missiles"(p.11)。但两条定理的证明中均未出现 u_T 项(见第 6 节);结论一节又称"attacking a stationary target"(p.12)。</li><li>约束(输入/状态/视场):未提及(无加速度饱和、速度界限或视场约束;文献 [8] 研究加速度饱和但本文未引入)。</li><li>噪声/时延:未提及(本文模型不含通信时延与量测噪声;引言提到 [5] 考虑时延、[14] 考虑输入时延,但均非本文设定,p.2-3)。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>Assumption(p.3,全文唯一一条编号假设):𝒢 连通——存在一条涉及所有导弹的通信路径。未显式区分有向/无向;Lemma 1 的谱界形式(λ_s 为 ℒ 最小非零特征值)对应无向图(p.3)。</li><li>平面化假设(p.4,§2.2):一旦所有导弹已"laterally headed on the target"(横向对准),弹道差异只在同一垂直平面内,故可化为单弹-目标平面交战场景(二维假设;三维侧向对准由谁完成未说明)。</li><li>运动学模型 (6) 引自 2,14(p.5);目标加速度 u^r_T,i、u^q_T,i 进入模型(p.5),仿真中机动且"unknown to the missiles"(p.11)。</li><li>滑模面参数条件(p.6):α_i &gt; 0(i=1,2);m_1/n_1 &gt; 1,p_1/q_1 &lt; 1,μ &gt; 0 为小常数;m_2/n_2 &gt; 1,p_2/q_2 &lt; 1,k_i &gt; 0(i=1..4),η_1 &gt; 0,ε &gt; 0,1 &gt; ω &gt; 0(p.6)。</li><li>Lemma 3 前提(p.3-4):a,b &gt; 0,m,n,p,q 为正奇整数且 m &gt; n,p &lt; q(保证负数底分数幂有定义)。</li><li>保守时间界的附加条件:ϑ ≜ [q(m−n)/n(q−p)] ≤ 1(p.4);ϑ_2 ≜ [q_2(m_2−n_2)/n_2(q_2−p_2)] ≤ 1(Remark 2,p.8);ϑ_1 ≜ [q_1(m_1−n_1)/n_1(q_1−p_1)] ≤ 1(Remark 3,p.9)。</li><li>速度可控:切向加速度 a_t,i 直接调节飞行速度(p.6),即弹速可变、非"仅航向角可控"类设定;无速度恒定假设。</li><li>剩余时间估计:不使用 time-to-go 估计,直接选 LOS 向距离与速度为一致性变量以规避 time-to-go 不能精确获取的困难(p.2)。</li><li>隐含条件:式 (11) 含 1/(Σ_{j=1}^n a_ij),要求每枚弹至少有一个邻居(Σ_j a_ij ≠ 0)(p.6;由"连通"保证,但通信故障时该分母可为零,见第 6 节)。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制:把"同时到达"解耦为三个固定时间收敛的子问题,逐弹(而非经 Laplacian 耦合场)处理:(a) 切向通道——在 FNTSMS 滑模面 s_i 上构造一致性动力学,利用式 (11) 中 Σa_ij(V²_q,i/r_i − V²_q,j/r_j + u^r_j) 项与邻居动力学精确对消,使每枚弹的 s_i 动力学解耦为 ṡ_i = −k_1 s_i^{m_2/n_2} − k_2 s_i^{p_2/q_2} − η_1 tanh(s_i)(p.7),由 Lemma 3 得固定时间到达滑模面;(b) 滑模面上 s_i = 0 ⟹ ξ_Vr,i = −α_1ξ_r,i^{m_1/n_1} − α_2ξ_r,i^{p_1/q_1}(式 27,p.9),代入 V̇_2 得到与 Lemma 3 同构的系统,固定时间收敛到 ξ_r,i = 0(⟹ ξ_Vr,i = 0,p.9);(c) 法向通道——u^q_i(式 12)直接把 V_q,i 动力学整定成 −k_3V^{m_3/n_3} − k_4V^{p_3/q_3} − ε|V|^ω sign(V) 的 Lemma 3 型系统(p.10),固定时间归零 ⟹ 航向误差 φ_i 归零(Remark 5)。奇异性处理:β(·) 的双支构造——在 s̄_i ≠ 0 且 |ξ_r,i| &lt; μ 的小邻域内用 l_1ξ + l_2 sgn(ξ)ξ²(系数含 μ 的负幂,值与斜率在 |ξ|=μ 处与 ξ^{p_1/q_1} 匹配)替换分数幂项,避免 ξ^{p_1/q_1} 求导在 ξ→0 处的奇性(p.6,式 9、15);抖振处理:切向通道用 η_1 tanh(s_i) 替代 sign(摘要称"saturation function",p.1;正文为 tanh,p.2、p.7),法向通道的 ε|V_q,i|^ω sign(V_q,i)(0&lt;ω&lt;1)本身为连续项(p.6)。三条收敛时间界均只含增益、幂次与弹数 n,不含初始状态(p.7-10)。</p>
+<p>关键公式:</p>
+<ul><li>一致性误差(7,p.5):ξ_r,i = Σ_{j=1}^{N} a_ij (r_i − r_j);ξ_Vr,i = Σ_{j=1}^{N} a_ij (V_r,i − V_r,j)</li><li>FNTSMS(8,p.6):s_i = ξ_Vr,i + α_1 ξ_r,i + α_2 β(ξ_r,i),α_i &gt; 0(i=1,2)</li><li>非奇异分支 β(9,p.6):β(ξ_r,i) = −(α_1/α_2)ξ_r,i + (α_1/α_2)ξ_r,i^{m_1/n_1} + ξ_r,i^{p_1/q_1}(若 s̄_i = 0 或 s̄_i ≠ 0, |ξ_r,i| ≥ μ);l_1 ξ_r,i + l_2 sgn(ξ_r,i) ξ_r,i²(若 s̄_i ≠ 0, |ξ_r,i| &lt; μ);其中 s̄_i = ξ_Vr,i + α_1 ξ_r,i + α_2 ξ_r,i^{p_1/q_1},l_1 = (2 − p_1/q_1)μ^{p_1/q_1 − 1},l_2 = (p_1/q_1 − 1)μ^{p_1/q_1 − 2}</li><li>LOS 系到弹体系映射(10,p.6):a_n,i = u^q_i cos φ_i − u^r_i sin φ_i;a_t,i = u^r_i cos φ_i + u^q_i sin φ_i</li><li>切向控制(11,p.6):u^r_i = (1/Σ_{j=1}^n a_ij)·{Σ_{j=1}^n a_ij (V²_q,i/r_i − V²_q,j/r_j + u^r_j) + (α_1 ξ_Vr,i + α_2 β̇(ξ_r,i)) + k_1 s_i^{m_2/n_2} + k_2 s_i^{p_2/q_2} + η_1 tanh(s_i)}</li><li>法向控制(12,p.6):u^q_i = −V_q,i V_r,i/r_i + k_3 V_q,i^{m_3/n_3} + k_4 V_q,i^{p_3/q_3} + ε|V_q,i|^ω sign(V_q,i)</li><li>解耦后滑模动力学(p.7):ṡ_i = −k_1 s_i^{m_2/n_2} − k_2 s_i^{p_2/q_2} − η_1 tanh(s_i);由 s tanh(s) ≥ 0(19,p.7)得 V̇_1 ≤ −k_1 Σ(s_i²)^{(m_2+n_2)/2n_2} − k_2 Σ(s_i²)^{(p_2+q_2)/2q_2}(20,p.8),再经 Lemma 2 与 y=√(2V_1)(23,p.8)化为 Lemma 3 型</li><li>固定时间核心引理(Lemma 3,式 3-5,p.3-4):ẏ = −a y^{m/n} − b y^{p/q} ⟹ T ≤ (1/a)(n/(m−n)) + (1/b)(q/(q−p));若 ϑ ≤ 1,保守界 T ≤ (q/(q−p))(1/√(ab)) tan^{-1}(√(a/b) + 1/(aϑ))</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<ul><li>Lemma 1 20(p.3):对任意 m ∈ ℝⁿ,1ᵀm = 0,有 mᵀℒm ≥ λ_s mᵀm(λ_s 为 ℒ 最小非零特征值)。注:全文证明未实际调用该引理(见第 6 节)。</li><li>Lemma 2 11(p.3):x_i ≥ 0 时 Σx_i^{p_1} ≥ (Σx_i)^{p_1}(0&lt;p_1≤1);Σx_i^{p_2} ≥ n^{1−p_2}(Σx_i)^{p_2}(1&lt;p_2&lt;∞)。用于把逐项和化为 Lyapunov 函数的幂。</li><li>Lemma 3 11(p.3-4):ẏ = −a y^{m/n} − b y^{p/q}(a,b&gt;0,m,n,p,q 正奇数,m&gt;n,p&lt;q)固定时间收敛,T ≤ (1/a)(n/(m−n)) + (1/b)(q/(q−p))(式 4);ϑ ≤ 1 时保守界式 (5)。</li><li>Definition 1 10(p.4):若收敛时间 T(X_0) 有界且 ∃T_max&gt;0: T(X_0) ≤ T_max, ∀X_0 ∈ ℝⁿ,则系统全局固定时间稳定。</li><li>Theorem 1(p.6-8):系统 (6) + 制导律 (10)(u^r_i 由式 11 给出)下,s_i = 0(i=1..n)固定时间达成,T_1 ≤ n^{(m_2−n_2)/2n_2}/k_1 · n_2/(m_2−n_2) + (1/k_2)·q_2/(q_2−p_2)(式 13/24,p.7-8)。前提:m_2/n_2&gt;1, p_2/q_2&lt;1, k_1,k_2&gt;0。T_1 与初值无关 ✓。</li><li>Remark 2(p.8):若 ϑ_2 ≤ 1,保守估计式 (25):T_1 ≤ (q_2/(q_2−p_2))(1/√(k_1 n^{(m_2−n_2)/2n_2} k_2)) tan^{-1}(√(k_1 n^{(m_2−n_2)/2n_2}/k_2) + 1/(k_1 n^{(m_2−n_2)/2n_2} ϑ_2))。</li><li>Theorem 2(p.8-9):在 Theorem 1 基础上(s_i = 0 后),ξ_r,i = 0 且 ξ_Vr,i = 0 固定时间达成,T_2 ≤ T_1 + n^{(m_1−n_1)/2n_1}/α_1 · n_1/(m_1−n_1) + (1/α_2)·q_1/(q_1−p_1)(式 26/33,p.8-9)。前提:m_1/n_1&gt;1, p_1/q_1&lt;1。</li><li>Remark 3(p.9):若 ϑ_1 ≤ 1,保守界式 (34):T_2 ≤ T_1 + (q_1/(q_1−p_1))(1/√(α_1α_2 n^{(m_1−n_1)/2n_1})) tan^{-1}(√(α_1 n^{(m_1−n_1)/2n_1}/α_2) + 1/(α_1 n^{(m_1−n_1)/2n_1} ϑ_1))。</li><li>Remark 4(p.9-10):T_1、T_2 与系统初始状态无关,"very unique feature compared to finite-time convergence"。</li><li>Theorem 3(p.10):系统 (6) + 法向律(文中误写"guidance law (13)",按内容应为式 12)下,V_q,i = 0(i=1..n)固定时间达成,T_3 ≤ n^{(m_3−n_3)/2n_3}/k_3 · n_3/(m_3−n_3) + (1/k_4)·q_3/(q_3−p_3)(式 35)。证明思路:代入得 V̇_q,i = −k_3V^{m_3/n_3} − k_4V^{p_3/q_3} − ε|V|^ω sign(V)(式 36,p.10),取 V_3 = ½ΣV_q,i²(37),V̇_3 中舍去 −ε|V|^{ω+1} 项后与定理 1/2 同构,"rest of the proof ... omitted for brevity"(p.10)。</li><li>Remark 5(p.10):V_q,i 固定时间归零 ⟹ 航向误差 φ_i 固定时间归零 ⟹ 精确打击。</li><li>收敛时间结构:T_3、T_1、T_2−T_1 三个界均只依赖 (k_i, α_i, m_j, n_j, p_j, q_j, n),与初始条件无关(p.7-10);级联总时间 T_2 为同时到达提供与初值无关的最迟时间界。</li></ul>
+<h2 id="sec-6">5. 实验设置</h2>
+<ul><li>场景:5 枚弹攻击 1 个目标;拓扑见 Fig.3(p.10,边大致为 1–2、1–4、4–3、4–5,图带箭头但正文声明无向连通,p.11)。仿真分两部分:①Fig.3 拓扑验证制导律 (10);②"三种不同通信拓扑"(Fig.4)验证鲁棒性——但本版本 Fig.4 实为 (10) 的结果曲线,拓扑突变场景缺失(p.11,见第 6/8 节)。</li><li>初始条件(Table 1,p.11):missile1: r=16000 m, V=350 m/s, φ=−0.09 rad;missile2: 15050, 320, 0.10;missile3: 13990, 270, 0.11;missile4: 13950, 300, −0.15;missile5: 15000, 331, 0.12。</li><li>参数(p.11):制导律 (10)+FNTSMS (8):k_1=0.265, k_2=2, k_3=0.25, k_4=2, p_2=5, q_2=7, m_2=13, n_2=11, ε=1.5, ω=0.5, η_1=1.5, μ=0.001, p_1=5, q_1=7, m_1=11, n_1=9, α_1=0.25, α_2=2, p_3=3, q_3=5, m_3=7, n_3=5。"制导律 (43)"参数:k_1=2, k_2=3, k_3=0.1, p_3=3, q_3=5, m_3=7, n_3=5, N_0=4, η_2=1(式 (43) 本身缺失)。</li><li>目标(p.11):初始位置 (15000,15000) m,V_x=V_y=100 m/s,a_x=a_y=3.5sin(0.5t+7π/6),机动且未知于导弹。</li><li>结果(p.11-12, Fig.4):各弹到达时间均 51.0 s(同时到达);ξ_r 于 19.9 s、ξ_Vr 于 21.2 s、φ_i 于 2.8 s 收敛到零;"由于 ϑ_1&lt;1、ϑ_2&lt;1",按 (25)(34) 得 T_2 ≤ 48.21 s(Fig.4(b) 满足界),按 (35) 得 T_3 ≤ 14.9 s。</li><li>对比基线:文中称与"guidance law (43)"相比收敛时间与到达时间更小(p.12),但 (43) 的表达式与结果图在本版本中均缺失,实际无可核对基线。</li><li>评价指标:到达时间(同时性)、ξ_r/ξ_Vr/φ 收敛时间 vs 理论时间界;未展示控制量 a_t,i/a_n,i 曲线。</li><li>无硬件实验,纯数值仿真(MATLAB 风格曲线,p.12)。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li>作者承认的:<ul><li>结论自述该文为"attacking a stationary target"的制导律(p.12),与摘要/标题/第 3 节标题的"maneuvering target"(p.1、p.5)自相矛盾;仿真段落先说"simultaneous attack on a stationary target"(p.11),随后给出的目标却是机动的(p.11)。</li><li>引理 3 的保守时间界需附加条件 ϑ ≤ 1(p.4、p.8、p.9),非任意参数组合可用。</li><li>承认滑模固有抖振问题,以 tanh(·) 缓解(p.1、p.2、p.12);Theorem 3 证明"omitted for brevity"(p.10)。</li></ul></li><li>我分析的(附依据):<ul><li>机动目标未进入稳定性证明:模型 (6) 含 u^r_T,i、u^q_T,i(p.5),但 (16)(p.7) 与 (36)(p.10) 的推导中 u_T 项整体消失,等效于假设目标不机动;故定理只对静止目标成立,仿真中机动目标场景(p.11)的成功无理论保证,摘要所称"attack a maneuvering target simultaneously"(p.1)与证明不匹配。</li><li>只证到一致性变量收敛,未证命中:三个定理仅覆盖 s_i、ξ_r,i、ξ_Vr,i、V_q,i 的固定时间收敛;r_i→0(命中)与共同到达时刻的显式表达式缺失,51.0 s 纯由仿真给出(p.11);"同时到达"依赖 ξ_r,i=ξ_Vr,i=0 ⟹ 各弹 time-to-go 相等这一隐式推理(Remark 1,p.5-6),且共同 V_r&lt;0 的保持未证明。</li><li>通信故障鲁棒性声明落空:摘要称"the distributed cooperative guidance law with communication failure is considered and proved theoretically"(p.1)、贡献 (3) 称讨论拓扑突变影响(p.2-3)、第 4 节称考虑三种拓扑(p.11),但本版本正文无任何相应证明或图表(公式止于 (38),Fig.4 只有 (10) 的曲线)。</li><li>u^r_i 含 1/(Σ_j a_ij)(式 11,p.6):某弹若因故障被孤立(Σa_ij=0)则制导律无定义;对"连通"假设的依赖是硬性的,且突变拓扑下连通性中断瞬间的行为无分析。</li><li>证明实为逐弹精确对消解耦(式 11 代入式 16 后每弹 s_i 独立,p.7),Lemma 1(Laplacian 谱界,p.3)全文未被调用——连通性/拓扑结构信息在稳定性论证中的实际作用远弱于常规一致性文献,固定时间界中的 n^{(·)} 仅来自 Lemma 2 的 n^{1−p} 因子。</li><li>β(ξ_r,i) 第一支含 −(α_1/α_2)ξ_r,i + (α_1/α_2)ξ_r,i^{m_1/n_1} 项(p.6),使 s_i 在该支上 ≠ s̄_i,且两支在 |ξ_r,i|=μ 处按字面定义存在 (α_1/α_2)(μ^{m_1/n_1} − μ) 量级的跳变(μ=0.001 时约 10⁻⁴ 量级),β 的连续性未证明(细节见第 8 节)。</li><li>表述/编号不一致多处:Theorem 3 与其证明引用"式 (13)"(实为时间界公式,应为式 12,p.10);式 (14) 中 α_1 项误写为 ξ̇_Vr,i(应为 ξ̇_r,i = ξ_Vr,i,p.7);式 (7) 求和上限 N 与全文 n 混用(p.5);式 (32) 处"y=√(2V_1)"应为 V_2(p.9);摘要称"saturation function"而正文为 tanh(p.1 vs p.2);p.3 残留"缺引用文献 [zuo]";参考文献 20(Lemma 1 出处)不在文献表中(p.13)——提示 arXiv 版为未经校对的草稿。</li><li>未展示 a_t,i/a_n,i 控制曲线与峰值(p.12),无法评估控制量可实现性;μ、ε、ω 等参数对性能的敏感性无分析。</li></ul></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li>已给出:完整制导律 (8)-(12)(p.5-6);全部参数数值(p.11);5 弹初值表(Table 1,p.11);拓扑图(Fig.3,p.10);目标初值与机动规律(p.11);关键仿真读数(51.0/19.9/21.2/2.8 s 及理论界 48.21/14.9 s,p.11)。</li><li>缺失:仿真步长、积分方法、命中/停止判据;拓扑突变场景的切换时刻与三种拓扑的具体连接;"guidance law (43)"的表达式及其结果图;控制量曲线;到达时间的理论刻画;代码未公开;参考文献多处不完整(p.13),文献 [1]-[9]、[16]-[19] 无完整作者/期刊信息,核对引文困难。</li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<ul><li>"guidance law (43)"的真实形式:由其参数含 N_0=4、η_2=1(p.11)推测为另一条含 N_0 项的固定时间律(可能对应被删去的 3.2 节或取自 [14] 的改进),本版本无法定位。</li><li>β(ξ_r,i) 第一支的额外项 −(α_1/α_2)ξ_r,i + (α_1/α_2)ξ_r,i^{m_1/n_1}(p.6)的设计意图:推测系从 [18,19] 的 FNTSMS 移植时笔误,原意可能是仅保留 ξ_r,i^{p_1/q_1}(其值/斜率在 |ξ|=μ 处恰与第二支匹配),需对照 [18,19] 核实。</li><li>时间界数值复核:按式 (24)+(26) 与仿真参数复算 T_2 ≈ 49.1 s(与文中 48.21 s 接近但不等),按 (35) 复算 T_3 ≈ 15.0 s(文中 14.9 s);而按保守式 (25)+(34) 复算仅约 12-13 s,与文中"根据 (25)(34) 得 T_2≤48.21s"(p.11)的说法不符——48.21 s 的确切计算路径无法在原文定位。</li><li>摘要所称通信故障理论证明(p.1)与三种拓扑鲁棒性仿真(p.11)推测存在于更长版本(会议/期刊版)中,本 arXiv 版缺失。</li><li>到达时间 51.0 s 对目标机动的依赖程度(目标以 100 m/s 接近弹群方向运动,p.11):若目标静止,到达时间是否显著变化,需复现仿真确认。</li><li>ϑ_1&lt;1、ϑ_2&lt;1 的取值:p.11 未给出数值,按参数表计算 ϑ_1 = q_1(m_1−n_1)/(n_1(q_1−p_1)) = 7×2/(9×2) ≈ 0.78,ϑ_2 = 7×2/(11×2) ≈ 0.64,均 &lt;1 成立(与文中一致,但原文未展示该计算)。</li></ul>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>𝒢=(𝒱, ε, 𝒜)</td><td>导弹间通信拓扑加权图(节点集、边集、邻接矩阵)</td><td>p.3, §2.1</td></tr>
+<tr><td>𝒱, ε, 𝒜=[a_ij]</td><td>节点集 {1,2,…,n};边集;邻接矩阵(a_ij=1 若 (j,i)∈ε)</td><td>p.3</td></tr>
+<tr><td>ℒ=[l_ij]</td><td>Laplacian 矩阵,l_ii=Σ_j a_ij,l_ij=−a_ij (i≠j)</td><td>p.3</td></tr>
+<tr><td>λ_s</td><td>ℒ 的最小非零特征值(Lemma 1)</td><td>p.3</td></tr>
+<tr><td>n / N</td><td>导弹数量((7) 中求和上限写作 N,余处为 n)</td><td>p.3 / p.5</td></tr>
+<tr><td>r_i</td><td>第 i 弹与目标的距离(range-to-go)</td><td>p.4, Fig.1</td></tr>
+<tr><td>V_i</td><td>第 i 弹速度</td><td>p.4</td></tr>
+<tr><td>V_r,i</td><td>第 i 弹沿 LOS 方向速度分量,V_r,i = ṙ_i</td><td>p.4-5</td></tr>
+<tr><td>V_q,i</td><td>第 i 弹垂直 LOS 方向速度分量,V_q,i = λ̇_i r_i</td><td>p.4-5</td></tr>
+<tr><td>a_n,i / a_t,i</td><td>第 i 弹法向 / 切向加速度(控制输出)</td><td>p.4-5</td></tr>
+<tr><td>λ_i / φ_i / γ_i</td><td>LOS 角 / 航向误差(弹速与 LOS 夹角)/ 弹道倾角</td><td>p.5, Fig.2</td></tr>
+<tr><td>u^r_i, u^q_i</td><td>第 i 弹沿/垂直 LOS 的加速度控制分量</td><td>p.5, 式(6)</td></tr>
+<tr><td>u^r_T,i, u^q_T,i</td><td>目标沿/垂直 LOS 的加速度分量</td><td>p.5, 式(6)</td></tr>
+<tr><td>ξ_r,i, ξ_Vr,i</td><td>range-to-go 与 LOS 向速度的一致性误差</td><td>p.5, 式(7)</td></tr>
+<tr><td>T_max</td><td>固定时间收敛时间上界(与初值无关)</td><td>p.4 (Def.1), p.5-6 (Remark 1)</td></tr>
+<tr><td>s_i</td><td>FNTSMS 滑模面变量</td><td>p.6, 式(8)</td></tr>
+<tr><td>α_1, α_2</td><td>滑模面增益(α_i&gt;0)</td><td>p.6</td></tr>
+<tr><td>β(·), s̄_i</td><td>滑模面非奇异分支函数及其判别变量</td><td>p.6, 式(9)</td></tr>
+<tr><td>l_1, l_2, μ</td><td>分支二系数与切换阈值(μ 为小正常数)</td><td>p.6, 式(9)</td></tr>
+<tr><td>m_1/n_1, m_2/n_2, m_3/n_3</td><td>快项幂次(&gt;1)</td><td>p.6</td></tr>
+<tr><td>p_1/q_1, p_2/q_2, p_3/q_3</td><td>终端项幂次(&lt;1)</td><td>p.6</td></tr>
+<tr><td>k_1, k_2</td><td>切向通道滑模增益(式 11)</td><td>p.6</td></tr>
+<tr><td>k_3, k_4</td><td>法向通道滑模增益(式 12)</td><td>p.6</td></tr>
+<tr><td>η_1</td><td>tanh(s_i) 项增益(式 11)</td><td>p.6</td></tr>
+<tr><td>ε, ω</td><td>ε\</td><td>V_q,i\</td><td>^ω sign(V_q,i) 项增益与幂次(0&lt;ω&lt;1)</td><td>p.6, 式(12)</td></tr>
+<tr><td>T_1, T_2, T_3</td><td>s_i→0、(ξ_r,i,ξ_Vr,i)→0、V_q,i→0 的收敛时间界</td><td>p.7 (13), p.8 (26), p.10 (35)</td></tr>
+<tr><td>ϑ, ϑ_1, ϑ_2</td><td>保守时间界的条件参数 [q(m−n)/n(q−p)]</td><td>p.4, p.8, p.9</td></tr>
+<tr><td>V_1, V_2, V_3</td><td>三个 Lyapunov 函数</td><td>p.7 (17), p.9 (28), p.10 (37)</td></tr>
+<tr><td>y, a, b, m, n, p, q</td><td>Lemma 3 标量系统及其参数(正奇数,m&gt;n,p&lt;q)</td><td>p.3-4, 式(3)</td></tr>
+<tr><td>N_0, η_2</td><td>仅出现于"制导律 (43)"参数表(公式本体缺失)</td><td>p.11</td></tr>
+</tbody></table></div><div class="pnav"><a href="06.html">← 06 Cooperative Nonlinear Guidan…</a><a href="08.html">08 Time-Optimal Collaborative G… →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

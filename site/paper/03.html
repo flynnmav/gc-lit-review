@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>03 The Complete Differential Game of Active Target Defense · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gA">微分博弈与目标防御</span> · E. Garcia, D. W. Casbeer, M. Pachter · 2020 · JGCD 2020 (arXiv 预印本) · arXiv:2002.04054 · <a href="../pdfs/03_Garcia2020_Complete-Game-Active-Target-Defense.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">03 | The Complete Differential Game of Active Target Defense</h1>
+<blockquote>Garcia E., Casbeer D.W., Pachter M. | JGCD 2020 (arXiv 预印本) | arXiv:2002.04054</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>补全 TAD(Target-Attacker-Defender)主动目标防御微分博弈的"最后一块拼图":此前 [20],[21],[30] 已解决 T/D 团队赢取区 Re 内的博弈(ATDDG),[22] 对 Attacker 赢取区 Rc 的求解被本文证明是错的(不满足半透屏障,其 Pure Pursuit 策略非最优),[23],[24] 给了几何解但无最优性证明(p.1-2);本文用双侧 Pontryagin 最大值原理严格求解 Rc 内的 Game of Degree(称为 Capture Differential Game, CDG),给出 C1 Value 函数并验证 HJI 方程,再用 Theorem 3 证明 CDG 与 ATDDG 在 Barrier 上解重合,从而给出全状态空间 R6 = Rc ∪ Re 的完整解(p.2, p.4)。<strong>与"快防御者"经典假设的关系(本文原话,p.3 Remark):本文不需要 VD &gt; VA,主文取临界情形 VA = VD(归一化 VA = VD = 1, VT = α &lt; 1);并明确指出当 VA &gt; VD(D 更慢)且要求点捕获时 A 必胜、T/D 无解,而 VD &gt; VA 情形"结果可推广"(论文未给推导)。</strong>即去除"防御者更快"这一支配性论证后,真正需要重新求解且可解的正是等速边界情形;此时 Game of Kind 的屏障不再是 A-D Apollonius 圆,而是 Theorem 1 给出的、以 A-D 视线角 σ 与中点 (x0, y0) 为参数、关于 T 坐标的双二次型(横截面为双曲线,p.4 Remark)。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li><strong>状态量(原文符号)</strong>: x = (xT, yT, xA, yA, xD, yD) ∈ R6,游戏集为全空间 R6(p.2, Sec. II-A)。</li><li><strong>控制量(原文符号)</strong>: T/D 团队控制 uT,D = {φ, ψ},Attacker 控制 uA = {χ};φ 为 Target 航向角、χ 为 Attacker 航向角、ψ 为 Defender 航向角(Fig. 1, p.3;Hamiltonian (14), p.5);容许控制 χ, φ, ψ ∈ −π, π(p.3)。</li><li><strong>动力学模型</strong>: Isaacs 式 "simple motion"(全向/holonomic 质点、常速、瞬时改变航向),ODE 组 (1)(p.3): ẋA = cos χ, ẏA = sin χ;ẋD = cos ψ, ẏD = sin ψ;ẋT = α cos φ, ẏT = α sin φ(各带初值)。 速度归一化 VA = VD = 1,VT = α,α = VT/VA &lt; 1 为问题参数(p.2-3)。</li><li><strong>参与者与支付/终端流形</strong>: 三方零和二人博弈(T、D 结盟对抗 A)。双终止集 S = Se ∪ Sc(式 (2), p.3):Se := {x | ‖A−D‖ = 0}(D 拦截 A,T 逃脱,T/D 胜),Sc := {x | ‖A−T‖ = 0}(A 捕获 T,A 胜)。Rc 内的 CDG:终止条件 xA = xT, yA = yT(式 (9), p.4),终端流形 Sc 是 R6 中 4 维超平面(式 (13), p.5);支付 J = Φ(xf) = 终端时刻 D-T 距离(式 (10)-(11), p.4),Value V(x0) = max_{uA(·)} min_{uT,D(·)} J(式 (12), p.4)——A 最大化、T/D 最小化终端 D-T 距离;tf 自由。</li><li><strong>机动目标</strong>: Target 可机动(控制为航向 φ),速度比 α &lt; 1;非机动 Target 的情形引 [12],[13],本文不处理(p.1)。</li><li><strong>约束(输入/状态/视场)</strong>: 航向角 ∈ [−π, π];"Both, the state and the controls, are unconstrained"(p.3);终端为点捕获(point capture,p.3)。视场/传感约束:未提及。</li><li><strong>噪声/时延</strong>: 未提及;CDG 为完美信息博弈,各方知道动力学 (1) 与 α、可获取当前状态 x,但"不知道对手当前决策",无需 discriminatory/stroboscopic 策略(p.4, Sec. II-C)。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>三参与者均做 Isaacs "simple motion"(holonomic、平面、常速)(p.2, Sec. II-A)。</li><li>速度比 α = VT/VA &lt; 1(Target 慢于 Attacker);当 VA &lt; VT 时"不需要 Defender,Target 总能跑赢"(p.2)。</li><li>Attacker 与 Defender 能力相近:VA = VD,无损归一化为 VA = VD = 1,VT = α(p.3)。</li><li><strong>速度比取值范围的完整论述(p.3 Remark)</strong>:若 VA &gt; VD(D 更慢)且要求点捕获,则 A 无视初始条件必捕获 T——慢者 D 无法点拦截快者 A,A 总能绕开慢速点去抓 T;又因 α &lt; 1,T/D 无法永远把 A 挡在 T 之外(用 [22] 的记号即无法恒保持 R = A−T 间距、r = A−D 间距 &gt; 0),T 与 D 的会合(réndezvous)策略必然导致 T 被捕。故本文只解 VA = VD,并称"结果可推广到 VD &gt; VA"(无推导)。</li><li>终止条件为点捕获(A-T 与 A-D 间距均为零才计终止,p.3;正捕获半径情形引 [11], p.1)。</li><li>容许控制 χ, φ, ψ ∈ [−π, π],状态与控制无其他约束(p.3)。</li><li>Game of Kind 划分先行给定:Red ⊂ Re(T 到 D 不远于到 A 时必逃脱,即使 α → 0,p.3, 式 (3));x ∉ Red 上由 Barrier 函数 B(x; α) 的符号划分 Rea(B&lt;0,逃脱)与 Rc(B&gt;0,捕获)(式 (4)-(5), p.3),屏障 B = {x ∉ Red | B(x;α)=0}(式 (6), p.4)。B(x;α) 的显式表征即 Theorem 1,其证明在 30(p.4)。</li><li>完美信息 + 状态反馈策略 + 对手当前决策不可知(无需歧视性/频闪策略)(p.4, Sec. II-C)。</li><li>CDG 内无奇异曲面,Isaacs 条件成立:min_{φ,ψ} max_χ H = max_χ min_{φ,ψ} H(p.5, 式 (14) 之后),故可用双侧("Two-person")PMP 合成正则解(p.5, Sec. III)。</li><li>参数范围:Theorem 1 要求 0 &lt; α &lt; 1(p.4);Theorem 2 允许 0 ≤ α &lt; 1(p.5)。</li><li><strong>拦截几何与参数平面划分(哪些初始条件 T 必死/可活)</strong>:固定 A、D 位置时,屏障 B 的横截面是 (x,y) 平面上的一条双曲线,只有"A 支"有效,"D 支"落在 D 的支配区(Red,由 A-D 线段的中垂线 OBS 界定)内无意义(p.4 Remark, Fig. 2)。初始条件归类:T 距 D 不远于距 A(Red)→ 必可活;x ∉ Red 且 B(x;α)&lt;0(Rea)→ 可活;x ∉ Red 且 B(x;α)&gt;0(Rc)→ 在最优博弈下 T 必死,此时进行 CDG,支付为终端 D-T 距离(p.3-4);B(x;α)=0 → 屏障上,A 捕获 T 与 D 拦截 A 同时发生(p.5, Sec. II-C 末;Thm 3, p.9-10)。</li><li>支付函数的衔接性要求:CDG 的支付 (10) 设计成与 [30] 中 ATDDG 支付衔接,使屏障成为半透面、两 Game of Degree 在 B 上给出同一策略与同一 Value(p.5 首段;Thm 3)。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制一句话:先用 Theorem 1 的双曲型屏障把 R6 分成 Re/Rc(Game of Kind);在 Rc 内把"必死"博弈建成以<strong>终端 D-T 距离</strong>为支付的零和 Game of Degree(CDG),用双侧 PMP 证明三玩家协态全为常数 → 最优航向恒定 → 直线轨迹;最优拦截点 I* 必在 A-T Apollonius 圆上、且满足一个多项式方程 (20),三人最优策略都是"指向 I*";由此得到显式 Value V = DI − TI/α,验证其 C1 且满足 HJI;最后证明在屏障上 CDG 与 ATDDG 的解重合(V=0),屏障为半透面。关键公式:</p>
+<ul><li>动力学 (1)(p.3);终止集 (2)(p.3);支配半空间 Red (3)、区域划分 Rea/Rc/Re (4)-(5)、屏障 (6)(p.3-4)。</li><li><strong>Barrier 方程(Theorem 1, p.4)</strong>:B(x; α) = bxx xT² + byy yT² + 2bxy xT yT + 2bx xT + 2by yT + b(式 (7)),系数 bxx = cos²σ − α², byy = sin²σ − α², bxy = sin σ cos σ, bx, by, b 由式 (8) 给出,其中 cos σ = (xA−xD)/‖A−D‖, sin σ = (yA−yD)/‖A−D‖,(x0, y0) 为 A-D 中点(p.4)。</li><li>CDG 支付与 Value:(9)-(12)(p.4);终端流形超平面 (13)(p.5)。</li><li>Hamiltonian (14)(p.5):H = λxA cos χ + λyA sin χ + λxD cos ψ + λyD sin ψ + αλxT cos φ + αλyT sin φ;Isaacs 条件成立(p.5)。</li><li><strong>A-T Apollonius 圆(15)-(16)(p.5)</strong>:(x−xc)² + (y−yc)² = r²,xc = (xT − α²xA)/(1−α²), yc = (yT − α²yA)/(1−α²), r = α‖T−A‖/(1−α²)。</li><li><strong>最优策略角(Theorem 2, p.5-6)</strong>:cos φ* = (x*−xT)/‖I*−T‖, cos ψ* = (x*−xD)/‖I*−D‖, cos χ* = (x*−xA)/‖I*−A‖(式 (17)-(19),含 sin 分量)——三人皆指向捕获点 I* = (x*(x), y*(x))。</li><li><strong>捕获点方程(p.6)</strong>:I* 为 (15) 与式 (20) 联立之解;(20) 为关于 (x,y) 的多项式方程:‖I−T‖²·[(I−D)×(I−T) − α²((I−D)×(I−A) + (I−A)×(I−D) 项组合)]² − α‖I−D‖²·[(I−A)×(I−T)]² = 0(逐项见 p.6)。</li><li><strong>Value 函数(21)(p.6)</strong>:V(x) = √([x*−xD]²+[y*−yD]²) − (1/α)√([x*−xT]²+[y*−yT]²) = DI − TI/α(即 DI − AI,由 (55) TI = αAI,p.7)。</li><li>PMP 细节:ME1 (22) 与控制-协态关系 (23)-(25)(p.6);协态动力学 ˙λ = −∂H/∂x ⇒ 全部协态为常数 → 最优航向恒定、直线轨迹(p.6);增广终端值 Φa (26)、横截条件 (27)-(35)、ME1 展开式 (36)(p.6);时间关系 tf − t = AI = TI/α(式 (55), p.7);D 的终端位置 (56)(p.7);协态的纯状态表达 (57)(p.8)。</li><li><strong>C1 验证</strong>:由 (59)-(64) 证明 dV/dx* = 0(p.8),梯度 ∂V/∂x 显式 (67)-(68)(p.9)。</li><li><strong>HJI 验证</strong> (69)-(70)(p.9):利用 AI = DI、TI = αAI,化简得 ∂V/∂x · f = 0。</li><li><strong>六次多项式(Corollary 1, p.9)</strong>:x* = xc + r cos ω*, y* = yc + r sin ω*,ω* 为复变量 v = e^{iω} 的六次方程 (71) 之根,系数 a0,b0,a1,b1,a2,b2,a3 由 (72) 给出。</li><li><strong>State-space 划分与屏障上的解(Theorem 3, p.9-10)</strong>:x ∈ B 时 A-T Apollonius 圆与 A-D 中垂线 OBS 相切,切点即 I*,此时 ω* = ρ(A 到 D 的视线角),该瞄准点同时满足 (15) 与 (20),V(x|x∈B) = 0;任何其他角度 ω ≠ ρ 给出终端分离 DT &gt; 0;ATDDG([30] 中式 (15)/(77),即本文 (78))在同一瞄准点下同样取零(p.10)。</li><li>[22] 的失败机理(p.2, p.5, p.12):其以捕获时间为目标导致 Attacker 实施 Pure Pursuit,所设计策略不构成半透屏障,一方可用本文最优策略使状态穿越屏障而翻盘。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<ul><li><strong>Theorem 1(p.4)</strong>:对 0 &lt; α &lt; 1,分隔 R6 为 Re 与 Rc 的屏障面为 B(x; α) = 0,B 为 (7)-(8) 给出的关于 (xT, yT) 的二次型(系数依赖 A-D 视线角 σ、中点与 A 的位置)。前提:0 &lt; α &lt; 1;证明见 [30]。</li><li><strong>Theorem 2(p.5-6)</strong>:对 CDG (1),(9)-(12),设 x ∈ Rc、速度比 0 ≤ α &lt; 1,则 T、D、A 的最优状态反馈策略为 (17)-(19)(均指向捕获点 (x*, y*),(x*, y*) 为 (15)+(20) 之解);Value 函数 (21) 为 C1、满足 HJI PDE、在 Rc 内显式成立(证明 p.6-9,含无奇异面结论:p.5 "V and ∂V/∂x are continuous for any x ∈ Rc; hence, no singular surfaces exist")。</li><li><strong>Corollary 1(p.9)</strong>:最优捕获坐标可写为 (x*, y*) = (xc + r cos ω*, yc + r sin ω*),ω* 为六次多项式方程 (71)(系数 (72))的根。前提:同 Theorem 2。</li><li><strong>Theorem 3(p.9,证明 p.10)</strong>:当 x ∈ B(屏障面)时,CDG 与 ATDDG 给出相同的最优解与相同的 Value(V = 0),即同一瞄准点(切点,ω* = ρ)且 A 捕获 T 与 D 拦截 A 同时发生。前提:x ∈ B;Apollonius 圆与 OBS 相切 (73)。</li><li>另有三条未编号 Remark:p.3(VA &gt; VD 时 T/D 必败、本文聚焦 VA = VD、可推广到 VD &gt; VA);p.4(屏障横截面为双曲线、仅 A 支有效);p.5(CDG 支付的实战解释:D 尽量贴近 T,可利用 A 的非最优行为,状态穿入 Re 后切换 ATDDG 策略即可逃脱)。</li><li>对 [22] 的否定性结果:以反例(Example 3, p.11-12)证明 [22] 策略非最优、不构成半透屏障(p.1 摘要、p.2);p.1 摘要称本文合成的是"该微分博弈唯一提供半透屏障面的正则解"。</li></ul>
+<h2 id="sec-6">5. 实验设置</h2>
+<p>纯理论论文,仅有 3 个说明性数值算例(Sec. V, p.10-12),无统计性实验、无代码:</p>
+<ul><li><strong>Example 1(p.10, Fig. 3)</strong>:屏障上初始条件:α = 0.7,T = (7.5, −3.28), A = (7.2, −4.5), D = (3, −2);x ∈ B。最优瞄准点 I* = (6.305, −1.224) 时不变;全程 B(x(t); α) = 0;三人同时到达 I*,V = 0。指标:轨迹图 + Barrier 函数时间历程。</li><li><strong>Example 2(p.11, Fig. 4)</strong>:Rc 内最优博弈:α = 0.5,T = (6.4, 3), A = (8, 0.5), D = (1.5, −1);x ∈ Rc。所有参与者连续在线重解 (17)-(19);Barrier 函数全程为正,最优捕获点时不变,A 捕获 T。</li><li><strong>Example 3(p.11-12, Fig. 5-6)</strong>:同 Example 2 参数,但 Attacker 实施 [22] 的 Pure Pursuit(PP);T/D 实施本文 CDG 最优策略 (17)-(18) 并在区域切换 Rc→Re 时改用 ATDDG 策略(切换发生在 t ≈ 0.243, Fig. 5.a);系统于 t ≈ 4.523 进入子区 Red(Fig. 5.b 显示式 (3) 中两距离之差 AT − DT);A 在捕获 T 之前被 D 拦截。结论:PP(最小化捕获时间)在 Defender 存在时非最优,[22] 策略不提供半透面。指标:Barrier 函数、AT − DT、轨迹。</li><li>对比基线:仅 [22] 的 PP 策略(Example 3);评价指标为屏障函数符号变化、终端结局(拦截/捕获)、Value。无数值实验规模/Monte Carlo/统计指标。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li><strong>作者承认的</strong>:<ul><li>Isaacs 方法不随状态维数扩展:"Isaacs' method does not scale well as the dimension of the state increases",闭式 C1 Value 函数在高维状态空间很难获得(p.2)。</li><li>速度设置只覆盖 VA = VD:VA &gt; VD 时 T/D 无解(直接排除,p.3 Remark);VD &gt; VA 仅声明"结果可推广"而无推导(p.3 Remark);Theorem 1 证明外包给 30(p.4)。</li><li>对 [22] 的反驳基于反例而非一般性定理("We show by counterexample", p.2)。</li><li>模型为 Isaacs simple motion + 点捕获,无惯性/过载/捕获半径(正捕获半径情形仅引 [11], p.1;非机动目标仅引 [12],[13], p.1)。</li></ul></li><li><strong>我分析的(推断依据)</strong>:<ul><li><strong>等速假设是零测度参数点且结论对其不连续</strong>:按 p.3 Remark,VD 一旦低于 VA(哪怕极小),点捕获下 T/D 直接必败;而 VD &gt; VA 又是另一种屏障结构。本文的屏障 (7)-(8) 与 Value (21) 均显式使用 AI = DI(等速),对 VD/VA 失配的鲁棒性完全未讨论——工程上速度匹配不可能精确成立。</li><li><strong>Value 的非负性未被证明</strong>:V = DI − TI/α(式 (21))要是合法的"距离"支付,需在 Rc 内恒有 DI ≥ AI(D 在 A 捕获 T 之前到不了捕获点);文中从未作为引理陈述或证明,只是被 Game of Kind 结论隐含(若 DI &lt; AI 则 D 可提前到 I 拦截,与 x ∈ Rc 矛盾)。这一步是隐含的几何论证。</li><li><strong>(71) 六次多项式的根选取无规则</strong>:Corollary 1 只说 "ω* is a solution";仅屏障上证明了所选 ω* = ρ 的唯一性(p.10 "any other angle ω ≠ ρ results in DT &gt; 0"),Rc 内部的 I* 唯一性、多根时的取舍、以及状态反馈每步重解六次方程的实时计算代价均未讨论。</li><li><strong>屏障附近解的连续性/衔接只有"值相等"层面的证明</strong>:Theorem 3 证明 B 上两 Game of Degree 的 Value 与瞄准点相同,但未证明 Rc 内部的 I*(x) 当 x → B 时的极限行为(策略切换 (p.11 Example 3) 依赖在线重解,切换瞬间的策略连续性未分析)。</li><li><strong>无噪声/时延/感知误差</strong>:策略为精确状态反馈(p.4),屏障函数 B(x;α) 对 A、D 位置的测量误差的敏感度未讨论。</li></ul></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li><strong>已给出</strong>:完整动力学与归一化(p.3);屏障系数显式 (8)(p.4);Apollonius 圆 (16)(p.5);最优策略 (17)-(19)(p.5);捕获点方程 (20)(p.6);Value (21)(p.6);梯度 (67)-(68)(p.9);六次多项式及全部系数 (71)-(72)(p.9);三个算例的完整参数(α、三方初始位置)与部分结果量(I* = (6.305, −1.224)、区域切换时刻 t ≈ 0.243、进入 Red 时刻 t ≈ 4.523)(p.10-11)。</li><li><strong>缺失</strong>:源代码/仿真程序;六次多项式根的选择准则;Rc 内 I* 的唯一性证明;屏障系数计算中 σ 在 A、D 重合时的退化处理;计算复杂度/实时性数据;对 [30] 的 Theorem 1 证明(需另行获取文献);速度失配 (VD ≠ VA) 的任何数值。</li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<p>(以下为无法在原文定位出处的推测,仅供后续核验)</p>
+<ol><li>Rc 内部最优捕获点 I* 的唯一性(六次方程 (71) 在 (0, 2π) 内实根个数与选取),以及由其保证的 Value (21) 非负(V ≥ 0 ⟺ DI ≥ AI)。</li><li>I*(x) 在 Rc 内连续、且 x → B 时收敛到切点(Thm 3 只证了 B 上取值相同)。</li><li>"结果可推广到 VD &gt; VA"(p.3)是否保持同一屏障结构 (7)-(8),还是会退化为 A-D Apollonius 圆型屏障(快防御者文献中的典型几何)——本文未给任何推导。</li><li>Example 3 中区域切换时刻(t ≈ 0.243)对在线重解频率的依赖:论文称参与者"连续重解"(p.11),若离散重解,屏障函数穿越检测的时滞效应未讨论。</li><li>屏障附近 A-D-T 近共线时 (8) 中 σ、以及 (71) 系数的数值病态问题(系数含 ‖A−D‖ 归一化)。</li></ol>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>T, A, D</td><td>Target(目标机)、Attacker(攻击弹)、Defender(防御弹)</td><td>p.1(Sec. I)</td></tr>
+<tr><td>xT = (xT, yT), xA = (xA, yA), xD = (xD, yD)</td><td>三方笛卡尔位置</td><td>p.2(Sec. II-A)</td></tr>
+<tr><td>x = (xT, yT, xA, yA, xD, yD) ∈ R6</td><td>博弈完整状态</td><td>p.2(Sec. II-A)</td></tr>
+<tr><td>VT, VA, VD</td><td>三方常速度</td><td>p.2(Sec. II-A)</td></tr>
+<tr><td>α = VT/VA</td><td>速度比,0 &lt; α &lt; 1</td><td>p.2(Sec. II-A)</td></tr>
+<tr><td>φ, χ, ψ</td><td>Target / Attacker / Defender 的瞬时航向角(控制)</td><td>p.2-3(Sec. II-A, Fig. 1, 式 (1))</td></tr>
+<tr><td>uT,D = {φ, ψ}, uA = {χ}</td><td>T/D 团队与 A 的控制</td><td>p.2-3(Sec. II-A)</td></tr>
+<tr><td>S = Se ∪ Sc</td><td>终止集:D 拦截 A / A 捕获 T</td><td>p.3(式 (2))</td></tr>
+<tr><td>Red</td><td>D 的支配半空间:‖A−T‖ ≥ ‖D−T‖</td><td>p.3(式 (3))</td></tr>
+<tr><td>Rea, Re</td><td>Red 之外 B&lt;0 的逃脱区;Re = Red ∪ Rea</td><td>p.3(式 (4)-(5))</td></tr>
+<tr><td>Rc</td><td>Attacker 赢取区(Red 之外 B&gt;0)</td><td>p.3(式 (4))</td></tr>
+<tr><td>B, B(x; α)</td><td>屏障面 / 屏障函数</td><td>p.3-4(式 (4),(6))</td></tr>
+<tr><td>bxx, byy, bxy, bx, by, b</td><td>屏障二次型系数</td><td>p.4(式 (7)-(8))</td></tr>
+<tr><td>σ</td><td>A-D 视线角(cos σ, sin σ 由 A−D 方向定义)</td><td>p.4(式 (8) 下方)</td></tr>
+<tr><td>(x0(x), y0(x))</td><td>A-D 线段中点(注意与初始状态 x0 记号冲突)</td><td>p.4(式 (8) 下方;x0 为初态见 p.2)</td></tr>
+<tr><td>Red 中的 OBS</td><td>A-D 线段的中垂线(orthogonal bisector)</td><td>p.4(Remark, Fig. 2)</td></tr>
+<tr><td>CDG</td><td>Capture Differential Game:Rc 内的 Game of Degree</td><td>p.4(Sec. II-C)</td></tr>
+<tr><td>ATDDG</td><td>Active Target Defense Differential Game:Re 内的 Game of Degree([20],[21],[30])</td><td>p.2(Sec. I)</td></tr>
+<tr><td>tf, xf</td><td>终端时刻 / 终端状态(tf 自由)</td><td>p.2, p.4(Sec. II-A, II-C)</td></tr>
+<tr><td>J, Φ(xf)</td><td>支付;终端 D-T 距离型终端代价</td><td>p.4(式 (10)-(11))</td></tr>
+<tr><td>V(x0), V(x)</td><td>Value 函数</td><td>p.4(式 (12));显式 p.6(式 (21))</td></tr>
+<tr><td>Sc(超平面式 (13))</td><td>CDG 的终端流形(A-T 重合)</td><td>p.5(式 (13);4 维超平面表述见 p.4)</td></tr>
+<tr><td>H</td><td>Hamiltonian</td><td>p.5(式 (14))</td></tr>
+<tr><td>λ = (λxA, λyA, λxD, λyD, λxT, λyT)</td><td>协态(全部为常数,p.6)</td><td>p.5(Sec. III)</td></tr>
+<tr><td>ν1, ν2</td><td>增广终端代价的 Lagrange 乘子</td><td>p.6(式 (26))</td></tr>
+<tr><td>(xc, yc), r</td><td>A-T Apollonius 圆的圆心与半径</td><td>p.5(式 (15)-(16))</td></tr>
+<tr><td>I : (x, y), I* : (x*, y*)</td><td>拦截/捕获点及其最优解</td><td>p.6(式 (43);I* 见 p.6 (20) 后)</td></tr>
+<tr><td>AI, TI, DI</td><td>A / T / D 到拦截点的距离</td><td>p.6-9(式 (55);TI, DI 见式 (67)-(68))</td></tr>
+<tr><td>(x*f, y*f) 等即 (xDf, yDf)</td><td>终端时刻各方位置</td><td>p.4(Sec. II-C);式 (37)-(42), p.6</td></tr>
+<tr><td>φ*, ψ*, χ*</td><td>三方最优航向(指向 I*)</td><td>p.5-6(式 (17)-(19))</td></tr>
+<tr><td>ω*</td><td>捕获点在 Apollonius 圆上的角参数</td><td>p.9(Corollary 1, 式 (71))</td></tr>
+<tr><td>v = e^{iω}</td><td>Corollary 1 六次方程的复变量</td><td>p.9(式 (71))</td></tr>
+<tr><td>ρ</td><td>A 到 D 的视线角(屏障上 ω* = ρ)</td><td>p.10(Thm 3 证明)</td></tr>
+<tr><td>PP</td><td>Pure Pursuit([22] 中 Attacker 的策略)</td><td>p.11(Example 3)</td></tr>
+<tr><td>R, r</td><td>[22] 记号:A−T 与 A−D 间距(仅引述用)</td><td>p.3(Remark)</td></tr>
+</tbody></table></div><div class="pnav"><a href="02.html">← 02 Active Target Defense Differ…</a><a href="04.html">04 Multiple Pursuer Multiple Ev… →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

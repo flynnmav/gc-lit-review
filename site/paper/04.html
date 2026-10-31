@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>04 Multiple Pursuer Multiple Evader Differential Games · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gA">微分博弈与目标防御</span> · E. Garcia, D. W. Casbeer, A. Von Moll, M. Pachter · 2019 · arXiv 长文 (29 页) · arXiv:1911.03806 · <a href="../pdfs/04_Garcia2019_MultiPursuer-MultiEvader-Diff-Games.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">04 | Multiple Pursuer Multiple Evader Differential Games</h1>
+<blockquote>Garcia E., Casbeer D.W., Von Moll A., Pachter M. | arXiv 长文 | arXiv:1911.03806 (v1, 2019-11-09, 29页)</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>在边界防御微分博弈(BDDG)谱系中,本文把单追单逃的 Apollonius 圆解"拼接"进 N 追 vs. M 逃的团队博弈,同时求解离散的武器-目标分配(target selection)与连续的状态反馈制导:与文献 31(Stackelberg 开环 + HJB 局部近似)和 32(半开环 + pairwise outcomes 近似)不同(p.3),本文声称给出 Isaacs 意义下的<strong>完整闭式解</strong>——Value 函数连续、C¹ 且满足 HJI PDE,克服维数灾难(p.3, p.21 Remark 5);解决的是"追方数量占优(N≥M)且承诺初始分配"下的静态一次分配问题,N&gt;M 时追方用两追共捕一逃利用数量优势,再分配(renegotiation)只作为鲁棒性推论和开放问题处理。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li>状态量(原文符号):完整博弈状态 x := (x_{P1}, y_{P1}, ..., x_{PN}, y_{PN}, x_{E1}, y_{E1}, ..., x_{EM}, y_{EM}) ∈ R^{2(N+M)}(p.4);2v2 情形写作 x := (x_{E1}, y_{E1}, x_{E2}, y_{E2}, x_{P1}, y_{P1}, x_{P2}, y_{P2}) ∈ R^8(p.7);含离散分配变量的增广状态 x̄ = [x^T μ^T]^T(p.5)。</li><li>控制量(原文符号):追方团队 u_P = {ψ_i}, i=1,...,N;逃方团队 u_E = {φ_j}, j=1,...,M,均为瞬时航向角,可许集 ψ_i, φ_j ∈ [−π, π)(p.4-5)。</li><li>动力学模型(类型与方程):简单运动(simple motion,常速质点),式 (1)(p.5):ẋ_{Pi} = v_{Pi} cos ψ_i, ẏ_{Pi} = v_{Pi} sin ψ_i,ẋ_{Ej} = v_{Ej} cos φ_j, ẏ_{Ej} = v_{Ej} sin φ_j,带初始条件 x_{Pi0}, y_{Pi0}, x_{Ej0}, y_{Ej0};共 2(N+M) 个微分方程。</li><li>参与者数量与团队结构:N 个追捕者/防御者 P_i(i=1,...,N)与 M 个逃逸者/攻击者 E_j(j=1,...,M),N ≥ M(p.4);队内合作、队间非合作(p.2)。</li><li>支付/终端流形:Mayer 型终端成本 J(u_P, u_E; x_0) = Φ(x_f),Φ(x_f) := Σ_{j=1}^M y_{Ej}(t_f)(式 (3)-(4), p.5-6);终端集 T := {x̄ | ∀j, ∃i, μ_ij = 1, x_{Pi}=x_{Ej}, y_{Pi}=y_{Ej}}(式 (2), p.5,点捕获);每对 (i,j) 有两种终止方式:y_{Ej}=0(逃逸者抵达边界)或被捕获(p.5);t_f 为最后一个逃逸者被捕获的时刻,个体拦截时刻 t_{fij} 之后该对状态冻结(ẋ=ẏ=0)(p.5);Value V(x_0) := max_{u_P} min_{u_E} J(式 (5), p.6)。</li><li>机动目标:逃逸者是完全理性博弈参与者(非被动目标),简单运动;论文证明最优策略要求双方以最大速度运动,故记 v_{Pi} = v*_{Pi} = v̄_{Pi}、v_{Ej} = v*_{Ej} = v̄_{Ej}(p.4)。</li><li>约束(输入/状态/视场):输入仅有航向角 ∈ [−π,π),速度取常值上界;分配约束:每个追捕者至多分配一个逃逸者 Σ_{j=1}^M μ_ij ≤ 1(p.5),终端集允许一个逃逸者被多个追捕者共同捕获(N&gt;M 情形,p.5);博弈在半平面 y ≥ 0 进行,边界为 x 轴(p.5);点捕获;视场约束:未提及(隐含全状态可观测,p.12 Remark 2 "all agents are aware of the state of the system")。</li><li>噪声/时延:未提及。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>N ≥ M(追方数量不劣于逃方)(p.4, Sec. II)。</li><li>追方速度优势:对所有 i,j 有 α_ij = v_{Ej}/v_{Pi} &lt; 1(p.4);作者注明可推广到"部分追捕者慢于部分逃逸者"的情形——只需在分配上加约束(慢追捕者不分配给快逃逸者),但未展开分析(p.4)。</li><li>速度异质(不假设同速):v_{Pi}、v_{Ej} 各不相同,成对定义速度比;追捕者之间也可不同速,定义追-追速度比 α_{i'i} = v_{Pi}/v_{Pi'} &lt; 1(P_{i'} 为较快者)(p.15)。</li><li>最优性下全员最大速度、航向恒定(p.4, Theorem 1 p.7)。</li><li>简单运动动力学,无转弯半径/过载/自动驾驶仪动态(p.4-5, 式 (1))。</li><li>二维平面假设:边界为 x 轴直线,博弈域为半平面 y ≥ 0(p.5)。</li><li>点捕获(point capture)(p.5)。</li><li>一个追捕者至多捕一个逃逸者:Σ_j μ_ij ≤ 1;但一个逃逸者可被至多两个追捕者同时捕获("up to two (but not more)", p.27)(p.5, p.27)。</li><li><strong>坚定承诺(firm commitment)</strong>:μ_ij(t) = μ_ij(t_0),追方锁定初始分配、交战中不换目标(p.6);第 VI 节放宽该假设仅得鲁棒性结果(Corollary 1, p.24)。</li><li>关注 Game of Degree,且只在追方必胜域 R_P ⊂ R^{2(N+M)} 内求解(域内保证全部逃逸者被捕获);策略同时给出 Game of Kind 的解(Remark 4, p.5, p.21)。</li><li>被捕获个体状态冻结(ẋ_{Pi} = ẏ_{Pi} = ẋ_{Ej} = ẏ_{Ej}, t ≥ t_{fij})以保证解的正则性、让博弈持续到最后一个逃逸者被捕获(p.5)。</li><li>角色固定:P 队永远追、E 队永远逃(BDDG 场景设定,p.2),全文未提及角色转换。</li><li>全状态信息:每个参与者都知道系统完整状态,可各自独立算出完整解(p.12 Remark 2)。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制一句话:对每个追-逃对 (P_i, E_j) 作 Apollonius 圆(圆内为 E_j 的支配区、圆外为 P_i 的支配区,p.7),单对最优拦截点取圆的最低点 y_ij = y_{cij} − r_{ij}(p.9);把 N=M 的所有可行分配 A_ι 枚举,每个分配的团队支付是若干个"圆最低点"之和,取 max 得 Value;N&gt;M 时用两个 Apollonius 圆相交的透镜区收缩逃逸者支配区、构造两追共捕项;最后逐项验证 V 连续、C¹、满足 HJI。关键公式:</p>
+<ul><li>对 (P_i,E_j) 的 Apollonius 圆最低点(= 该对的支付项),式 (8)(p.7): y_ij(x) = (y_{Ej} − α²_ij y_{Pi} − α_ij d_ij)/(1 − α²_ij),其中 d_ij = √((x_{Ej}−x_{Pi})² + (y_{Ej}−y_{Pi})²)(式 (13), p.8)。</li><li>Apollonius 圆心与半径(式 (22), p.14):x_{cij} = (x_{Ej} − α²_ij x_{Pi})/(1 − α²_ij),y_{cij} = (y_{Ej} − α²_ij y_{Pi})/(1 − α²_ij),r_ij = α_ij d_ij/(1 − α²_ij)。</li><li>2v2 两种分配的支付 y_{s1} = y_{11}+y_{22},y_{s2} = y_{12}+y_{21}(式 (9), p.7);最优分配 ι* = arg max_{ι=1,2} y_{sι}(p.9)。</li><li>一般分配支付,式 (18)(N=M, p.12)与式 (24)(N&gt;M, p.16):y_{sι}(x) = Σ_{j=1}^M μ^ι_ij y_ij(x);可行分配 = 所有配对的 Apollonius 圆不与 x 轴相交(图 2 示例,p.12-13)。</li><li>最优状态反馈航向 = 指向最优瞄准点的单位向量(式 (10) p.8,式 (19) p.13);瞄准点闭式(式 (11)-(12) p.8,式 (20) p.13):x*_{Ej} = x*_{Pi} = (x_{Ej} − α²_ij x_{Pi})/(1 − α²_ij),y*_{Ej} = y*_{Pi} = (y_{Ej} − α²_ij y_{Pi} − α_ij d_ij)/(1 − α²_ij)(对 μ*_ij = 1 的配对)。</li><li>N&gt;M 协同追捕:两追共捕时逃逸者支配区收缩为两圆交集(透镜形),最低点在两圆交点 I(图 3.a, p.13-14);追-追 Apollonius 圆(式 (23), p.15)用于确定两追捕者同时到达的点;两 E-P 圆相减得根轴线性方程 2(x_{ci'j}−x_{cij})x + 2(y_{ci'j}−y_{cij})y = R_ij(式 (28), p.17),代入 (23) 得 y 的二次方程(式 (29), p.17),其适用解即同时捕获支付项: V_s(x) = (F_ij − √((x_{cij}−x_{ci'j})² G_ij))/D_ij(式 (25), p.16),系数 F_ij, G_ij, D_ij, R_ij 见式 (26)(p.17);同时捕获瞄准点 x* = [R_ij − 2(y_{ci'j}−y_{cij})V_s]/(2(x_{ci'j}−x_{cij})),y* = V_s(式 (27), p.17)。</li><li>HJI 验证:−∂V/∂t = ∂V/∂x·f + g 中 ∂V/∂t = 0、g = 0(p.10),代入最优航向后逐项抵消,∫V/∂x·f = 0(2v2:式 (16)-(17), p.10-11;N&gt;M 的 V_s 项:式 (34)-(39), p.19-21)。</li><li>分配问题的 LP 形式:max J = ΣΣ y_{i,j} μ_{i,j} s.t. Σ_i μ_{i,j} = 1(每个逃逸者恰一个追捕者)、Σ_j μ_{i,j} = 1(每个追捕者恰一个逃逸者)(式 (43)-(45), p.26-27),可用匈牙利算法求解 [37];N&gt;M 时允许每逃逸者至多两追,需计算的距离数为 M!N!/[(N−M)!]²(2M−N)(p.27)。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<ul><li><strong>Theorem 1</strong>(p.7):最优 play 下所有参与者航向恒定、最优轨迹为直线。前提:简单运动 + Mayer 型成本。</li><li><strong>Theorem 2</strong>(p.7-11):2v2 BDDG(α_ij &lt; 1,x ∈ R_P,承诺初始分配):V(x) = y_{s1}(若 y_{s1} &gt; y_{s2})或 y_{s2}(若 y_{s2} &gt; y_{s1});V 连续、连续可微(dispersal surface y_{s1} = y_{s2} 上除外)、满足 HJI;最优状态反馈航向 (10)、瞄准点 (11)-(12)。证明中给出梯度 (14)(p.10)并证明 dispersal surface 上两种分配等优、V 连续但不可微(p.11)。</li><li><strong>Remark 1</strong>(p.11):虽承诺分配,航向 (10) 是状态反馈律,可在线利用逃方任何非最优机动,且终端支付只会增大(对追方有利)。</li><li><strong>Remark 2</strong>(p.12):每个 agent 无需通信即可独立计算完整解(分配+全员航向);仅在 dispersal surface 上需一次通信去冲突(deconfliction),否则两追可能同捕一逃、放跑另一逃。</li><li><strong>Theorem 3</strong>(p.12-13):N=M 的 N vs. M BDDG(α_ij &lt; 1,x ∈ R_P):V(x) = max_ι y_{sι}(x),最优分配 ι* = arg max_ι A_ι;V 连续、C¹(dispersal surface y_{sι} = y_{sι'} 除外)、满足 HJI;航向 (19)、瞄准点 (20)。证明沿用 Theorem 2,略。</li><li><strong>Remark 3</strong>(p.14):两个 E-P Apollonius 圆相交是同时捕获的必要而非充分条件;逃逸者恒在两圆内部,故两圆从不互斥;圆相交但单圆弧最低点更低时仍单追捕获(图 3.b 数值例:交点 y=7.846 &gt; 单圆最低点 y=7.642,p.14-15)。</li><li><strong>Theorem 4</strong>(p.17-21):N&gt;M 的 BDDG(α_ij &lt; 1,x ∈ R_P):V(x) = max_ι y_{sι}(x),其中单追捕获项为 (8)、两追同时捕获项为 V_s(x) (25);V 连续、C¹(dispersal surface 除外)、满足 HJI;瞄准点为 (20)(单捕)或 (27)+(y* = V_s)(共捕);最优航向仍为 (19)。证明中论证 D ≠ 0、G ≠ 0 在相关区域恒成立(p.19)。</li><li><strong>Remark 4</strong>(p.21):N&lt;M 时按问题设定逃方必胜(M−N 个逃逸者可达边界);Game of Kind:若最优分配中每个 y_ij &gt; 0 则边界完全可保(V &gt; 0),否则只能部分保护、最优分配最小化突防逃逸者数量。</li><li><strong>Remark 5</strong>(p.21):闭式解随参与者数量扩展性好;可行分配枚举只在交战开始时做一次(承诺假设下)。</li><li><strong>Corollary 1</strong>(p.24):2v2 无承诺(不锁定初始分配)博弈中,承诺情形的追方策略 (40)-(42) 构成无承诺博弈的鲁棒状态反馈策略,保底支付 y_s = max(y_{s1}, y_{s2})。前提:α_ij &lt; 1,x ∈ R_P。</li><li><strong>Remark 6</strong>(p.24-25):何时换分配有利与 dispersal surface 相关,是开放问题;并明确 y_s 只是追方可达支付的<strong>下界</strong>,不是无承诺博弈的值。</li><li><strong>Remark 7</strong>(p.25):放宽承诺后可用"协同 + 换班"(cooperation and switch)扩展 R_P:两追先共捕收缩逃逸者支配区,随后其一脱离转攻其他目标。</li><li><strong>Appendix A 结果</strong>(p.25-26,非正式命题):3P1E 边界防御中,第三个追捕者不提升支付(图 6.b 中三圆共点时去掉任一冗余追捕者拦截点不变),故无需考虑三追共捕;拦截点唯一 ⇒ 无奇异面,saddle point 状态反馈策略存在;对比 [36] 的 capture-time 成本则可出现三追同时捕获。</li></ul>
+<p>定理/命题计数:4 个定理 + 1 个推论 + 7 个注释(Remark)+ 附录 2 项非正式结果。</p>
+<h2 id="sec-6">5. 实验设置</h2>
+<p>有数值算例(非大规模仿真):</p>
+<ul><li><strong>Example 1(2v2,p.21-23,图 5)</strong>:P1 = (−1.5, 4.2),P2 = (9.3, 4.5),E1 = (4.1, 11),E2 = (5.5, 12.2);速度 v_{P1} = 1, v_{P2} = 1.04, v_{E1} = 0.81, v_{E2} = 0.77(异质速度)。<ul><li>1.1 最优博弈:y_{s1} = 10.696 &gt; y_{s2} = 8.288 ⇒ μ11 = μ22 = 1,V = 10.696;瞄准点 (14.784, 3.225) 与 (0.890, 7.472);最优瞄准点沿轨迹时不变(p.22)。</li><li>1.2 逃方按错误分配优化(假设 P2 追 E1):终端支付 16.632 &gt; V = 10.696,逃方被拦在离边界更远处。</li><li>1.3 追方改用 Pure Pursuit(PP)制导(分配正确):P2 拦截点更靠近 x 轴,P1 未能在 E1 抵达边界前捕获(防御失败)——正确分配 + 错误制导即显著劣化(p.22-23)。</li><li>1.4 追方用错误分配 + 该分配下的最优制导:支付 y_{s2} = 8.288 &lt; V = 10.696。</li></ul></li><li><strong>几何示例</strong>:图 2(3v3 可行分配判定,p.13)、图 4 + Table I(3P vs 2E 的 6 个可行分配 A1–A6 及 μ_ij,p.15-16)、图 3(两追共捕一逃的透镜支配区,p.15)、图 6(3P1E 三圆共点特例,p.26)。</li><li>规模:最大 3v3(仅几何示意),动态仿真仅 2v2;对比基线:Pure Pursuit 制导与错误分配/错误制导;评价指标:终端捕获点距边界 y 向距离之和 Σ y_{Ej}(t_f) 与 V 的比较。无 Monte Carlo、无统计指标、无计算时间测量。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li><strong>作者承认的</strong>:<ul><li>承诺假设:追方锁定初始分配不换目标(p.6);无承诺 2v2 只得到保底下界 y_s,真正的 Value 未求出(Remark 6, p.25;附录 B p.27 "the Value of the game has not been found");何时换分配有利是开放问题(p.24-25)。</li><li>N &lt; M 未解决:按设定逃方必胜,只定性建议追方"尽量多拦 + 拦最远的 N 个"(Remark 4, p.21)。</li><li>每个逃逸者最多两追共捕,"up to two (but not more)"(p.27);三追共捕无增益仅在 3P1E 附加例中论证(p.26)。</li><li>部分追捕者慢于部分逃逸者的情形只提出"用分配约束规避",未分析(p.4)。</li><li>扩展方向(诱饵 decoys、牺牲型自损、目标重要性分级)留待未来研究(p.23, Sec. VI)。</li><li>dispersal surface 上 V 不可微,需要一次通信事件去冲突(Remark 2, p.12;Theorem 2 证明, p.11)。</li></ul></li><li><strong>我分析的</strong>(推断依据):<ul><li>简单运动假设忽略转弯半径、过载限制与自动驾驶仪滞后(依据:式 (1) 仅为常速质点,p.5),直接映射到飞行器/导弹需松弛模型;论文的导弹拦截动机(p.6)与该假设有落差。</li><li>二维 + 直线静态边界(p.5),未涉及三维空间、弯曲或多段边界、多个防御资产。</li><li>支付 Σ y_{Ej}(t_f) 线性可加、无权重(依据:式 (4), p.6),无法表达不同逃逸者威胁等级差异——作者也承认重要性分级是未来工作(p.23)。</li><li>可行分配枚举复杂度为阶乘级 M!N!/[(N−M)!]²(2M−N)(p.27),作者以"仅算一次"辩护扩展性(p.21),但对大规模 N、M 仍构成瓶颈,且全文无运行时间数据支撑"real time 实现可行"(p.3)的论断。</li><li>完美信息、无噪声/时延/传感视场约束(全文未提及),与实际拦截场景的 BDA/量测噪声不符。</li><li>被捕获个体冻结(p.5)与承诺绑定,意味着已捕获的追捕者不可再分配,进一步限制 N&gt;M 剩余兵力的动态利用(Remark 7 的 cooperation-and-switch 仅在无承诺下定性讨论, p.25)。</li><li>鲁棒性结论只由单点算例(例 1.2-1.4)展示,无系统性量化(依据:第 V 节仅 4 个轨迹图, p.21-23)。</li></ul></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li><strong>已给出</strong>:全部闭式公式——动力学 (1)、支付 (3)-(4)、Apollonius 圆最低点 (8)、2v2 航向/瞄准点 (10)-(13)、分配支付 (18)/(24)、圆参数 (22)、追-追圆 (23)、共捕项 (25)-(29)、梯度 (14) 与 (30)-(33)、无承诺策略 (40)-(42)、LP (43)-(45);Example 1 完整初值、速度与数值结果(y_{s1} = 10.696, y_{s2} = 8.288, V, 瞄准点坐标, p.21-22);图 1-6 几何示意;Table I 分配列表;指认匈牙利算法 [37]。</li><li><strong>缺失</strong>:无代码或数据发布;例 1.2-1.4 非最优轨迹的数值积分格式(步长、PP 制导离散化)未说明;图 2、图 4 对应场景的坐标数值未给出(仅有图);Table I(3P vs 2E)场景的初值未给;无统计性/ Monte Carlo 验证;R_P 之外(边界上、圆与 x 轴相切)的行为未给算法处理。</li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<p>(以下为无法在原文定位到严格出处的推测)</p>
+<ul><li>p.11 称 dispersal surface 上"追方选任一等优分配都不损失性能"——正文仅一句话论断,未见形式化证明。</li><li>V 在 R_P 边界(某 y_ij = 0、Apollonius 圆与 x 轴相切处)附近是否以粘性解意义满足 HJI,论文未讨论;HJI 验证似乎只在 R_P 内部成立(Theorem 2-4 均以 x ∈ R_P 为前提)。</li><li>Corollary 1 的鲁棒性论证(p.24)默认逃方在给定分配下的最优响应是奔向圆最低点;若逃方策略故意诱导追方越过 dispersal surface 后再变向,能否突破下界 y_s 未被排除(Remark 6 承认相关问题是开放的)。</li><li>可行分配枚举中如何自动排除"两圆相交但共捕并非最优"的情形(图 3.b, p.14-15)——文中是几何判读,未见算法化判据。</li><li>N&gt;M 时若最优分配需要两个以上追捕者共捕才能保住 V &gt; 0(单个追捕者的圆均与 x 轴相交)的场景,枚举流程是否完备,原文未明确讨论(仅 Remark 7 定性提及 cooperation and switch 可扩展 R_P, p.25)。</li></ul>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>N, M</td><td>追捕者(防御者)数、逃逸者(攻击者)数</td><td>p.4, Sec. II</td></tr>
+<tr><td>P_i, E_j</td><td>第 i 个追捕者、第 j 个逃逸者</td><td>p.4</td></tr>
+<tr><td>v_{Pi} ∈ [v_{Pi}, v̄_{Pi}]</td><td>P_i 的速度下/上界</td><td>p.4</td></tr>
+<tr><td>v_{Ej} ∈ [v_{Ej}, v̄_{Ej}]</td><td>E_j 的速度下/上界</td><td>p.4</td></tr>
+<tr><td>α_ij = v_{Ej}/v_{Pi}</td><td>追-逃速度比(&lt; 1)</td><td>p.4</td></tr>
+<tr><td>α_{i'i} = v_{Pi}/v_{Pi'}</td><td>追-追速度比(P_{i'} 较快,&lt; 1)</td><td>p.15</td></tr>
+<tr><td>x_{Pi} = (x_{Pi}, y_{Pi}), x_{Ej} = (x_{Ej}, y_{Ej})</td><td>各参与者的笛卡尔坐标状态</td><td>p.4</td></tr>
+<tr><td>x ∈ R^{2(N+M)}</td><td>博弈完整状态</td><td>p.4</td></tr>
+<tr><td>u_P = {ψ_i}, u_E = {φ_j}</td><td>两队的控制(瞬时航向角集合)</td><td>p.4</td></tr>
+<tr><td>ψ_i, φ_j ∈ [−π, π)</td><td>可许控制(航向角)</td><td>p.5</td></tr>
+<tr><td>μ_ij</td><td>二元分配变量(P_i 分配给 E_j 时为 1)</td><td>p.5</td></tr>
+<tr><td>μ = {μ_ij}, x̄ = [x^T μ^T]^T</td><td>分配变量集合、增广状态</td><td>p.5</td></tr>
+<tr><td>R_P</td><td>追方必胜域(Game of Degree 的定义域)</td><td>p.5</td></tr>
+<tr><td>T</td><td>终端集(全部逃逸者被捕获)</td><td>p.5, 式 (2)</td></tr>
+<tr><td>t_f, t_{fij}</td><td>终端时刻(最后捕获)、单对拦截时刻</td><td>p.5</td></tr>
+<tr><td>J, Φ(x_f) = Σ_j y_{Ej}(t_f)</td><td>Mayer 型终端支付</td><td>p.5-6, 式 (3)-(4)</td></tr>
+<tr><td>V(x_0) = max_{u_P} min_{u_E} J</td><td>博弈的 Value</td><td>p.6, 式 (5)</td></tr>
+<tr><td>λ</td><td>协态向量 ∈ R^{2(N+M)}</td><td>p.6, 式 (6)</td></tr>
+<tr><td>H</td><td>Hamiltonian</td><td>p.7, 式 (7)</td></tr>
+<tr><td>S, I = (x_I, y_I)</td><td>Apollonius 圆上的点、拦截点</td><td>p.7</td></tr>
+<tr><td>y_ij(x)</td><td>配对 (P_i, E_j) 的 Apollonius 圆最低点 y 坐标(该对支付项)</td><td>p.7, 式 (8)</td></tr>
+<tr><td>y_{s1}, y_{s2}</td><td>2v2 两种分配的团队支付</td><td>p.7, 式 (9)</td></tr>
+<tr><td>d_ij</td><td>P_i 与 E_j 间距离</td><td>p.8, 式 (13)</td></tr>
+<tr><td>x*_{Ej}, y*_{Ej}, x*_{Pi}, y*_{Pi}</td><td>最优瞄准点(aimpoints)</td><td>p.8, 式 (11)-(12)</td></tr>
+<tr><td>(x_{cij}, y_{cij}), r_ij</td><td>Apollonius 圆圆心、半径</td><td>p.9(闭式 p.14, 式 (22))</td></tr>
+<tr><td>A_ι, ι, ī</td><td>可行分配、分配索引、可行分配总数</td><td>p.9(2v2)、p.12(一般)</td></tr>
+<tr><td>y_{sι}(x) = Σ_j μ^ι_ij y_ij(x)</td><td>分配 A_ι 的团队支付</td><td>p.12, 式 (18);N&gt;M 版 p.16, 式 (24)</td></tr>
+<tr><td>μ*_ij, ι*</td><td>最优分配变量、最优分配索引</td><td>p.12</td></tr>
+<tr><td>V_s(x)</td><td>两追同时捕获的支付项</td><td>p.16, 式 (25)</td></tr>
+<tr><td>F_ij, G_ij, D_ij, R_ij</td><td>V_s 的中间系数</td><td>p.17, 式 (26)</td></tr>
+<tr><td>R_{P^{ι*}}</td><td>最优分配 ι* 含同时捕获项的region</td><td>p.19</td></tr>
+<tr><td>y_s(x)</td><td>无承诺博弈中追方的保底支付(下界)</td><td>p.24, Corollary 1</td></tr>
+</tbody></table></div><div class="pnav"><a href="03.html">← 03 The Complete Differential Ga…</a><a href="05.html">05 Optimal Strategies for Guard… →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

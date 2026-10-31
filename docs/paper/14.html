@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>14 Integrated and Adaptive Guidance and Control for Endoatmospheric Missiles via Reinforcement Meta-Learning · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gC">强化学习制导</span> · B. Gaudet, R. Furfaro · 2023 · AIAA Scitech 2023 预印本 · arXiv:2109.03880 · <a href="../pdfs/14_Gaudet2023_Integrated-GC-Endoatmospheric-RL.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">14 | Integrated and Adaptive Guidance and Control for Endoatmospheric Missiles via Reinforcement Learning</h1>
+<blockquote>Gaudet B., Furfaro R. | AIAA Scitech 2023 预印本 | arXiv:2109.03880 (v6) 注:PDF 第 1 页标题实为 "...via Reinforcement <strong>Meta-Learning</strong>"(p.1),arXiv 列表标题为 "...via Reinforcement Learning"。本笔记页码均为 PDF(=文内印刷)页码。</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>单环(single-loop)制导-控制一体化:策略网络把导航系统输出(捷联导引头 LOS、速率陀螺、加速度计的少量处理后信号)直接映射为四个舵面偏转角速率指令,用 meta-RL(recurrent PPO)在"环境系综"(气动参数/罩体折射/目标机动/初始条件随机)上训练,GRU 隐状态 h 在部署时在线自适应而权重冻结(p.2, p.12-13)。相对分离式设计(PN 制导律 + 三回路自动驾驶仪 + 增益调度),一体化避免了频谱分离假设在交战末段失效的问题、可利用欠阻尼弹性体响应、且无需难以测量的高度/速度/攻角(p.1-2, p.20)。在 Gaudet-Furfaro 系列中的位置:将其大气层外拦截工作([11], JSR 2021)推广到大气层内 6-DOF 空空导弹,新增非线性气动模型、radome 寄生姿态回路、柔性体动力学等大气层内特有要素(p.2)。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<p><strong>总体</strong>:6-DOF 刚体 + 3-DOF 质点目标;拦截段为火箭燃尽后的末段(p.8);决策频率 100 Hz(导航采样 0.01 s,p.7)。</p>
+<ul><li><strong>状态量/观测量</strong>:真实状态 x 为 6-DOF 状态(r_M, v_M, 姿态四元数 q, ω)加目标 (r_T, v_T)(Eqs. 16-22, p.11-12)。RL 观测(Eq. 29, p.14): o = [λ_obs^S, Ω, v_c_obs, r_obs, q_obs, ω_obs^B, a_obs^B, θ_defl] 即稳定化 LOS 单位向量(3)、LOS 转率 Ω(3)、接近速度 v_c_obs(1)、距离 r_obs(1)、姿态四元数 q_obs(4)、本体角速度 ω_obs^B(3)、本体加速度 a_obs^B(3)、指令舵偏 θ_defl(4)(推算共 22 维,原文未写数值)。关键点:不含高度、速度、攻角、侧滑——只用导引头+速率陀螺+加速度计可得的量(p.2, p.14);q_obs = q_init ∘ dq(q_init 由载机装订,p.8)。IR 导引头版本去掉 r_obs 与 v_c_obs(p.19)。</li><li><strong>动作空间</strong>(p.8):u = c_θ(o) ∈ R⁴,连续,解释为<strong>舵面偏转角速率指令</strong>:水平组合(上下舵同向)、垂直组合(左右舵同向)、水平差动、垂直差动。角速率限幅:组合 80°/s、差动 1°/s;积分后舵偏限幅:组合 20°、差动 0.1°;合成 θ_LT = θ_H−Δθ_H, θ_RT = θ_H+Δθ_H, θ_BT = θ_V−Δθ_V, θ_UT = θ_V+Δθ_V(p.8)。</li><li><strong>动力学模型</strong>:刚体 6-DOF(Eqs. 15-22, p.11-12):α = arctan(w/u),β = arcsin(v/‖v^B‖)(15);J ω̇ = −[ω×]Jω + L^B(16);四元数运动学(18);v̇^B = −[ω×]v^B + F^B/m + [C_BN(q)]^T0 0 g(19),g = −9.81 m/s²;NED 旋转 180° 得交战系速度 v_M(20);ṙ_M = v_M(21);目标 ṙ_T = v_T, v̇_T = a_T(22)。RK4 积分,&gt;40 m 用 10 ms 步长,最后 40 m 用 0.1 ms(脱靶量测准到 0.2 m,借自 Zarchan [25],p.12)。<strong>气动模型</strong>(II.F, p.8-10):细长体+牛顿碰撞理论(slender body and Newtonian impact theory),沿用 Zarchan [22] 导弹几何并扩展到 6-DOF(含滚转耦合):C_N、C_Y 按鼻/翼/身/尾四分量向量给出(Eq. 10a-b,含 8S_WING sinα/(ηS_REF)、1.5S_PLAN sign(α)sin²α/(ηS_REF)、8S_TAIL sin(α−θ)/(2ηS_REF) 等),η = √(M²−1)(p.5);轴向力 C_A = C_A0 + k·‖‖[ΣC_N ΣC_Y]‖‖,k=4,C_A0=0.35(Eq. 11a);俯仰/偏航/滚转力矩(Eq. 12a-e,C_l_damp=−5,C_lβ=C_lα=0.1);F^B = qS_REF[−C_A, −ΣC_Y, −ΣC_N],L^B(Eq. 13a-b);动压 q_o = ½ρV²;指数大气 ρ = ρ_0 e^{−h/h_s},ρ_0=1.225 kg/m³,h_s=7018.00344 m(p.11);M 用标准大气温度模型。几何参数(p.8, Fig. 6):d=0.31, h_W=0.63, c_RW=1.88, c_RT=0.63, h_T=0.63, x_HL=6.09, x_L=6.25, x_CG=3.13, x_N=0.94(m);惯性张量按圆柱近似 J = m·diag(r²/2, (3r²+x_L²)/12, (3r²+x_L²)/12),r=d/2,m=455 kg(Eq. 14, p.10)。<strong>气动系数扰动</strong>:每回合开始对力和力矩系数乘 (1+ε_coeff),ε_coeff∈[−0.1,0.1],以 p=0.5 概率逐回合均匀抽取、否则固定 ±ε_coeff(Table 4, p.11)。</li><li><strong>目标机动模型</strong>(II.A, p.4-5):质点目标,有动力、机动中保持恒速;气动舵控制(无推力矢量);加速度垂直于 v_T;等概率选 bang-bang / weave / jinking 之一,幅值、起始时刻、持续时间、切换时刻随机;回合开始以 0.5 概率取最大加速度、0.5 概率均匀抽取;最大加速度按动压折减:a_max·(q_T/q_T^MAX)(q_T^MAX 为海平面最大速度对应动压);参数范围见 Table 1(p.5):距离 5-10 km、高低角 θ_E ±30°、v_M 800-1000 m/s、v_T 250-600 m/s、速度锥半顶角 θ_vT=30°、航向误差 HE 0-5°、初始 α ±10°、β ±5°、滚转 ±30°、目标最大加速度 0-8×9.81 m/s²、bang-bang 时长 1-8 s/起始 0-6 s、weave 周期 1-8 s/偏置 1-5 s。</li><li><strong>奖励函数</strong>(Eqs. 30a-30f, p.14):<ul><li>r_shaping = α·exp(−‖Ω‖²/σ_Ω²),α=1,σ_Ω=0.02(每步,高斯型 LOS 转率惩罚);</li><li>r_rollrate = β|ω_x|,β=−0.05(抑制滚转速率,差动舵只用于抵消 α/β 引起的滚转力矩);</li><li>r_ctrl = δ·‖‖[θ_LT θ_RT θ_BT θ_UT]‖‖,δ=−0.01(控制量惩罚);</li><li>r_bonus = ε(若 r_TM &lt; r_lim 且 done),ε=10,r_lim=10 m(终端奖励);</li><li>r_penalty = ζ(违反任一路径约束时),ζ=−10;</li><li>r = r_shaping + r_ctrl + r_bonus + r_penalty。折扣率:shaping 用 0.95,终端奖励用 0.995(p.14)。</li></ul></li><li><strong>约束</strong>(Table 2, p.5):最小速度 400 m/s(保证 M&gt;1 以免 η=√(M²−1) 失效);俯仰/偏航 ±85°、滚转 ±100°、滚转角速率 ω_x ±15°/s(作者说明姿态约束非必需,只为加速优化);视线角 θ_L ≤ 45°(视场约束);过载 ‖[F_B^y, F_B^z]‖ ≤ 45 g。执行器约束:舵偏速率 80°/s(组合)/1°/s(差动)、舵偏 20°/0.1°(p.8)。终止条件:V_c&lt;0、速度&lt;400 m/s 或违反路径约束(p.14)。</li><li><strong>噪声/时延</strong>(II.B-D, p.6-7):radome 折射 θ_R 随视线角 θ_L 非线性变化(Eq. 2a-b,A_u,A_v∈±10 mrad,k_u,k_v∈[1,3],Table 3);导引头 LOS 测量噪声 q_N = N(μ,σ_LOS,3) 随机欧拉旋转,σ_LOS=1 mrad;速率陀螺:标度因子误差 ε_ω=0.001(每回合均匀)+ 高斯噪声 σ_ω=0.001(Eq. 3a);加速度计:标度因子 ε_acc=0.001,无加性噪声(Eq. 4a);LOS 稳定依赖 dq_obs 四元数积分(Eq. 5),有标度误差即稳定不完美 → 寄生姿态回路;<strong>不建模 Kalman 滤波</strong>,用单极点低通(τ=0.01 s)替代,Ω 计算中 v_TM 用真值加 1 mrad 噪声再低通(p.7);传感器/执行器传输时延未建模(仅执行器一阶滞后)。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>只仿真火箭燃尽后的末段,质心恒定、不建模助推段(p.2 "we decided to simplify the problem by not modeling the rocket boost phase";p.8)。</li><li>气动模型为细长体+牛顿碰撞的<strong>解析公式模型</strong>(非 CFD/风洞数据表),几何取自 Zarchan [22];原文未提供对外发布的气动系数数据表,系数由公式+几何参数生成(p.8-10)。</li><li>目标为质点、有动力恒速、气动控制(无 TVC),最大过载随动压折减,不自主动态规避(按预设机动族机动,p.4)。</li><li>训练时导弹-目标加速度优势 5:1(目标 ≤8g),测试到 2:1(目标 20g)(p.4)。</li><li>radome 对称,折射角仅随视线角变化(Eq. 2, p.6);radome 参数每回合随机抽取(Table 3)。</li><li>不建模非线性 Kalman 滤波,以单极点低通 + 真值 v_TM 加噪替代(p.7)。</li><li>LOS 稳定化所用姿态增量 dq_obs 由受扰 ω 积分得到,积分用 RK4 近似(p.7)。</li><li>q_init 可由发射载机精确装订(p.8)。</li><li>惯性张量按圆柱近似(r = d/2)(p.10)。</li><li>优化时执行器为一阶滞后(τ=0.01 s),二阶模型(ζ_ACT=0.7, ω_ACT=600 rad/s)只用于测试;原因是二阶高频极点会迫使减小积分步长、拖慢优化(p.8)。</li><li>柔性体动力学只在测试中加入、不参与优化;高频模态需 1 ms 步长、仿真慢 10 倍(p.17)。</li><li>无风扰动模型(全文未提及风);无传感器时延/镜象闪烁(glint)模型(benchmark 中明确"removed glint and fading noise", p.15)。</li><li>部署(测试)时关闭探索噪声(p.16)。</li><li>观测自适应缩放("adaptively scale the observations")与 ε、学习率一起伺服到 KL 目标 0.001(p.14),机制细节未展开。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制一句话:用带 GRU 循环层的策略 π_θ(u|o) 实现单环一体化 G&amp;C,在由 6-DOF 仿真器实例化的环境系综(交战场景、气动系数、radome 参数等逐回合随机,p.12-13)上以定制 PPO 优化;循环层隐状态 h 随 (o,u) 历史演化,训练中学会从历史推断当前气动模型/工况,从而在部署时对训练分布外的新环境实现前缀自适应(meta-RL / learning-to-learn 范式,引 [26]),<strong>网络权重部署时冻结,自适应只经 h 的演化完成</strong>(p.2, p.12-13)。奖励用 LOS 转率高斯整形 + 滚转率惩罚 + 控制量惩罚 + 命中 bonus + 约束违反罚,通过"违反约束即截断正整形奖励流"把路径约束硬性引入(p.14)。</p>
+<p>关键公式(标页码):</p>
+<ul><li>概率比 p_k(θ) = π_θ(u_k|o_k)/π_θold(u_k|o_k)(Eq. 23, p.13)。</li><li>PPO 目标:obj1 = p_k(θ)A_w^π(o_k,u_k);obj2 = clip(p_k(θ)A_w^π(o_k,u_k), 1−ε, 1+ε);J(θ) = E_{p(τ)}min(obj1, obj2)(Eqs. 24a-c, p.13)。</li><li>优势估计(经验回报减学习基线,非 GAE):A_w^π(x_k,u_k) = [Σ_{ℓ=k}^T γ^{ℓ−k} r(x_ℓ,u_ℓ)] − V_w^π(x_k)(Eq. 25, p.13);值函数损失 L(w) = (1/2M)Σ(V_w^π(x_k^i) − 经验回报)²(Eq. 26, p.13);梯度上升/下降更新(Eqs. 27-28, p.14)。</li><li>自定义实现:观测自适应缩放;ε(clip)与学习率伺服至 KL 散度目标 0.001(p.14);每次更新用 30 回合 rollout(p.14)。</li><li>LOS 转率:Ω = r_obs λ_obs^S × v_TM^S / r_obs²(Eq. 6, p.7);IR 备用替代 Ω_surr = λ_obs^S(t)×λ_obs^S(t−Δt)/Δt(Eq. 7, p.8)。</li><li>radome:θ_u = A_u(0.75·θ_L/(π/2) + 0.25cos(2πθ_L/k_u)),θ_v 同构(Eqs. 2a-b, p.6);λ̃^B = C(q_R)λ^B,q_R=θ_u,θ_v,0(p.6)。</li><li>LOS 稳定化:λ_obs^S = [C(dq)]^T λ_obs^B,dq_obs 由 ω_obs 四元数积分(Eq. 5, p.7)。</li><li>制导-控制耦合方式:<strong>无独立制导律</strong>——策略输出即舵偏角速率,制导与控制功能在同一映射中隐式耦合;作者解释动作取"偏转角速率"可平滑舵面变化、提高优化效率(p.8)。</li><li>网络(Table 5, p.15):4 层、tanh 隐层;hidden1 = 10·obs_dim;hidden2 = √(n_h1·n_h3) 为 GRU 循环层(策略与值网络同构);hidden3:策略 10·act_dim / 值网络 5;输出:策略 act_dim(线性)/ 值 1(线性)。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<ul><li><strong>无理论证明</strong>:全文无定理、无收敛性/稳定性证明(如实记录)。</li><li>引用性论证:clip 目标函数"已被证明"维持有界 KL 散度以保证策略更新平稳——引 28(p.13),非本文证明。</li><li>作者明示未严格分析的部分:替代 LOS 转率 Ω_surr "we have not rigorously analyzed",仅指出其与真值同正交于 LOS(p.8);一体化系统等效时间常数"难以确定……可以推测(system time constant)远低于纵向基准"(p.20,明确为推测)。</li><li>寄生姿态回路稳定性:只通过仿真证明鲁棒性(robust to parasitic attitude loop,p.1 摘要、p.7),无解析分析。</li></ul>
+<h2 id="sec-6">5. 实验设置</h2>
+<ul><li><strong>对比基准</strong>(IV.A, p.15-16):Zarchan 纵向 PN(N'=4)+ 三回路自动驾驶仪,用 adjoint 代码(Listing 23.3 [30])在 0-15 km 高度(1.5 km 步)扫描;为公平做了改动:执行器带宽提到 600 rad/s、radome 斜率限 ±0.01、去除 glint/衰落噪声、距离无关噪声 2→1 mrad、FCS 时间常数 0.10、阻尼 0.4、噪声滤波器 τ=0.1 s;基准用目标阶跃机动、<strong>不含阻力</strong>、恒定接近速度 1250 m/s,且<strong>用真值高度/速度逐步重算 FCS 增益</strong>(p.15)。结果(Table 6, p.15):TACC=2g:μ 0.7±0.3 m,&lt;1m 95%;4g:0.9±0.3,71%;6g:1.1±0.4,42%;8g:1.4±0.5,25%(&lt;100cm 命中率随目标过载迅速下降)。</li><li><strong>Meta-RL 测试</strong>(IV.B, p.16-17):每工况 <strong>5000 回合</strong> Monte Carlo;工况(Table 7, p.17):Nominal(=训练分布)、High Altitude(全部 15 km 起始)、TACC=10/12/15/20 g(目标最大过载)、Peak θ_R=0.02/0.05(radome 折射峰值增大,训练只到 0.01)、PV=20%/30%(气动系数扰动幅度)、STEP-TACC=2/4/6/8 g(阶跃机动、v_M/v_T=1000/300 m/s,与基准直接可比);指标:Miss&lt;1/2/3 m 百分比、V_c 均值±σ、‖a_M‖(本体法向+侧向加速度范数)均值±σ、约束违反率 Vio。Nominal:91/98/99%,Vio 0;TACC=20g:76/89/93%,Vio 1.4;Peak θ_R=0.05:46/72/84%(最差工况);PV=30%:79/90/93%,Vio 3.4;STEP-TACC=8g:92/96/97%。Nominal 工况下实际目标加速度统计 5.9±7.5、最大 67.2 m/s²(p.16);15 km 高度示例弹道脱靶 0.7 m(Fig. 13, p.18)。</li><li><strong>柔性体动力学</strong>(IV.C, p.16-18):二阶模态 η_N^(1), η_N^(2), η_Y^(1), η_Y^(2)(Eqs. 31a-d),ω_fb^(1)=169 rad/s、ω_fb^(2)=400 rad/s、ζ_fb^(1)=0.015、ζ_fb^(2)=0.022;C_N/C_Y/C_m/C_n 按模态坐标扰动(Eqs. 32a-d),形成舵偏→ω_obs 的寄生反馈通路;积分步长 1 ms、仿真慢 10 倍。结果(Table 8, p.18):k=0.02 时 91/99/100%(同 Nominal);k=0.10 时 C_N 扰动最大达 133.5%,命中率降至 88/94/95%,Vio 4.5%。</li><li><strong>IR 导引头</strong>(IV.D, p.19):观测去掉 r_obs、v_c_obs,用 Ω_surr(Eq. 7)替代;导引头噪声须从 1 mrad 降到 0.5 mrad 才能得到所报性能;结果(Table 9, p.19):Nominal 88/97/98%,TACC=20g 64/78/86%,STEP-TACC=8g 93/97/98%——低于 RF 版但仍高于基准。</li><li><strong>无循环层消融</strong>(IV.E, p.19):去掉 GRU 后 Nominal 工况仅 10%/17%/22%(&lt;1/2/3 m),大量脱靶达数 km;向观测中加入高度与速度也无改善 → 结论:单环一体化 G&amp;C 神经网络<strong>必须至少含一个循环层</strong>(p.19)。</li><li>泛化/摄动测试覆盖:飞行包线 0-20 km(动压 22,680-612,500,论文单位写作 kg-m²,p.19)、气动系数 ±10%(训练)至 ±30%(测试)、radome 折射峰值 0.02/0.05(测试,超训练范围)、柔性体(测试,训练未建模)。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li>作者承认的:<ul><li>未建模助推段与质心变化(p.2;结论 p.21 列为 future work)。</li><li>柔性体动力学只测试未优化,因 1 ms 步长拖慢 10 倍;并推测"若优化时包含柔性体,agent 可能学会避免导致过大扰动的动作序列"(p.17-18)。</li><li>IR 版性能下降、"could likely be improved upon with further hyperparameter tuning";且对导引头噪声耐受降低(1→0.5 mrad)(p.19)。</li><li>高目标过载、高 radome 折射下性能退化;提出可用 biased PN 型奖励整形、LOS 整形策略 [35]、主动补偿 [33]、或训练时加大 radome 斜率来改进(p.19-20)。</li><li>替代 LOS 转率未严格分析(p.8);Kalman 滤波未建模而以低通替代(p.7)。</li></ul></li><li>我分析的(推断依据):<ul><li>基准对比不对等:基准是纵向(3-DOF)线性化模型、无阻力、无滚转通道、阶跃机动、且用真值高度/速度在线调增益(p.15, p.20 作者也承认"much more difficult problem"),因此"大幅超越基准"的定量结论对现代 IGC 方法(如 [5-10] 的预测控制/滑模/反步/L1)没有可比数据——论文未与任何非线性 IGC 方法对比。</li><li>训练分布外自适应有限:Peak θ_R=0.05(训练上限 0.01 的 5 倍)时命中率从 91% 跌至 46%(Table 7),说明 GRU 隐状态外推能力对超出训练分布的寄生回路参数是主要脆弱点;同理 PV=30%(训练 ±10%)Vio 升至 3.4%。</li><li>目标模型理想化:恒速、预定义机动族(bang-bang/weave/jinking 等概率)、加速度垂直 v_T 且上界 8g×(q_T/q_T^MAX)(p.4),不含对抗性/反应式规避,也不含目标 RCS/导引头跟踪丢失逻辑。</li><li>传感器链路简化:无 Kalman 滤波、Ω 计算直接用加噪真值 v_TM(p.7),相当于给策略提供了比真实系统更干净的 LOS 转率;无时延、无 glint、无风;IR 版部分缓解(无 r/v_c)但噪声却调低了一半——这两项都使绝对性能数字偏乐观。</li><li>一体化策略可解释性/安全性:路径约束靠"违者截断+罚 10"的软方式(p.14),测试中仍出现 0-4.5% 的违反率(Table 7/8),对实战可接受性需额外硬限幅或 safety filter;论文未讨论。</li><li>优化成本:单个策略优化"several days"(p.20),且需对每个导引头构型(RF/IR)单独重训,论文未报训练样本量/收敛所需回合数(仅 Fig. 11-12 曲线,p.16)。</li></ul></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li>已给出:<ul><li>完整解析气动模型(Eqs. 9-14)与全部几何参数(p.8-10);气动扰动方式与幅度(Table 4, p.11)。</li><li>radome 模型公式与参数范围(Eqs. 2a-b, Table 3, p.6);导引头/陀螺/加计噪声模型与量级(Eqs. 3-4, p.6-7)。</li><li>执行器两种模型与全部常数(p.8);EOM、积分器与步长(p.11-12)。</li><li>初始条件全范围(Table 1, p.5)、路径约束(Table 2, p.5)、目标机动参数(Table 1)。</li><li>奖励函数逐项与全部系数值(p.14);网络结构公式(Table 5, p.15);折扣率、KL 目标 0.001、rollout 批量 30 回合、测试 5000 回合(p.14-16);基准的全部改动参数(p.15);柔性体模型与参数(p.17)。</li></ul></li><li>缺失:<ul><li>学习率数值、PPO clip ε 的数值/初值(只说被伺服,p.14)、PPO epoch/minibatch 数、优化总步数/回合数、探索噪声类型与幅度(只说部署时关闭,p.16)、观测自适应缩放的具体算法。</li><li>S_REF、S_WING、S_PLAN、S_TAIL 的数值(可由几何推算但未给出);jinking 机动无任何参数定义(bang-bang/weave 有 Table 1 参数,p.4-5)。</li><li>训练曲线对应的优化时长(墙钟)与计算资源;"several days"(p.20)为唯一线索。</li><li>无代码/数据发布声明(全文未提及)。</li></ul></li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<ul><li>导弹自身最大过载未显式给出;"优化时 5:1 优势、测试 2:1"(p.4)结合目标 8g/20g 推断弹体约 40g 能力,需复算气动模型验证。</li><li>obs_dim=22(RF)/20(IR)为按 Eq. 29 分量推算,原文未写明。</li><li>策略更新频率是否恰为 100 Hz(与导航采样同拍)——原文只说导航频率 100 Hz、每 0.01 s 采样(p.7),未明说决策节拍。</li><li>Table 8/正文 k 上标不一致:正文写 k^(0)=k^(1)=0.1(p.17),Eq. 32 用 k^(1), k^(2)(p.17),疑为排版笔误,实际应为 k^(1)=k^(2)。</li><li>几何参数列表中 h_W 出现两次(0.63 与 0.63,p.8),其一疑为 x_W(翼面 x 位置)之误;Fig. 6 有 x_W 标注但参数表未单列。</li><li>Table 6 基准的 "μ Miss" 与正文"root-mean-square miss"(p.15)表述不一致(adjoint RMS 统计 vs 均值),具体统计口径待核。</li><li>部署时 GRU 隐状态的初始化/重置策略(每回合是否清零)未写明。</li><li>r_ctrl 式(Eq. 30c)用的是指令舵偏 θ_defl 还是执行器输出舵偏 [θ_LT,θ_RT,θ_BT,θ_UT]——Eq. 30c 记号与执行器输出同名,而正文称观测中的 θ_defl 为"输入执行器模型的指令"(p.14),两者是否同一序列待核。</li></ul>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>r_M, v_M, r_T, v_T</td><td>导弹/目标位置、速度矢量</td><td>p.3 (Fig. 2)</td></tr>
+<tr><td>r_TM = r_T − r_M, v_TM</td><td>相对位置/速度</td><td>p.3</td></tr>
+<tr><td>θ_E</td><td>r_TM 的高低角(相对 x-y 平面)</td><td>p.3 (Fig. 2)</td></tr>
+<tr><td>θ_vT</td><td>目标速度锥半顶角</td><td>p.3 (Fig. 2)</td></tr>
+<tr><td>L</td><td>前置角(lead angle)</td><td>p.4, Eq. (1a)</td></tr>
+<tr><td>γ, β (Fig. 3)</td><td>LOS 角 / 目标速度与 LOS 夹角</td><td>p.4 (Fig. 3)</td></tr>
+<tr><td>v_my, v_mz</td><td>碰撞三角要求的导弹速度分量</td><td>p.4, Eqs. (1b-c)</td></tr>
+<tr><td>HE</td><td>航向误差(3D 定义)</td><td>p.4</td></tr>
+<tr><td>q_T, q_T^MAX</td><td>目标动压及其海平面最大值</td><td>p.4</td></tr>
+<tr><td>ε_force / ε_coeff</td><td>气动系数相对扰动(Table 4 记 ε_coeff)</td><td>p.4, p.11</td></tr>
+<tr><td>a_T^MAX</td><td>目标最大加速度(8×9.81 m/s² 上限)</td><td>p.4-5 (Table 1)</td></tr>
+<tr><td>θ_L</td><td>视线角(look angle),= arccos(λ^B·e_w^B)</td><td>p.6</td></tr>
+<tr><td>λ^N, λ^B, λ̃^B, λ^B_obs, λ_obs^S</td><td>LOS 单位向量:惯性/本体真值/折射后/导引头输出/稳定化后</td><td>p.5-7</td></tr>
+<tr><td>θ_R</td><td>radome 折射角</td><td>p.6</td></tr>
+<tr><td>θ_u, θ_v; A_u, A_v, k_u, k_v</td><td>方位/俯仰折射误差及其模型参数</td><td>p.6, Eqs. (2a-b), Table 3</td></tr>
+<tr><td>q_R, q_N</td><td>折射/测量噪声的 321 欧拉旋转</td><td>p.6</td></tr>
+<tr><td>N(μ,σ,n), U(·,·,n)</td><td>n 维正态/均匀随机变量</td><td>p.6</td></tr>
+<tr><td>σ_LOS</td><td>导引头 LOS 测量噪声标准差(1 mrad)</td><td>p.6</td></tr>
+<tr><td>v_c_obs, r_obs</td><td>测得的接近速度、距离</td><td>p.6</td></tr>
+<tr><td>ω, ω_obs^B; ε_ω, σ_ω</td><td>本体角速度及含扰测量;陀螺标度/噪声</td><td>p.6-7, Eq. (3a)</td></tr>
+<tr><td>a_obs^B; ε_acc</td><td>本体加速度含扰测量;加计标度误差</td><td>p.7, Eq. (4a)</td></tr>
+<tr><td>dq, dq_obs</td><td>交战开始以来的姿态增量四元数(真值/估计)</td><td>p.7, Eq. (5)</td></tr>
+<tr><td>Ω</td><td>LOS 转率</td><td>p.7, Eq. (6)</td></tr>
+<tr><td>Ω_surr</td><td>替代 LOS 转率(无需 v_TM)</td><td>p.8, Eq. (7)</td></tr>
+<tr><td>u = c_θ(o)</td><td>策略映射,R⁴ 舵偏角速率指令</td><td>p.8, p.13</td></tr>
+<tr><td>θ_H, θ_V, Δθ_H, Δθ_V; θ_LT/RT/BT/UT</td><td>组合/差动舵偏及四个舵面偏转</td><td>p.8</td></tr>
+<tr><td>θ_defl, θ_ctrl</td><td>指令舵偏向量(执行器输入)</td><td>p.8, p.11, p.14</td></tr>
+<tr><td>τ; ζ_ACT, ω_ACT</td><td>一阶执行器时间常数;二阶模型阻尼/带宽</td><td>p.8, Eq. (8)</td></tr>
+<tr><td>cp_x; cplt_y, cprt_y, cpbt_z, cput_z</td><td>压心位置向量及舵面压心分量</td><td>p.8-9, Eqs. (9a-c)</td></tr>
+<tr><td>d, h_W, c_RW, c_RT, h_T, x_HL, x_L, x_CG, x_N</td><td>导弹几何参数(Fig. 6)</td><td>p.8-9</td></tr>
+<tr><td>C_N, C_Y</td><td>法向/侧向力系数向量(鼻/翼/身/尾分量)</td><td>p.9, Eqs. (10a-b)</td></tr>
+<tr><td>S_WING, S_PLAN, S_TAIL, S_REF</td><td>翼/身平面/舵/参考面积</td><td>p.9</td></tr>
+<tr><td>η = √(M²−1)</td><td>超声速相似参数</td><td>p.5, Eqs. (10)</td></tr>
+<tr><td>C_A, C_A0, k</td><td>轴向力系数及其常数(k=4, C_A0=0.35)</td><td>p.9, Eq. (11a)</td></tr>
+<tr><td>C_m, C_n, C_l, C_l_damp, C_lα, C_lβ</td><td>俯仰/偏航/滚转力矩系数及耦合系数</td><td>p.9-10, Eqs. (12)-(13b)</td></tr>
+<tr><td>q, q_o = ½ρV²</td><td>动压</td><td>p.4, p.11</td></tr>
+<tr><td>F^B, L^B</td><td>本体系气动力/力矩</td><td>p.9-10, Eqs. (13a-b)</td></tr>
+<tr><td>m = 455 kg; J; r = d/2</td><td>导弹质量、惯性张量、圆柱半径</td><td>p.10, Eq. (14)</td></tr>
+<tr><td>v^B = [u,v,w]; α, β</td><td>本体速度分量;攻角/侧滑角</td><td>p.11, Eqs. (15a-b)</td></tr>
+<tr><td>ρ, ρ_0, h_s</td><td>大气密度、海平面密度(1.225)、标高(7018.00344 m)</td><td>p.11</td></tr>
+<tr><td>M</td><td>马赫数</td><td>p.11</td></tr>
+<tr><td>[a×]</td><td>反对称叉乘算子</td><td>p.11, Eq. (17)</td></tr>
+<tr><td>q, q_obs, q_init</td><td>姿态四元数(真值/观测/发射装订)</td><td>p.8, p.11-12</td></tr>
+<tr><td>g = −9.81 m/s²</td><td>重力加速度</td><td>p.12, Eq. (19)</td></tr>
+<tr><td>v^NED, v_M</td><td>NED 系速度/交战参考系速度</td><td>p.12, Eqs. (20a-b)</td></tr>
+<tr><td>a_T</td><td>目标加速度指令</td><td>p.12, Eq. (22b)</td></tr>
+<tr><td>π_θ, V_w^π, p_k(θ), ε, J(θ)</td><td>策略/值函数/概率比/clip 参数/PPO 目标</td><td>p.13-14, Eqs. (23)-(24)</td></tr>
+<tr><td>A_w^π(x_k,u_k)</td><td>经验回报减基线的优势估计</td><td>p.13, Eq. (25)</td></tr>
+<tr><td>h</td><td>GRU 循环层隐状态</td><td>p.2, p.12-13</td></tr>
+<tr><td>r_shaping, r_rollrate, r_ctrl, r_bonus, r_penalty, r</td><td>奖励各项及总奖励</td><td>p.14, Eqs. (30a-f)</td></tr>
+<tr><td>α=1, β=−0.05, δ=−0.01, ε=10, ζ=−10, r_lim=10 m, σ_Ω=0.02</td><td>奖励系数(与气动角 α、β 记号重载)</td><td>p.14</td></tr>
+<tr><td>η_N^(1,2), η_Y^(1,2); ω_fb^(1,2), ζ_fb^(1,2)</td><td>柔性体模态坐标;模态频率(169/400 rad/s)与阻尼</td><td>p.17, Eqs. (31)</td></tr>
+<tr><td>k^(1), k^(2)(Table 8 写 k^(0)=k^(1))</td><td>柔性体气动扰动增益</td><td>p.17, Eqs. (32)</td></tr>
+<tr><td>C_Nfb, C_Yfb, C_mfb, C_nfb</td><td>含柔性体扰动的气动系数</td><td>p.17, Eqs. (32a-d)</td></tr>
+<tr><td>‖a_M‖</td><td>本体法向+侧向加速度范数(Table 7 指标)</td><td>p.16</td></tr>
+<tr><td>Vio</td><td>约束违反率(%)</td><td>p.17 (Table 7)</td></tr>
+</tbody></table></div><div class="pnav"><a href="13.html">← 13 Reinforcement Learning for A…</a><a href="15.html">15 Learning to Guide: Guidance … →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

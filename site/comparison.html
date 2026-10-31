@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>对比总表 · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="index.html">首页</a>
+    <a href="papers.html">论文精读</a>
+    <a href="comparison.html" class="on">对比总表</a>
+    <a href="gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="hero"><h1>方法对比总表</h1><p class="sub">假设强度 / 信息结构 / 理论证明 / 对抗性 / 实验规模 五维对照 + 记号对应表 + 三类红旗清单。</p></div><div class="doc"><h2 id="csv">机读对比表(可排序 / 搜索)</h2><p class="tag">点击表头排序;搜索框过滤全部 20 列;数据来自 comparison_table.csv。</p><div class="bar"><input id="csvQ" type="search" placeholder="在 20 列中搜索,如:固定时间 / V_D>V_A / 6DOF / 无定理…"><span id="csvCount" class="tag"></span></div><div id="csvTable"></div><script type="application/json" id="csv-data">[{"id": "01", "标题": "An Introduction to Pursuit-Evasion Differential Games", "作者": "Weintraub; Pachter; Garcia", "年份": "2020", "出处": "ACC 2020 tutorial / arXiv:2003.05013", "方法类别": "微分博弈-解析", "动力学模型": "simple motion 常速质点仅航向可控", "维数": "2D", "机动目标": "机动-最优", "输入约束": "无(仅航向角、点捕获)", "FOV约束": "无", "噪声时延": "无", "假设强度": "强(全向常速+点捕获+完全信息+速度优势)", "信息结构": "集中式-完全信息-无拓扑", "理论证明": "3定理+2命题;Value C1满足HJI(Theorem 2文内证明);PMP", "防御方或对抗机动": "双方都智能(2P1EDG与ATDDG)", "实验规模": "3个示意算例;无MC无基线", "代码": "无", "内部矛盾或疑似笔误": "p.13/14的α范围不一致;p.7协态式下标疑误", "最缺复现项": "四次方程(49)选根细节;ATDDG捕获区策略伪代码"}, {"id": "02", "标题": "Active Target Defense Differential Game with a Fast Defender", "作者": "Garcia; Casbeer; Pachter", "年份": "2015", "出处": "ACC 2015 / arXiv:1502.02747", "方法类别": "微分博弈-解析", "动力学模型": "simple motion降维(R r θ)", "维数": "2D", "机动目标": "机动-最优(T主动机动)", "输入约束": "无", "FOV约束": "未提及", "噪声时延": "未提及", "假设强度": "强(β=V_D/V_A>1;点捕获;Attacker理性)", "信息结构": "集中式-完全信息", "理论证明": "2定理+4命题;PMP闭式+静态minmax鞍点;无HJI验证", "防御方或对抗机动": "双方都智能(另测A用PN)", "实验规模": "3个算例;基线=TPBVP数值自洽", "代码": "无", "内部矛盾或疑似笔误": "解析=数值仅2例支撑;式(41)根唯一性未讨论", "最缺复现项": "TPBVP求解细节;r_c取值"}, {"id": "03", "标题": "The Complete Differential Game of Active Target Defense", "作者": "Garcia; Casbeer; Pachter", "年份": "2020", "出处": "JGCD 2020(arXiv预印本)/ arXiv:2002.04054", "方法类别": "微分博弈-解析", "动力学模型": "simple motion(V_A=V_D=1;V_T=α)", "维数": "2D(R6)", "机动目标": "机动-最优", "输入约束": "无(点捕获)", "FOV约束": "未提及", "噪声时延": "无(完美信息)", "假设强度": "强(等速临界V_A=V_D;V_D>V_A可推广无推导)", "信息结构": "集中式-完美信息-T/D结盟", "理论证明": "3定理+1推论;双侧PMP;Value=DI−TI/α满足HJI;反例否定前作PP", "防御方或对抗机动": "双方都智能", "实验规模": "3个算例;基线=前作PP反例", "代码": "无", "内部矛盾或疑似笔误": "V_D>V_A可推广无推导;V非负性未证;六次根选取无规则", "最缺复现项": "六次方程(71)根选择准则;Theorem 1证明需查[30]"}, {"id": "04", "标题": "Multiple Pursuer Multiple Evader Differential Games", "作者": "Garcia; Casbeer; Von Moll; Pachter", "年份": "2019", "出处": "arXiv:1911.03806(29页)", "方法类别": "微分博弈-解析", "动力学模型": "simple motion速度异质", "维数": "2D(R^{2(N+M)})", "机动目标": "机动-最优", "输入约束": "无(点捕获;被捕者冻结)", "FOV约束": "未提及", "噪声时延": "未提及", "假设强度": "强(N≥M且α_ij<1;坚定承诺分配)", "信息结构": "集中式-全状态-无通信(除dispersal面去冲突)", "理论证明": "4定理+1推论;Value连续C1满足HJI;分配LP/匈牙利算法", "防御方或对抗机动": "双方都智能(P队max E队min)", "实验规模": "2v2动态仿真4情形;3v3几何示意;无MC", "代码": "无", "内部矛盾或疑似笔误": "dispersal面等优分配论断无证明;共捕判据非算法化", "最缺复现项": "非最优轨迹积分格式;场景坐标数值"}, {"id": "05", "标题": "Optimal Strategies for Guarding a Compact and Convex Target Set", "作者": "Lee; Bakolas", "年份": "2021", "出处": "arXiv:2104.00717", "方法类别": "微分博弈-解析", "动力学模型": "simple motion单位向量输入", "维数": "2D(R4)", "机动目标": "未提及(守卫静态凸集Ω)", "输入约束": "有-限幅(‖u‖=1)", "FOV约束": "未提及", "噪声时延": "无", "假设强度": "强(Ω紧致凸光滑可透;0<γ<1;式(35)唯一性断言)", "信息结构": "集中式-完全信息", "理论证明": "5命题;屏障半透+两Game of Degree的V_c/V_a经HJI验证构成鞍点", "防御方或对抗机动": "双方都智能(含最优vs非最优自对照)", "实验规模": "2场景轨迹可视化;无定量指标无文献基线", "代码": "无", "内部矛盾或疑似笔误": "式(30)(31)与(23)不一致;仿真h不满足自身凸性假设;式(35)凸标签存疑", "最缺复现项": "B0屏障曲线数值算法;优化(35)求解器与容差"}, {"id": "06", "标题": "Cooperative Nonlinear Guidance Strategies for Guaranteed Pursuit-Evasion", "作者": "Kumar; Kumar; Sinha", "年份": "2024", "出处": "arXiv:2402.06176 v3", "方法类别": "保证性制导", "动力学模型": "2D非完整质点横向加速度转向", "维数": "2D", "机动目标": "机动-有界(仅需|a_P|≤上界)", "输入约束": "有-限幅(v_P≈v_D>v_E)", "FOV约束": "未提及", "噪声时延": "未提及", "假设强度": "中(增益条件在r_DP→0不可满足)", "信息结构": "分布式(E-D联盟;信息级共享a_E;无图拓扑)", "理论证明": "1命题+1引理+4定理;几何捕获次序+双层滑模预设时间;捕获链ṙ_DP<0未闭合", "防御方或对抗机动": "含防御方D;攻方固定未知(仅假设有界机动;仿真用PNG/PPG/DPG/BPNG)", "实验规模": "多场景数值仿真(±20g;能力下调);无MC无同类基线", "代码": "无", "内部矛盾或疑似笔误": "引用不存在的Theorem 1;增益条件与终端目标集冲突;多处下标笔误", "最缺复现项": "积分方法与步长;拦截判定阈值;BPNG偏置"}, {"id": "07", "标题": "Fixed-time Cooperative Guidance Law for Multiple Missiles", "作者": "Yu; Dai; Li; Zou; Ma; Zhang(NUDT)", "年份": "2021", "出处": "arXiv:2106.02772(疑未定稿)", "方法类别": "一致性协同", "动力学模型": "平面质点LOS系r/Vr/Vq;切向调速法向调向", "维数": "2D", "机动目标": "机动-有界但定理仅覆盖静止(u_T消失)", "输入约束": "无", "FOV约束": "未提及", "噪声时延": "无", "假设强度": "中(连通图唯一编号假设;机动目标未进证明)", "信息结构": "分布式(加权图𝒢/Laplacian ℒ;无时延)", "理论证明": "3定理+3引理;固定时间收敛界与初值无关;Theorem 3证明省略;未证命中", "防御方或对抗机动": "无(目标被动机动未知)", "实验规模": "5弹1目标数值仿真(51.0s同时到达);基线式(43)缺失", "代码": "无", "内部矛盾或疑似笔误": "摘要机动目标与结论静止目标自相矛盾;u_T项消失;引用不存在的式(43);残留[zuo]占位", "最缺复现项": "基线制导律(43)表达式与结果;仿真步长与命中判据"}, {"id": "08", "标题": "Time-Optimal Collaborative Guidance Using the Generalized Hopf Formula", "作者": "Kirchner; Mar; Hewer; Darbon; Osher; Chow", "年份": "2018", "出处": "IEEE L-CSS 2018 / arXiv:1709.06590", "方法类别": "最优控制-数值(Hopf公式化HJI)", "动力学模型": "小角度线性化4k维联合;仿真3DOF+三阶自动驾驶仪", "维数": "2D(χ∈R^{4×k})", "机动目标": "机动-最优(逃逸者博弈对抗)", "输入约束": "有-限幅(‖Q_p^{-1}a_p‖∞≤1;Q_p(t)舵效下降)", "FOV约束": "未提及", "噪声时延": "未提及", "假设强度": "强(线性+凸控制+凸终端代价;Isaacs条件;凸性需Q_e≤Q_p为断言)", "信息结构": "集中式(联合状态4k;逃逸者公共输入)", "理论证明": "无自行编号定理;Hopf公式精确黏性解(引用);非凸时仅上界", "防御方或对抗机动": "双方都智能(追逃博弈最优)", "实验规模": "3DOF闭环仿真k=2;单次求解40-83ms;基线仅引用网格HJI耗时", "代码": "无", "内部矛盾或疑似笔误": "p0=V(0)z/2疑应为2V(0)z;时间变量t疑应为T*;40-83ms口径不明", "最缺复现项": "Q_p/Q_e取值与自动驾驶仪参数;T*搜索算法与求积步长"}, {"id": "09", "标题": "Cooperative Salvo Guidance over Leader-Follower Network", "作者": "Pal; Kumar; Mukherjee", "年份": "2024", "出处": "arXiv:2407.15324", "方法类别": "一致性协同", "动力学模型": "平面质点恒速;理想或一阶滞后自动驾驶(τ_i)", "维数": "2D", "机动目标": "静止(机动列未来工作)", "输入约束": "无-设计层面(仿真|a_Mi|≤300m/s²)", "FOV约束": "未提及", "噪声时延": "无(Assumption 4明确无通信时延失败)", "假设强度": "中(恒速+tgo小角近似无误差界;leader单点;增益需全局拓扑信息)", "信息结构": "分布式-混合拓扑(leader-follower;T_d仅leader知)", "理论证明": "3引理(引[25])+2未编号主结果(Lyapunov;backstepping)", "防御方或对抗机动": "无(静止目标)", "实验规模": "1+4弹(扩展1+8);3组初值参数扫描;基线=[30]AST 2022;无MC", "代码": "无", "内部矛盾或疑似笔误": "Table I Set3 r0=600m与正文6000m矛盾;tgod定义两处不一;收敛区间端点笔误", "最缺复现项": "积分算法与步长;图中tgo为真实还是估计"}, {"id": "10", "标题": "Nonlinear Cooperative Salvo Guidance with Seeker-Limited Interceptors", "作者": "Gopikannan; Kumar; Sinha", "年份": "2025", "出处": "arXiv:2509.15136", "方法类别": "一致性协同(感知异构+固定时间观测器)", "动力学模型": "2D运动学质点;目标常速模型ż=Az;deviated pursuit精确t_go", "维数": "2D", "机动目标": "常速非机动(机动列未来工作)", "输入约束": "仿真有限幅(40g);理论未处理", "FOV约束": "无(seeker-limited指有无导引头的感知异构而非FOV角)", "噪声时延": "未提及", "假设强度": "中(仅部分弹有导引头;感知图含生成树;Theorem 2证明省略)", "信息结构": "分布式(感知图G含目标leader;执行图G^a leaderless;固定时间观测器)", "理论证明": "5引理+2定理;Theorem 1观测器固定时间收敛;Theorem 2共识证明省略且T_c无上界", "防御方或对抗机动": "无(目标常速非机动)", "实验规模": "1目标+4拦截弹(仅I1带导引头);2场景;无基线无MC", "代码": "无", "内部矛盾或疑似笔误": "Theorem 2证明省略;40g饱和未进理论而初始指令近边界;δ记号冲突", "最缺复现项": "Theorem 2证明细节;感知/执行图边表"}, {"id": "11", "标题": "Trajectory Encryption Cooperative Salvo Guidance", "作者": "Gopikannan; Kumar; Sinha", "年份": "2025", "出处": "arXiv:2509.17341 v2", "方法类别": "一致性协同(prescribed-time共识+ε-不可区分性)", "动力学模型": "2D质点;DPG恒速(V_{P_k}>V_T);TPNG单加速度", "维数": "2D", "机动目标": "非机动恒速(机动列未来工作)", "输入约束": "有-限幅(仅仿真6g;理论无饱和设计)", "FOV约束": "未提及", "噪声时延": "无(噪声w仅在对手量测模型)", "假设强度": "强(目标非机动恒速;理想质点;tgo动力学须控制仿射)", "信息结构": "分布式(强连通有向图无leader;对手侧量测O=C(X)+w能力边界未形式化)", "理论证明": "1定理+2推论(prescribed-time共识);ε-加密仅定义无证明无定量评估", "防御方或对抗机动": "无防御方;目标恒速;无对手估计器仿真", "实验规模": "4场景(N=4;两种拓扑/morphing/PIP);无定量基线;ε/TV距离均未计算;无MC", "代码": "无", "内部矛盾或疑似笔误": "增益下界β≥1/λ₂与β≥1/(2λ₂)不一致;ε-加密无定量验证;morphing再共识t_switch>t_e无定理支撑;摘要宣称抗扰动但无扰动注入", "最缺复现项": "积分方法与步长;λ₂数值与拓扑边表;对手模型参数实例化"}, {"id": "12", "标题": "Cooperative Guidance of Multiple Missiles: a Hybrid Co-evolutionary Approach", "作者": "Lan; Chen; Zhao; Zou", "年份": "2022", "出处": "IEEE TCST录用稿(页眉)/ arXiv:2208.07156", "方法类别": "离线进化优化(NCES训练NN+PNG混合)", "动力学模型": "2D质点速度可控(侧向+推力加速度)", "维数": "2D", "机动目标": "机动-正弦(Case2 5g);Case1/3静止", "输入约束": "有-限幅(a_lmax=50g;av_max=5g;V∈[350,900]m/s)", "FOV约束": "未提及", "噪声时延": "无(确定性环境假设)", "假设强度": "强(目标特征估计误差可忽略;确定性环境;Theorem 1需m→∞)", "信息结构": "分布式(无向图邻居集N_i;离线并行训练;无时延模型)", "理论证明": "仅1定理(收敛到最优策略小邻域;启发式;无速率无全局最优性)", "防御方或对抗机动": "无防御方;目标固定正弦机动(非对抗)", "实验规模": "3场景;Case3五弹200episodes MC;基线=TASCGL;Case1/2无重复次数", "代码": "无", "内部矛盾或疑似笔误": "Eq.(32)求和指标与Eq.(27)维数笔误;λ_a/λ_t与γa/γt关系未解释;Case3重训还是复测不明", "最缺复现项": "NN隐层宽度q1/q2与初始化;训练迭代数与停止准则;基线参数与方差"}, {"id": "13", "标题": "Reinforcement Learning for Angle-Only Intercept Guidance of Maneuvering Targets", "作者": "Gaudet; Furfaro; Linares", "年份": "2020", "出处": "AIAA Scitech 2020 / arXiv:1906.02113", "方法类别": "RL(PPO+GRU强化元学习)", "动力学模型": "导弹3DOF点质量+质量变化4台脉冲divert推力器;目标双积分;无重力姿态恒定", "维数": "3D", "机动目标": "机动-有界(bang-bang≤5g垂直速度随机起止)", "输入约束": "有-二值脉冲(10Hz;幅值∈[T_min,T_max])", "FOV约束": "有(导引头视场135°越界终止)", "噪声时延": "无(导引头完美无噪)", "假设强度": "强(无重力+迎头;姿态恒定;完美导引头;无sim-to-real)", "信息结构": "单弹集中式;不完美信息(角度-only POMDP)", "理论证明": "无定理(作者自明无最优性保证)", "防御方或对抗机动": "无防御方;目标bang-bang随机机动(固定族非反应式)", "实验规模": "5000MC/策略;基线=增强ZEM(理想信息版);泛化测试(barrel roll)", "代码": "无", "内部矛盾或疑似笔误": "正文燃料略增与Table5/6(RL更省油)矛盾;Fig5/6同名;脱靶量测定协议未写明", "最缺复现项": "学习率与shaping超参α σ_e σ_dθ;T_min/T_max与Isp;训练总回合数"}, {"id": "14", "标题": "Integrated and Adaptive G&C for Endoatmospheric Missiles via Reinforcement Meta-Learning", "作者": "Gaudet; Furfaro", "年份": "2023", "出处": "AIAA Scitech 2023预印本 / arXiv:2109.03880 v6", "方法类别": "RL(meta-RL recurrent PPO单环制导控制一体化)", "动力学模型": "导弹6DOF刚体(解析气动+radome折射+执行器一二阶)+目标3DOF质点", "维数": "3D", "机动目标": "机动-有界(bang-bang/weave/jinking预设族≤8g;非反应式)", "输入约束": "有-限幅(舵偏速率80°/s;舵偏20°;V≥400m/s;过载路径约束)", "FOV约束": "有(θ_L≤45°路径约束)", "噪声时延": "有(LOS 1mrad;radome±10mrad;陀螺加计误差;无时延无风)", "假设强度": "中(仅末段;解析气动;目标恒速质点;低通替代Kalman——但含radome/噪声/±10%摄动/柔性体为组内最丰富)", "信息结构": "单弹集中式;不完美信息(22维观测含噪链路)", "理论证明": "无定理(转率替代we have not rigorously analyzed;寄生回路仅仿真)", "防御方或对抗机动": "无防御方;目标预设机动族(训练5:1测试2:1加速度优势)", "实验规模": "5000回合/工况×10+工况6DOF;基线=Zarchan PN+三回路自动驾驶仪(adjoint);消融去GRU掉到10-22%", "代码": "无", "内部矛盾或疑似笔误": "Table8与Eq.(32)记号不一致;μ Miss与RMS口径不一;h_W参数重复疑为x_W", "最缺复现项": "PPO超参数值;观测自适应缩放算法;S_REF与jinking参数"}, {"id": "15", "标题": "Learning to Guide: Guidance Law Based on Deep Meta-learning and MPPI", "作者": "Liang; Wang; Liu; Lai; Zhou", "年份": "2019", "出处": "IEEE Access 2019 / arXiv:1904.06892", "方法类别": "最优控制-数值(MPPI采样式MPC+NN动力学+元学习在线适应)", "动力学模型": "3D追逃运动学+变速拦截器(推力/阻力/质量燃耗);NN扩展状态观测器", "维数": "3D", "机动目标": "机动-正弦(40sin(t) m/s²;V_T=270m/s)", "输入约束": "有(200m/s²上限;执行器故障η_i∈{1,0.5,0.6})", "FOV约束": "未提及", "噪声时延": "有(MPPI控制注入噪声;MC乘性+8mrad LOS噪声;无显式时延)", "假设强度": "中(MPPI高斯采样;元训练不含机动与故障;5ms实时性无实测——但带噪MC+半实物为组内较实)", "信息结构": "单弹集中式;不完美信息(6维带噪观测;口径不一致)", "理论证明": "无定理(仅Remark 2非正式Lyapunov只针对参考规划器)", "防御方或对抗机动": "无防御方;目标固定正弦机动(非对抗;元训练时无机动)", "实验规模": "MC 3500次;半实物三轴转台+CCD导引100次交战;基线=standard MPPI自家变体(无PN/APN)", "代码": "有(GitHub MIT含预训练模型;训练代码/数据集未发布)", "内部矛盾或疑似笔误": "状态向量速率项重复;K1/K2归属歧义;Table II脱靶量10⁻⁵m口径可疑;终端代价φ未给出", "最缺复现项": "元训练代码与数据集;M/Σ数值与φ形式"}, {"id": "16", "标题": "Cooperative Guidance Strategy for Active Defense Spacecraft with Imperfect Information via DRL", "作者": "Li; Liang; Wu; Wang; Zheng", "年份": "2021", "出处": "arXiv:2212.03093(含[引用]占位)", "方法类别": "RL(TD3单agent集中策略)", "动力学模型": "恒速质点+一阶动力学;绕初始视线线性化7维;仿真计轨道引力", "维数": "2D(平面线性化)", "机动目标": "无独立目标方(T与D由同一agent控制;对手I用OGL/SOGL/LQOGL固定策略)", "输入约束": "有-限幅(u_I^max=6g;u_T^max=1g;u_D^max=2g)", "FOV约束": "未提及", "噪声时延": "有(T/D侧掩模+乘性均匀噪声;I侧完美;无时延)", "假设强度": "强(端末段线性化;I完美信息且不可学习仅OGL族;奖励超参不通用)", "信息结构": "集中式(单TD3输出[u_T,u_D];非对称不完美信息;T-D理想通信)", "理论证明": "RL部分无定理;解析部分2引理(SOGL为本文PMP推导)", "防御方或对抗机动": "含防御方D(核心);对手I为OGL族固定最优策略(课程0g→方波→OGL;不可学习无自博弈)", "实验规模": "训练20000episodes 8worker 6seeds;win-rate基线SOGL 87.0%;6组噪声算例;泛化测试u_I^max 30-80m/s²;MC次数未给", "代码": "无(留[引用]占位)", "内部矛盾或疑似笔误": "正文τ=5/10ms与Table3的0.05/0.1/0.02s冲突;Fig4 win-rate超1;式(30)编号重复;两处[引用]占位", "最缺复现项": "奖励超参α1 α2 β1 β2 σ与c n;13维观测分量与掩模Γ;MC次数与win-rate判定规则"}, {"id": "17", "标题": "Learning-Based Multi-Stage Strategy for a Fixed-Wing Aircraft to Evade a Missile", "作者": "Niu; Zhou; Xiong", "年份": "2025", "出处": "arXiv:2511.05828(版权行指向IEEE TAES)", "方法类别": "RL(3个vanilla PPO策略+规则切换多阶段)", "动力学模型": "飞机JSBSim F-16全量6DOF(200Hz);导弹三维运动学PN/APN恒速800-1400m/s", "维数": "3D", "机动目标": "无目标方设定(逃逸视角;飞机即机动方)", "输入约束": "有-限幅(动作[-1,1];油门[0,1];最低高度1000m;速度软约束)", "FOV约束": "未提及(导弹无导引头失锁建模)", "噪声时延": "无(仅对λ̇低通平滑非噪声建模)", "假设强度": "强(导弹恒速;飞机对导弹相对状态全知;无噪声时延漏检;对手固定脚本硬编码阈值)", "信息结构": "单机集中式;全信息(12维状态含Δxm Δẋm)", "理论证明": "无(仅经验性Remark 1切换阈值由统计得出)", "防御方或对抗机动": "无防御方(逃逸视角);对手为PN/APN固定脚本(杀伤半径10m)", "实验规模": "JSBSim 200Hz;分区间MC每区间40/20次总数未给;基线=文献RL 34.14%与steep turn 3.34%;本文80.89%;APN泛化75.63%", "代码": "无", "内部矛盾或疑似笔误": "式(51) n_m导弹过载与p.17飞机过载解释矛盾(基线或被低估);训练7500步与场景5000步不一致;结论缺局限性章节", "最缺复现项": "PPO训练细节(clip熵系数GAE等);导弹离散导引实现;成功/捕获判定式"}]</script><h1 id="sec-0">方法对比总表(17 篇 · 多智能体协同制导 / 微分博弈 / 强化学习)</h1>
+<blockquote>生成日期:2026-10-31。 数据来源:<code>literature/extract/01…17</code> 精读笔记(每篇 10 节、论断带页码),行数据经 <code>literature/comparison_rows_A.md</code>(01–10)与 <code>literature/comparison_rows_B.md</code>(11–17)汇总。 纪律:全部内容可在对应笔记→原文页码定位;原文没有的字段写"未提及";推测一律标"待验证"并集中到第 6 节与 <code>gaps.md</code>。 符号:各列保留各论文原始记号,不强行统一;跨论文对应关系见第 4 节。</blockquote>
+<hr>
+<h2 id="sec-1">1. 论文总览</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>ID</th>
+<th>文件(papers/)</th>
+<th>标题(缩写)</th>
+<th>作者</th>
+<th>年份</th>
+<th>出处</th>
+</tr></thead><tbody>
+<tr><td>01</td><td>01_Weintraub2020_…</td><td>An Introduction to Pursuit-Evasion Differential Games</td><td>Weintraub, Pachter, Garcia</td><td>2020</td><td>ACC 2020 (tutorial), arXiv:2003.05013</td></tr>
+<tr><td>02</td><td>02_Garcia2015_…</td><td>Active Target Defense Differential Game with a Fast Defender</td><td>Garcia, Casbeer, Pachter</td><td>2015</td><td>ACC 2015, arXiv:1502.02747</td></tr>
+<tr><td>03</td><td>03_Garcia2020_…</td><td>The Complete Differential Game of Active Target Defense</td><td>Garcia, Casbeer, Pachter</td><td>2020</td><td>JGCD 2020(arXiv 预印本), arXiv:2002.04054</td></tr>
+<tr><td>04</td><td>04_Garcia2019_…</td><td>Multiple Pursuer Multiple Evader Differential Games</td><td>Garcia, Casbeer, Von Moll, Pachter</td><td>2019</td><td>arXiv 长文 29 页, arXiv:1911.03806</td></tr>
+<tr><td>05</td><td>05_Lee2021_…</td><td>Optimal Strategies for Guarding a Compact and Convex Target Set</td><td>Lee, Bakolas</td><td>2021</td><td>arXiv:2104.00717</td></tr>
+<tr><td>06</td><td>06_Kumar2024_…</td><td>Cooperative Nonlinear Guidance Strategies for Guaranteed Pursuit-Evasion</td><td>S. Kumar, S.R. Kumar, Sinha</td><td>2024</td><td>arXiv:2402.06176 (v3)</td></tr>
+<tr><td>07</td><td>07_Yu2021_…</td><td>Fixed-time Cooperative Guidance Law for Multiple Missiles</td><td>Yu 等(NUDT)</td><td>2021</td><td>arXiv:2106.02772(疑未定稿)</td></tr>
+<tr><td>08</td><td>08_Kirchner2018_…</td><td>Time-Optimal Collaborative Guidance Using the Generalized Hopf Formula</td><td>Kirchner 等(UCLA)</td><td>2018</td><td>IEEE L-CSS 2018, arXiv:1709.06590</td></tr>
+<tr><td>09</td><td>09_Pal2024_…</td><td>Cooperative Salvo Guidance over Leader-Follower Network</td><td>Pal, Kumar, Mukherjee</td><td>2024</td><td>arXiv:2407.15324</td></tr>
+<tr><td>10</td><td>10_Gopikannan2025_…(Salvo-Seeker-Limited)</td><td>Nonlinear Cooperative Salvo Guidance with Seeker-Limited Interceptors</td><td>Gopikannan, Kumar, Sinha</td><td>2025</td><td>arXiv:2509.15136</td></tr>
+<tr><td>11</td><td>11_Gopikannan2025_…(Trajectory-Encryption)</td><td>Trajectory Encryption Cooperative Salvo Guidance</td><td>Gopikannan, Kumar, Sinha</td><td>2025</td><td>arXiv:2509.17341 (v2)</td></tr>
+<tr><td>12</td><td>12_Lan2022_…</td><td>Cooperative Guidance of Multiple Missiles: a Hybrid Co-evolutionary Approach</td><td>Lan, Chen, Zhao, Zou</td><td>2022</td><td>页眉标 IEEE TCST 录用稿, arXiv:2208.07156</td></tr>
+<tr><td>13</td><td>13_Gaudet2020_…</td><td>RL for Angle-Only Intercept Guidance of Maneuvering Targets</td><td>Gaudet, Furfaro, Linares</td><td>2020</td><td>AIAA Scitech 2020, arXiv:1906.02113</td></tr>
+<tr><td>14</td><td>14_Gaudet2023_…</td><td>Integrated and Adaptive G&amp;C for Endoatmospheric Missiles via RL(PDF 首页实为 Reinforcement <strong>Meta</strong>-Learning)</td><td>Gaudet, Furfaro</td><td>2023</td><td>AIAA Scitech 2023 预印本, arXiv:2109.03880 (v6)</td></tr>
+<tr><td>15</td><td>15_Liang2019_…</td><td>Learning to Guide: Deep Meta-learning + MPPI Guidance Law</td><td>Liang 等</td><td>2019</td><td>IEEE Access 2019(有代码仓), arXiv:1904.06892</td></tr>
+<tr><td>16</td><td>16_Li2021_…</td><td>Cooperative Guidance Strategy for Active Defense Spacecraft … via DRL</td><td>Li, Liang, Wu, Wang, Zheng</td><td>2021</td><td>arXiv:2212.03093(含 [引用] 占位)</td></tr>
+<tr><td>17</td><td>17_Niu2025_…</td><td>Learning-Based Multi-Stage Strategy … to Evade a Missile</td><td>Niu, Zhou, Xiong</td><td>2025</td><td>arXiv:2511.05828(版权行指向 IEEE TAES)</td></tr>
+</tbody></table></div>
+<p>方法谱系:01–05 微分博弈-解析(T-A-D 目标防御/守卫);06 保证性制导(Lyapunov/滑模);07、09、10、11 一致性/预设时间齐射;08 数值最优控制(Hopf 公式 HJI);12 离线进化优化;13、14、16、17 强化学习;15 采样式 MPC(MPPI)+元学习。</p>
+<hr>
+<h2 id="sec-2">2. 表 A · 问题设定与建模(动力学 / 目标 / 约束)</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>ID</th>
+<th>动力学模型</th>
+<th>维数</th>
+<th>机动目标</th>
+<th>输入约束</th>
+<th>FOV 约束</th>
+<th>噪声/时延</th>
+</tr></thead><tbody>
+<tr><td>01</td><td>simple motion 常速质点,仅航向可控(β_i&gt;1 / V_A=V_D=1、V_T=α)</td><td>2D</td><td>机动-最优</td><td>无(仅航向角∈[−π,π],点捕获)</td><td>无</td><td>无</td></tr>
+<tr><td>02</td><td>simple motion,可瞬时转向(降维 (R,r,θ))</td><td>2D</td><td>机动-最优(T 主动机动)</td><td>无</td><td>未提及</td><td>未提及</td></tr>
+<tr><td>03</td><td>simple motion(Isaacs 式,V_A=V_D=1、V_T=α&lt;1)</td><td>2D(R⁶)</td><td>机动-最优</td><td>无,点捕获</td><td>未提及</td><td>无(完美信息)</td></tr>
+<tr><td>04</td><td>simple motion,速度异质、全员最大速度</td><td>2D(R^{2(N+M)})</td><td>机动-最优(E_j 完全理性)</td><td>无,点捕获</td><td>未提及</td><td>未提及</td></tr>
+<tr><td>05</td><td>simple motion,输入为单位向量(饱和型)</td><td>2D(R⁴)</td><td>未提及(守卫静态凸集 Ω,攻击者 simple motion)</td><td>有-限幅(‖u‖=1)</td><td>未提及</td><td>无</td></tr>
+<tr><td>06</td><td>2D 非完整质点,横向加速度转向 a_ℓ/v_ℓ;速度不可控</td><td>2D</td><td>机动-有界(仅需 ‖a_P‖≤a_P^max,仿真用 PNG/PPG/DPG/BPNG)</td><td>有-限幅(‖a_ℓ‖≤a_ℓ^max;v_P≈v_D&gt;v_E)</td><td>未提及</td><td>未提及</td></tr>
+<tr><td>07</td><td>平面质点交战运动学(r_i, V_r,i, V_q,i),含目标加速度 u_T;切向调速、法向调向;速度可控</td><td>2D</td><td>机动-有界(模型含 u_T;<strong>定理中 u_T 消失,结论自述仅静止目标</strong>)</td><td>无</td><td>未提及</td><td>无</td></tr>
+<tr><td>08</td><td>小角度线性化相对运动学(改进 Dubin's car,4k 维联合);仿真 3DOF+三阶自动驾驶仪</td><td>2D(χ∈R^{4×k})</td><td>机动-最优(逃逸者最大化代价)</td><td>有-限幅(‖Q_p^{-1}a_p‖∞≤1,Q_p(t) 模拟舵效下降)</td><td>未提及</td><td>未提及</td></tr>
+<tr><td>09</td><td>平面质点恒速,仅法向加速度;理想或一阶滞后自动驾驶(τ_i)</td><td>2D</td><td>静止(机动目标列为未来工作)</td><td>无-设计层面(仿真</td><td>a_Mi</td><td>≤300 m/s²)</td><td>未提及</td><td>无(Assumption 4 明确无通信时延/失败)</td></tr>
+<tr><td>10</td><td>2D 运动学质点;目标常速模型 ż=Az;deviated pursuit 精确 t_go</td><td>2D</td><td>常速非机动(机动列为未来工作)</td><td>仿真有限幅(40g);理论未处理饱和</td><td><strong>无</strong>(标题"seeker-limited"指有无导引头的感知异构,非 FOV 角)</td><td>未提及</td></tr>
+<tr><td>11</td><td>2D 质点;DPG 弹恒速(需 V_{P_k}&gt;V_T),TPNG 弹 a_{P_j} 转动+增速</td><td>2D</td><td>非机动恒速(机动列为未来工作)</td><td>有-限幅(仅仿真 6g;理论指令无饱和设计)</td><td>未提及</td><td>无(噪声 w 仅出现在<strong>对手</strong>量测模型)</td></tr>
+<tr><td>12</td><td>2D 质点,速度可控(V̇_mi=a_vi, α̇_mi=a_li/V_mi)</td><td>2D</td><td>机动-正弦(Case 2:5g sin(πt/7);Case 1/3 静止)</td><td>有-限幅(a_lmax=50g、av_max=5g、V∈[350,900] m/s)</td><td>未提及</td><td>无(确定性环境假设)</td></tr>
+<tr><td>13</td><td>导弹 3DOF 点质量+质量变化,4 台脉冲 divert 推力器;目标双积分;无重力、姿态恒定</td><td>3D</td><td>机动-有界(bang-bang ≤5g 垂直于速度,随机起止/切换)</td><td>有-二值脉冲(10 Hz 开关,幅值∈[T_min,T_max])</td><td><strong>有</strong>(导引头视场 135°,越界终止回合)</td><td>无(导引头"perfectly stabilized / perfect tracking")</td></tr>
+<tr><td>14</td><td>导弹 6DOF 刚体(解析气动细长体+牛顿碰撞,radome 折射,执行器一/二阶)+目标 3DOF 质点</td><td>3D</td><td>机动-有界(bang-bang/weave/jinking 预设族,≤8g 动压折减;非反应式)</td><td>有-限幅(舵偏速率 80°/s、舵偏 20°;V≥400 m/s;过载路径约束)</td><td><strong>有</strong>(视线角 θ_L≤45° 路径约束)</td><td><strong>有</strong>(LOS 噪声 1 mrad、radome ±10 mrad、陀螺/加计误差;无时延、无 glint、无风)</td></tr>
+<tr><td>15</td><td>3D 追逃运动学+变速拦截器(推力 7500 N、阻力、质量燃耗);NN 学动力学</td><td>3D</td><td>机动-正弦(40sin(t) m/s²,V_T=270 m/s)</td><td>有(最大加速度 200 m/s²;执行器故障模型 η_i∈{1,0.5,0.6})</td><td>未提及</td><td><strong>有</strong>(MPPI 控制注入噪声;MC 观测乘性+8 mrad LOS 高斯噪声)</td></tr>
+<tr><td>16</td><td>恒速质点+一阶动力学 å_i=−(a_i−u_i)/τ_i,绕初始视线线性化 7 维;仿真另计轨道引力</td><td>2D(平面线性化)</td><td>无独立目标方——T 与 D 由同一 agent 控制;对手 I 用 OGL/SOGL/LQOGL 固定策略</td><td>有-限幅(u_I^max=6g、u_T^max=1g、u_D^max=2g)</td><td>未提及</td><td><strong>有</strong>(T/D 侧掩模+乘性均匀噪声 o_t=Γs_t×(I+ω_{o,t});I 侧完美信息;无时延)</td></tr>
+<tr><td>17</td><td>飞机 JSBSim F-16 全量 6DOF(200 Hz);导弹三维运动学点模型(PN/APN,恒速 800–1400 m/s)</td><td>3D</td><td>无目标方设定(逃逸视角;飞机即被追击的机动方)</td><td>有-限幅(动作 [−1,1]、油门 [0,1];最低高度 1000 m;速度 240–510 m/s 软约束)</td><td>未提及(导弹无导引头失锁建模)</td><td>无(仅对 λ̇ 数值低通平滑,非噪声建模)</td></tr>
+</tbody></table></div>
+<hr>
+<h2 id="sec-3">3. 表 B · 假设强度 / 信息结构 / 理论证明 / 对抗性 / 实验规模</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>ID</th>
+<th>假设强度(最关键 2–3 条)</th>
+<th>信息结构</th>
+<th>理论证明</th>
+<th>防御方/对抗机动</th>
+<th>实验规模</th>
+<th>代码</th>
+</tr></thead><tbody>
+<tr><td>01</td><td><strong>强</strong>:simple motion+点捕获零半径;完全信息;速度优势 β_i&gt;1、α&lt;1</td><td>集中式;完全信息;无通信拓扑</td><td>3 定理+2 命题;Theorem 2 文内完整证明(Value C¹+HJI);HJI+PMP</td><td>双方都智能(2P1EDG 与 ATDDG 均博弈最优)</td><td>3 个示意算例(区域划分、dispersal 面、5P3E 指派);无 MC、无基线</td><td>无</td></tr>
+<tr><td>02</td><td><strong>强</strong>:simple motion;β=V_D/V_A&gt;1 且 α&lt;1;点捕获;Attacker 博弈理性</td><td>集中式;完全信息(Example 3 团队仅测 A 位置在线重解)</td><td>2 定理+4 命题;PMP 闭式最优航向+静态 minmax 鞍点 u*=v*;<strong>无 HJI/反馈值函数验证</strong></td><td>双方都智能(A 博弈最优;另测 A 用 PN(N'=3) 的鲁棒性)</td><td>3 个算例;基线=TPBVP 数值解 vs 解析解自洽</td><td>无</td></tr>
+<tr><td>03</td><td><strong>强</strong>:simple motion+点捕获;等速临界 V_A=V_D(V_A&gt;V_D 时 T/D 必败;V_D&gt;V_A"可推广"无推导)</td><td>集中式;完美信息;T/D 结盟</td><td>3 定理+1 推论;Theorem 2 双侧 PMP+Value V=DI−TI/α 的 C¹+HJI 验证;反例否定前作 PP 策略</td><td>双方都智能(Rc 内 A 最大化终端 D-T 距离)</td><td>3 个算例;基线=前作 PP 策略(反例)</td><td>无</td></tr>
+<tr><td>04</td><td><strong>强</strong>:simple motion;N≥M 且 α_ij&lt;1;<strong>坚定承诺分配</strong>(不换目标);点捕获+被捕者冻结</td><td>集中式;全状态信息,无通信即可独立求解;dispersal 面需一次通信去冲突</td><td>4 定理+1 推论;Value 连续、C¹(除 dispersal 面)、满足 HJI;分配给 LP/匈牙利算法</td><td>双方都智能(P 队 max、E 队 min)</td><td>2v2 动态仿真(4 情形);3v3 几何示意;基线=PP 制导、错误分配自对照;无 MC</td><td>无</td></tr>
+<tr><td>05</td><td><strong>强</strong>:simple motion;Ω 紧致凸+光滑+可透;慢逃逸者 0&lt;γ&lt;1;式(35)唯一性直接断言</td><td>集中式;双方每时刻互知状态与动力学</td><td>5 命题(无编号定理);屏障函数半透性+两 Game of Degree 的 V_c/V_a 经 HJI 验证构成鞍点</td><td>双方都智能(鞍点策略;仿真含最优 vs 单方非最优自对照)</td><td>2 场景×2 初始区域纯轨迹可视化;无定量指标、无文献基线</td><td>无</td></tr>
+<tr><td>06</td><td><strong>中</strong>:E-D 联盟仅需追者机动上界;但 v_P≈v_D 能力对等;增益条件 K&gt;sup a_P^max/r_DP 在 r_DP→0 不可满足</td><td>分布式(E-D 联盟,信息级协同共享 a_E;无图拓扑)</td><td>1 命题+1 引理+4 定理;外接圆弦几何捕获次序+双层滑模预设时间精确归零(Lyapunov);<strong>捕获链 ṙ_DP&lt;0 前提未闭合</strong></td><td>含防御方 D;<strong>攻方策略未知但固定</strong>(仅假设有界机动,仿真 P 用 PNG/PPG/DPG/BPNG)</td><td>多场景数值仿真(±20g、能力下调 ±8g);无 MC、无脱靶量统计、无同类基线</td><td>无</td></tr>
+<tr><td>07</td><td><strong>中</strong>:连通图为唯一编号假设;<strong>机动目标未进证明</strong>(u_T 消失);保守时间界需附加 ϑ≤1</td><td>分布式(加权图 𝒢、Laplacian ℒ;无时延)</td><td>3 定理+3 引理;固定时间收敛(T_1/T_2/T_3 与初值无关,Lyapunov);Theorem 3 证明"omitted";<strong>未证命中 r_i→0</strong></td><td>无(目标被动机动且未知,非博弈参与者)</td><td>5 弹 1 目标数值仿真(51.0 s 同时到达);基线"式(43)"表达式缺失无法核对;无 MC</td><td>无</td></tr>
+<tr><td>08</td><td><strong>强</strong>:线性系统+凸控制集+凸终端代价+L 凸/1-coercive;Isaacs 条件 H⁺=H⁻;凸性需 Q_e≤Q_p(断言)</td><td>集中式(联合状态 4k;追方各自控制、逃逸者公共输入)</td><td>无自行编号定理;Hopf 公式为 HJ 方程精确黏性解(引用);<strong>非凸时逐点最小仅为真值上界</strong>(引用)</td><td>双方都智能(追逃博弈最优;明确放弃"目标不机动"的 PN 类设定)</td><td>3DOF 闭环仿真(k=2,8 维;单次求解 40–83 ms,i7-950);基线仅引用网格 HJI 耗时,无同题受控基线</td><td>无</td></tr>
+<tr><td>09</td><td><strong>中</strong>:通信无时延无失败;恒速+tgo 小角近似无误差界;leader 单点;增益 η_f&gt;1/λ_min(H) 需全局拓扑信息</td><td>分布式-混合拓扑(leader-follower:T_d 仅 leader 知;followers 持续接收 leader tgo)</td><td>3 引理(引[25])+2 个未编号主结果(Lyapunov V=δᵀHδ;一阶自动驾驶 backstepping);无博弈均衡</td><td>无(静止目标)</td><td>1 leader+4 followers(扩展 1+8);3 组初值+参数扫描;基线=[30] AST 2022;无 MC、无噪声时延仿真</td><td>无</td></tr>
+<tr><td>10</td><td><strong>中</strong>:仅部分弹有导引头(Assumption 1)+感知图含生成树(Assumption 2);目标恒速非机动;<strong>Theorem 2 证明省略</strong></td><td>分布式(感知图 G 含目标 leader 节点;执行图 G^a leaderless,两图不必重合;固定时间观测器)</td><td>5 引理+2 定理;Theorem 1 观测器固定时间收敛(Lyapunov);Theorem 2 super-twisting 共识<strong>证明省略、T_c 无显式上界</strong></td><td>无(目标常速非机动)</td><td>1 目标+4 拦截弹(仅 I1 带导引头);2 场景;无对比基线、无 MC</td><td>无</td></tr>
+<tr><td>11</td><td><strong>强</strong>:目标非机动恒速;理想质点+快速 autopilot 可忽略;tgo 动力学须控制仿射且 V_P&gt;V_T</td><td>分布式(固定强连通有向图,无 leader,仅交换 tgo 误差 e_k);对手侧不完美(量测 O=C(X(E,𝒢))+w,能力边界未形式化)</td><td>1 定理+2 推论(prescribed-time tgo 共识,Lyapunov+TBG);<strong>ε-加密仅定义式,无证明无定量评估</strong></td><td>无防御方;目标恒速;对抗仅体现为外部观察者被动不可预测(<strong>无对手估计器仿真</strong>)</td><td>4 场景(N=4,两种拓扑/morphing/PIP 切换);无定量基线,ε/TV 距离/熵均未计算;无 MC</td><td>无</td></tr>
+<tr><td>12</td><td><strong>强</strong>:目标特征估计误差可忽略;确定性环境(POMDP 退化);Theorem 1 需适应度可微单调+m→∞</td><td>分布式(无向图、邻居集 N_i;离线主从式并行训练;无通信时延模型)</td><td>仅 1 定理(收敛到最优策略小邻域;<strong>启发式论证,无速率、无全局最优性</strong>)</td><td>无防御方;目标固定正弦机动(非对抗)</td><td>3 场景:四弹(vs TASCGL 基线)、机动目标单次、五弹 200 episodes MC;指标 e_t/e_a/ZEM;Case 1/2 无重复次数</td><td>无</td></tr>
+<tr><td>13</td><td><strong>强</strong>:无重力+末段迎头;姿态恒定不实现;导引头完美无噪;训练=同一仿真器无 sim-to-real</td><td>单弹集中式;<strong>不完美信息</strong>(角度-only:obs=[e_u,e_v,dθu,dθv],无距离/加速度);POMDP 表述</td><td><strong>无</strong>(作者自明"no guarantee on the optimality of trajectories",p.8;仅引 PPO 的 KL 有界)</td><td>无防御方;目标 bang-bang 随机机动(固定机动族,非最优、非反应式)</td><td>5000 MC/策略;基线=增强 ZEM(给予完整真值状态的"理想信息版");泛化测试(扩展包线/barrel roll)</td><td>无</td></tr>
+<tr><td>14</td><td><strong>中</strong>:仅末段;解析气动非 CFD;目标恒速质点+预设机动族;低通替代 Kalman——但含 radome、传感器噪声、气动 ±10% 摄动、柔性体,组内模型最丰富</td><td>单弹集中式;不完美信息(22 维观测,含噪链路+radome 寄生回路)</td><td><strong>无</strong>(转率替代 Ω_surr "we have not rigorously analyzed",p.8;寄生回路鲁棒性仅仿真)</td><td>无防御方;目标 bang-bang/weave/jinking 预设族(非反应式;训练 5:1、测试至 2:1 加速度优势)</td><td>5000 回合/工况 ×10+ 工况(6DOF);基线=Zarchan PN(N'=4)+三回路自动驾驶仪(adjoint);消融去 GRU(成功率掉到 10–22%)</td><td>无</td></tr>
+<tr><td>15</td><td><strong>中</strong>:MPPI 高斯采样假设;元训练任务集不含目标机动与执行器故障(全靠在线适应);5 ms 实时性仅设计论证无实测——但带噪 MC+半实物为组内较实</td><td>单弹集中式;不完美信息(实际观测 6 维带噪;可观测量列 10 维口径不一致)</td><td><strong>无定理</strong>;仅 Remark 2 非正式 Lyapunov 论证(V̇=−K₂e₁²≤0,只针对参考规划器)</td><td>无防御方;目标固定正弦机动(非对抗);元训练时目标无机动</td><td>MC 3500 次;<strong>半实物三轴转台+CCD 导引 100 次交战</strong>;基线=standard MPPI 自家变体(无 PN/APN)</td><td><strong>有</strong>(GitHub,MIT,含预训练模型;训练代码/数据集未发布)</td></tr>
+<tr><td>16</td><td><strong>强</strong>:端末段恒速质点+平面线性化;拦截弹 I 完美信息且策略不可学习(仅 OGL 族);奖励超参不通用</td><td><strong>集中式</strong>(单 TD3 agent 输出 [u_T,u_D],T+D 完全联盟);<strong>非对称不完美信息</strong>(I 完美、T/D 掩模+乘性噪声);T-D 理想通信</td><td>RL 部分无定理;解析部分 2 引理(LQOGL 援引、SOGL 本文 PMP 推导)</td><td><strong>含防御方 D(核心贡献)</strong>;对手 I 为 OGL 族固定最优策略(课程 0g→方波→OGL;评估 SOGL/LQOGL;<strong>不可学习、无自博弈</strong>)</td><td>训练 20000 episodes、8 worker、12 h、6 seeds;win-rate 基线 SOGL 87.0%;6 组噪声算例;泛化测试(u_I^max 30–80 m/s²、τ_I 0.002–0.05 s);MC 次数未给</td><td>无(留 [引用] 占位)</td></tr>
+<tr><td>17</td><td><strong>强</strong>:导弹恒速 800–1400 m/s;飞机对导弹相对位置/速度全知;无噪声/时延/漏检;对手为固定 PN/APN 脚本、切换阈值硬编码</td><td>单机集中式;全信息(12 维状态含 Δxm、Δẋm);导弹侧 PN 需 λ̇(真实几何计算)</td><td><strong>无</strong>(无定理/命题;仅经验性 Remark 1:切换阈值 8000 m 由统计得出)</td><td>无防御方(逃逸视角);对手为 PN/APN 导弹固定脚本(恒速、过载截断、杀伤半径 10 m)</td><td>JSBSim F-16 200 Hz;分区间 MC(每区间 40/20 次,总次数未给);基线=文献 RL 策略 34.14%、steep turn 3.34%,本文 80.89%;APN 泛化 75.63%</td><td>无</td></tr>
+</tbody></table></div>
+<hr>
+<h2 id="sec-4">4. 记号对应表(跨论文符号映射;保留原始记号)</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>概念</th>
+<th>01</th>
+<th>02</th>
+<th>03</th>
+<th>04</th>
+<th>05</th>
+<th>06</th>
+<th>07</th>
+<th>08</th>
+<th>09</th>
+<th>10</th>
+<th>11</th>
+<th>12</th>
+<th>13</th>
+<th>14</th>
+<th>15</th>
+<th>16</th>
+<th>17</th>
+</tr></thead><tbody>
+<tr><td>目标/追方速度比</td><td>α=V_T/V_A;β_i=v_Pi/v_E</td><td>α=V_T/V_A&lt;1;β=V_D/V_A&gt;1</td><td>α=V_T/V_A&lt;1</td><td>α_ij=v_Ej/v_Pi&lt;1</td><td>γ=v_E/v_P∈(0,1)</td><td>v_P≈v_D&gt;v_E(数值)</td><td>—</td><td>V_p/V_e</td><td>—</td><td>V_T(常速)</td><td>V_{P_k}&gt;V_T</td><td>—</td><td>训练 5:1(加速度)</td><td>5:1/2:1(加速度)</td><td>—</td><td>u_I^max/u_T^max/u_D^max</td><td>导弹 40–50g</td></tr>
+<tr><td>time-to-go</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>T*=argmin φ</td><td>tgo_i=r_i/V_Mi(1+θ²/2K)</td><td>t_go_i(式(2) 精确)</td><td>t_{go_k}</td><td>t_go^i=−r_i/ṙ_i</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>一致性/协同误差</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>β=χ−χ★(角度)</td><td>ξ_r,i/ξ_Vr,i;s_i</td><td>—</td><td>e_i/e_ℓ(时间误差)</td><td>s_i=Σ[L_I]_ij e_j</td><td>e_k=t_{go_k}−t^d</td><td>e_t^i=Σ(t_go^i−t_go^j)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>通信拓扑/交互矩阵</td><td>无</td><td>无</td><td>无</td><td>无(dispersal 面一次通信)</td><td>无</td><td>无图(相对量测)</td><td>𝒢、ℒ、λ_s</td><td>无</td><td>H=L_f+B</td><td>感知图 L_TI / 执行图 L_II</td><td>L̂(λ₂=Fiedler 值)</td><td>邻居集 N_i</td><td>无</td><td>无</td><td>无</td><td>无(理想通信)</td><td>无</td></tr>
+<tr><td>LOS 角/角率</td><td>λ_i(初始视线角)</td><td>θ(视线夹角)</td><td>σ(A-D 视线角)</td><td>—</td><td>—</td><td>λ_DP/λ_ED/λ_EP</td><td>φ/LOS 系</td><td>—</td><td>θ_Mi</td><td>θ_i;δ_i 偏差角</td><td>—</td><td>Ξ_mi/e_Ξ^i</td><td>e_u,e_v;dθu,dθv</td><td>Ω(LOS 转率);θ_L</td><td>θ_m,ψ_m</td><td>λ(隐含于 ZEM)</td><td>λ̇s(带符号)</td></tr>
+<tr><td>制导/控制量</td><td>航向 φ,ψ,χ</td><td>航向(闭式)</td><td>χ,φ,ψ∈[−π,π]</td><td>ψ_i,φ_j</td><td>u(‖u‖=1)</td><td>a_ℓ(横向加速度)</td><td>u^r_i/u^q_i(LOS 系)</td><td>a_p/a_e</td><td>a_Mi</td><td>a_Mi</td><td>a_{P_i}/a_{M_k}</td><td>u_i=(1−η)u_pi+ηu_ei</td><td>u∈Z^k(二值脉冲)</td><td>u=c_θ(o)∈R⁴(舵偏速率)</td><td>a_zm,a_ym</td><td>action=[u_T,u_D]</td><td>a=[δe,δa,δr,δt]</td></tr>
+<tr><td>屏障/捕获几何</td><td>c_i/ρ_i(Apollonius 圆);dispersal 面 D</td><td>a/r_A(DA 圆);ᾱ 临界速度比</td><td>B(x;α) 屏障;I* 捕获点;ω*</td><td>y_ij(圆最低点);R_P 必胜域</td><td>B(x;Ω,γ);C(x)/R(x);Proj_Ω</td><td>χ∈[π/2,3π/2] 外接圆弦</td><td>—</td><td>Ω 捕获椭球;φ(z,t) 值函数</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>Z_IT/Z_ID(零控脱靶量);η 切换阈值</td><td>—</td></tr>
+<tr><td>值函数/代价</td><td>J_c;Value(2P1EDG)</td><td>I*(拦截点);J=I*</td><td>V=DI−TI/α</td><td>V=max min J;y_s</td><td>V_c/V_a</td><td>V₁=½S̿²(Lyapunov)</td><td>V_q(Lyapunov)</td><td>φ/H(p,t) 对偶范数</td><td>V=δᵀHδ</td><td>—</td><td>V=eᵀe/2</td><td>—</td><td>r_shaping/r_terminal(奖励)</td><td>r_shaping 等(Eqs.30a–f)</td><td>S(τ)(轨迹代价);φ(x_N)</td><td>奖励 φ(χ)=e^{−χ}+χ−1(ZEM 项)</td><td>奖励含 λ̇s</td></tr>
+<tr><td>观测/状态(RL 类)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>obs=[e_u,e_v,dθu,dθv]</td><td>o(RF 版 22 维)</td><td>观测 6 维带噪</td><td>o_t=Γs_t×(I+ω)</td><td>s(12 维)</td></tr>
+</tbody></table></div>
+<blockquote>注意两处极易混淆的记号:(i) "seeker-limited"(10)指<strong>有无导引头的感知异构</strong>,与 FOV 角约束无关;(ii) 速度比方向——02/03/04 的 β、α_ij 定义在追逃两侧,分母分子与 01 的 β_i 相反,引用数值时务必核对定义。</blockquote>
+<hr>
+<h2 id="sec-5">5. 三类红旗清单(矛盾 / 仅仿真支撑 / 真实条件不成立)</h2>
+<h3>5.1 互相矛盾的结论与内部矛盾(逐条带出处)</h3>
+<p><strong>跨文献矛盾</strong></p>
+<ol><li><strong>博弈内部纠错链</strong>:03 用双侧 PMP 证明其前作([22],Pure Pursuit)在 Attacker 赢取区 R_c 的策略不满足半透屏障、非最优(03 笔记 Theorem 2/Example 3);01 教程在 ATDDG 部分采用 03 的结论。→ 该领域"早期几何解被后续 PMP 证明推翻"并非孤例,引用 2015–2018 年 T-A-D 结论时必须核对 03 之后是否被修正。</li><li><strong>防御方弱势时的表面张力</strong>:03 证明等速临界 V_A=V_D 下 T/D 在 R_c 内必死(点捕获);16 的 RL 却让 T(1g)/D(2g) 对抗 6g 的 OGL 拦截弹拿到高胜率。两者并不直接矛盾——03 是 simple motion+点捕获+速度优势刻画,16 是有界加速度+一阶动力学+非零杀伤半径 η+对手仅 OGL 族——但<strong>如果换掉 16 的对手设定(博弈最优 I)其结论是否保持,完全未知</strong>。这是"博弈最优对手 vs OGL 对手"的待验证命题。</li><li><strong>齐射三兄弟假设互斥</strong>:07(固定时间,目标可"机动"但证明只覆盖静止)、09(任意预设时间,静止目标)、11(prescribed-time,非机动恒速)同为 time-to-go 共识,但 07 声称机动目标而 09/11 明确排除——07 的声称与自身证明矛盾(见下),以 09/11 的口径为准。</li></ol>
+<p><strong>单篇内部矛盾/疑似笔误</strong>(全量见对应笔记第 6/8 节)</p>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>ID</th>
+<th>矛盾/笔误</th>
+<th>位置</th>
+</tr></thead><tbody>
+<tr><td>01</td><td>p.14 Theorem 3 写 0≤α&lt;1 与 p.13 Prop 2 写 0&lt;α&lt;1 不一致;协态式 λ̇_{x_P2}=λ̇_{y_P1}=0 末项疑为 λ̇_{y_P2}</td><td>p.7/p.13/p.14</td></tr>
+<tr><td>02</td><td>解析解=数值解仅 2 例支撑;式(41)根唯一性未讨论;TPBVP 的 r_c 取值未披露</td><td>p.6–8</td></tr>
+<tr><td>03</td><td>"结果可推广到 V_D&gt;V_A"无任何推导;V=DI−TI/α 非负性未证明;六次根选取无规则</td><td>p.3/p.6/p.9–10</td></tr>
+<tr><td>04</td><td>dispersal 面"选任一等优分配不损失性能"仅一句话论断;共捕判据无算法化判据</td><td>p.11/p.14–15</td></tr>
+<tr><td>05</td><td>式(30)(31) 与定义式(23) 数值不一致(印刷缺 R(x) 因子,子代理数值核验);<strong>仿真 h 不满足自身凸性假设</strong>(Hessian 在 (1,1) 负特征值);式(35)"凸优化"标签与目标含凹项矛盾</td><td>p.2/p.4–5</td></tr>
+<tr><td>06</td><td>引用不存在的"Theorem 1"(应为 Proposition 1);增益条件 K&gt;sup a_P^max/r_DP 与终端目标集 r_DP(t_f)=0 冲突;式(25) 权重下标误写</td><td>p.5/p.8</td></tr>
+<tr><td>07</td><td><strong>摘要/标题"机动目标"与结论"静止目标"自相矛盾;证明中 u_T 项消失</strong>;引用不存在的式(43) 且基线图缺失;p.3 残留"[zuo]"占位、文献[20]缺失</td><td>p.1/p.5–12/p.13</td></tr>
+<tr><td>08</td><td>牛顿初值 p₀=V(0)z/2 与按 J⋆_z 求极小应得 2V(0)z 矛盾;时间变量 t 疑应为 T*;"40–83 ms"统计口径不明</td><td>p.4–5</td></tr>
+<tr><td>09</td><td>Table I Set 3 Follower 2 r₀=600 m 与正文 6000 m 矛盾(疑漏零);tgod 定义两处写法不一;收敛区间端点笔误</td><td>p.5–6/p.9</td></tr>
+<tr><td>10</td><td><strong>Theorem 2 证明省略</strong>("omitted for brevity"),共识时间 T_c 无上界;40g 饱和未进理论而初始指令≈边界值;证明中组合校正向量 δ 与偏差角 δ_i 记号冲突</td><td>p.3/p.5</td></tr>
+<tr><td>11</td><td><strong>增益下界不一致:Theorem 1 要求 β≥1/λ₂(p.4),Corollary 写 β≥1/(2λ₂)(p.5)</strong>;ε-加密无定量评估且无对手仿真;morphing 再共识在 t_switch&gt;t_e 时无定理支撑;摘要宣称抗扰动但无扰动注入</td><td>p.4–8</td></tr>
+<tr><td>12</td><td>Eq.(32) 求和指标、Eq.(27) 维数笔误;Table IV λ_a/λ_t 与 Eq.(7) γa/γt 关系未解释;Case 3 的 200 episodes 是重训还是复测不明</td><td>p.6–7/p.9/p.12–13</td></tr>
+<tr><td>13</td><td><strong>正文"燃料略增"与 Table 5/6(RL 更省油)直接矛盾</strong>;Fig.5/6 标题同名;脱靶量测定协议未写明</td><td>p.3/p.7/p.10–12</td></tr>
+<tr><td>14</td><td>Table 8 的 k^(0)=k^(1)=0.1 与 Eq.(32) 记号不符;Table 6 "μ Miss" 与正文 "root-mean-square" 口径不一;h_W 参数重复疑为 x_W</td><td>p.8/p.15/p.17</td></tr>
+<tr><td>15</td><td>状态向量 Ṙ,θ̇_m,ψ̇_m 重复出现;K₁/K₂ 数值归属两处歧义;Table II 脱靶量 10⁻⁵ m 口径可疑;终端代价 φ 全文未给出</td><td>p.4–7</td></tr>
+<tr><td>16</td><td><strong>时间常数正文 τ=5/10 ms(p.19)与 Table 3 的 0.05/0.1/0.02 s(p.20)冲突</strong>(ms 级时间常数对 19.7 s 交战物理合理性存疑);Fig.4 win-rate 纵轴超过 1;式(30) 编号重复;两处 [引用] 占位</td><td>p.8/p.12–13/p.19–22/p.24</td></tr>
+<tr><td>17</td><td><strong>式(51) n_m 明写导弹过载、p.17 解释为抑制飞机过载——基线奖励方向疑反,34.14% 基线或被低估</strong>;训练 7500 步与场景 5000 步不一致;结论缺承诺的局限性章节</td><td>p.6–8/p.16–17/p.20</td></tr>
+</tbody></table></div>
+<h3>5.2 仅有仿真验证、缺理论与实物支撑的结论(红旗级)</h3>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>结论</th>
+<th>支撑现状</th>
+<th>涉及</th>
+</tr></thead><tbody>
+<tr><td>"固定时间/预设时间同时到达<strong>机动</strong>目标"</td><td>证明丢 u_T,仅静止目标严格成立;基线不可核对</td><td>07(09/11 反证其口径)</td></tr>
+<tr><td>"轨迹加密使弹道不可预测"</td><td>ε 仅定义式,TV 距离从未计算,无对手估计器仿真</td><td>11</td></tr>
+<tr><td>"保证拦截"(E-D 联盟)</td><td>捕获链 ṙ_DP&lt;0 未闭合;增益条件终端自相冲突</td><td>06</td></tr>
+<tr><td>"固定时间 time-to-go 共识→同时命中"</td><td>Theorem 2 证明省略、T_c 无上界;未证命中 r_i→0</td><td>10;07 同病</td></tr>
+<tr><td>RL 拦截/规避胜率(80.89%、91%&lt;1 m 等)</td><td>全部零定理,对手均为预设机动族/固定制导律,无自适应对手</td><td>13/14/17;16 同(OGL 族对手不可学习)</td></tr>
+<tr><td>Hopf 公式实时性(40–83 ms)</td><td>单机单场景、统计口径不明;非凸情形只有上界保证</td><td>08</td></tr>
+<tr><td>元学习 MPPI 适应机动/故障</td><td>元训练任务集不含机动与故障;实时性无实测;基线全是自家变体</td><td>15</td></tr>
+<tr><td>等速解析解=数值解一般等价</td><td>仅 2 个算例</td><td>02</td></tr>
+<tr><td>dispersal 面上分配无关紧要</td><td>一句话论断无证明</td><td>04</td></tr>
+<tr><td>屏障/仿真几何正确性</td><td>式(30)(31) 印刷错误;仿真不满足自身凸性假设</td><td>05</td></tr>
+</tbody></table></div>
+<p><strong>实物/半实物覆盖</strong>:17 篇中仅 15 有半实物三轴转台+CCD 导引子系统(100 次交战);其余 16 篇全部为纯数字仿真,无一篇有飞行/车载/桌面硬件验证。</p>
+<h3>5.3 在真实飞行条件下不成立的假设(按篇归档)</h3>
+<ol><li><strong>simple motion 全向常速、可瞬时翻转航向</strong>(01/02/03/04/05):真实导弹有转弯半径、过载限制、速度剖面;此假设使 01–05 的"最优策略=恒定直线航向"结论在末端不可直接执行(01 p.13–14、03 式(1)、04 Theorem 1)。</li><li><strong>点捕获(零杀伤半径)</strong>(01/02/03/04):真实弹有杀伤半径(17 导弹杀伤半径 10 m、16 的 η=防御器杀伤半径)。03 的捕获区 R_c 划分对非零半径情形未刻画(仅引 [11] 提及)。</li><li><strong>完美信息/零噪声/零时延</strong>(01–12 中除 14/15/16 外全部):16 证明不完美信息可以建模(T/D 掩模+乘性噪声),但因此<strong>放弃了全部理论保证</strong>;05–12 的共识/滑模结论在带噪测量+数据链抖动下无任何鲁棒性定理(09 Assumption 4 明确排除;10 随机扰动列为未来工作)。</li><li><strong>通信无时延无失败 + 图恒连通</strong>(07 唯一编号假设、09 Assumption 4、10/11 固定图):真实弹间链路有抖动、断链、抗干扰压制,四篇均无拓扑切换/时延下的稳定性结果(07 声称的鲁棒性场景在该版本缺失)。</li><li><strong>目标静止或恒速非机动</strong>(07 结论口径/09/10/11):齐射协同全部退化到非机动目标;12 虽有正弦机动但纯离线优化、环境确定性假设。</li><li><strong>无 FOV/导引头物理限制</strong>(06–12 明确未建模):仅 13(135° 视场、越界终止)与 14(θ_L≤45° 路径约束)建模;10 的"seeker-limited"不涉及 FOV;齐射类(09/10/11)无一处理 FOV 与同时到达的耦合。</li><li><strong>二维平面</strong>(01–12 全部):三维几何(如 09 的 leader-follower 环绕、11 的加密弹道族)在立体空间的拓扑/奇异性差异完全未量化;3D 仅出现在单弹 RL(13/14/15/17)。</li><li><strong>理想自动驾驶仪</strong>(09 理想情形、11 忽略 autopilot):09 自己补了一阶滞后分析(主结果 B)、11 仿真加了 τ=0.15 s 低通——说明作者自知理想化,但 11 的定理仍建立在无 autopilot 模型上。</li><li><strong>训练=部署环境</strong>(13 同一仿真器无 sim-to-real;12 确定性 POMDP):14 是唯一系统性测试气动摄动 ±10%/radome/柔性体的 RL 工作,但仍无风、无 glint、无时延。</li><li><strong>对手固定且能力已知</strong>(16 的 OGL 族、17 的 PN/APN 脚本、06 的有界机动假设):真实对手会改变制导律与参数;17 对未训练过的 APN 成功率从 80.89% 掉到 75.63% 是全场唯一给 出"对手泛化损失"硬数字的工作。</li></ol>
+<hr>
+<h2 id="sec-6">6. 组间梯度总结(由 A/B 组内观察合并)</h2>
+<ol><li><strong>假设强度 ↔ 现实性的剪刀差</strong>:01–05(博弈组)假设最强(全向常速+点捕获+完美信息)但理论最硬(HJI 验证的 C¹ Value、闭环鞍点);13/14/15/17(RL/MPC 组)动力学最实(6DOF、radome、执行器故障、半实物)但理论最空(0 定理)。<strong>没有任何一篇同时做到"较真实动力学 + 博弈最优对手 + 理论保证"</strong>——三者取二的现状是本领域最大结构特征。</li><li><strong>信息结构断层</strong>:博弈组(01–05、08)集中式完美信息;制导组(07/09/10/11)分布式图拓扑但无时延;RL 组(13/14/15/17)单弹集中式;16 独占"非对称不完美信息 + 多方联盟"生态位(但无理论、对手固定)。<strong>噪声/时延在 01–12 中全部为"无/未提及",是公共断层。</strong></li><li><strong>对抗性互不越界</strong>:有博弈最优对手的(01–05、08)全部无输入约束/视场;有输入约束的(05/06/08/10/11/12)全部无博弈最优对手;唯一含防御方的 16 用的是不可学习的 OGL 族对手。<strong>"双方都智能 + 双方都有约束"为全空白。</strong></li><li><strong>证明完整性断层</strong>:07(Theorem 3 省略+基线缺失)、10(Theorem 2 省略)、16(预印本占位符)——三篇的核心主张直接依赖省略/未定稿部分;11/13/16/17 各有正文与表格/图表互相矛盾的硬伤。</li><li><strong>可复现性</strong>:17 篇中仅 15 开放代码(训练代码与数据集仍缺),其余 16 篇无任何代码;RL 类(13/14/16/17)的关键超参(奖励权重、PPO 细节、观测构造)普遍缺失,12 连隐层宽度都未给。</li></ol>
+<hr>
+<h2 id="sec-7">附:行数据与 CSV</h2>
+<ul><li>行数据(全字段):<code>literature/comparison_rows_A.md</code>、<code>literature/comparison_rows_B.md</code></li><li>机读版:<code>literature/comparison_table.csv</code>(列含义与上表一致,内容为紧凑短语)</li><li>空白与机会:<code>literature/gaps.md</code></li></ul></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="assets/app.js?ver=91628a33"></script>
+</body>
+</html>

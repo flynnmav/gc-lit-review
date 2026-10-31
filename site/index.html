@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>首页 · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="index.html" class="on">首页</a>
+    <a href="papers.html">论文精读</a>
+    <a href="comparison.html">对比总表</a>
+    <a href="gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="hero ghero"><div class="gleft"><div class="eyebrow">系统性文献综述 · 2026</div><h1><span>多智能体协同制导</span><span>微分博弈</span><mark>强化学习</mark></h1><p class="sub">17 篇论文的结构化精读、五维方法对比与 12 条研究空白。所有论断可回溯:笔记 → 原文页码;推测一律标注「待验证」。</p><div class="gsearch"><svg class="gsicon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="globalQ" type="search" placeholder="搜索 17 篇精读笔记…" aria-label="全局搜索"><div class="hint">回车进入「论文精读」并自动过滤 · 例:固定时间 / Garcia / 规避</div></div></div><div class="heroart" aria-hidden="true"><i class="sq s1"></i><i class="sq s2"></i><i class="sq s3"></i><b>✱</b></div></div><div class="marquee"><div class="track"><span>17 篇结构化精读</span><span>✱</span><span>12 条研究空白</span><span>✱</span><span>20+ 处矛盾红旗</span><span>✱</span><span>5 维方法对比</span><span>✱</span><span>0 外部依赖</span><span>✱</span><span>17 篇结构化精读</span><span>✱</span><span>12 条研究空白</span><span>✱</span><span>20+ 处矛盾红旗</span><span>✱</span><span>5 维方法对比</span><span>✱</span><span>0 外部依赖</span><span>✱</span></div></div><div class="stats"><div class="stat"><b>17</b><span>篇论文精读</span></div><div class="stat"><b>3</b><span>研究支柱</span></div><div class="stat"><b>12</b><span>条研究空白</span></div><div class="stat hot"><b>20+</b><span>矛盾/笔误红旗</span></div><div class="stat"><b>0</b><span>外部依赖</span></div></div><div class="grid"><article class="card"><div class="row"><span class="gtile gA"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.6" fill="#fff" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><span class="tag">6 篇 · 01–06</span></div><h3>微分博弈与目标防御</h3><p class="teaser">T-A-D 三方博弈、多追多逃、区域守卫:Apollonius 几何、屏障面、HJI/PMP 闭环鞍点</p><div class="links"><a href="papers.html?g=A">浏览该组 →</a></div></article><article class="card"><div class="row"><span class="gtile gB"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="2.4"/><circle cx="19" cy="5" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M7 10.8 17 6M7 13.2 17 18"/></svg></span><span class="tag">6 篇 · 07–12</span></div><h3>多弹协同制导</h3><p class="teaser">同时到达/齐射:一致性、固定时间与预设时间共识、 leader-follower、感知异构</p><div class="links"><a href="papers.html?g=B">浏览该组 →</a></div></article><article class="card"><div class="row"><span class="gtile gC"><svg viewBox="0 0 24 24"><path d="M13 2 4.5 13.5H11l-1 8.5L18.5 10.5H12l1-8.5z"/></svg></span><span class="tag">5 篇 · 13–17</span></div><h3>强化学习制导</h3><p class="teaser">RL/MPC 制导:角度-only 拦截、6DOF 一体化 G&C、元学习 MPPI、不完美信息防御、逃逸</p><div class="links"><a href="papers.html?g=C">浏览该组 →</a></div></article></div><h2 style="margin:34px 0 14px;font-size:20px">三条最重要的横向结论</h2><div class="grid"><article class="card"><h3><span class="mini gA"></span>理论-现实的剪刀差</h3><p class="teaser">博弈组理论最硬、假设最虚;RL 组动力学最实、0 定理。三属性(真实动力学/最优对手/理论保证)无一同时占二。</p><div class="links"><a href="gaps.html#sec-0">G1 · 博弈×约束 →</a></div></article><article class="card"><h3><span class="mini gC"></span>同族文献的实锤矛盾</h3><p class="teaser">03 用双侧 PMP 推翻自家 2015 年解;07 的机动目标声称被自身证明否定;11 增益下界差一倍;13 正文与表格相反;16 时间常数差 10 倍。</p><div class="links"><a href="comparison.html#sec-4">红旗清单 →</a></div></article><article class="card"><h3><span class="mini gB"></span>最小可做实验</h3><p class="teaser">以 16 的 T-A-D 场景为公共测试床:博弈最优策略(03)、保障性制导(06)、TD3(16) 同协议换边对决。</p><div class="links"><a href="gaps.html#sec-10">G11 · 统一测试床 →</a></div></article></div><h2 style="margin:34px 0 14px;font-size:20px">快速入口</h2><div class="bar"><a class="fbtn" href="papers.html">📖 17 篇精读笔记</a><a class="fbtn" href="comparison.html">📊 五维对比 + 记号对应</a><a class="fbtn" href="gaps.html">🕳 研究空白 G1–G12</a><a class="fbtn" href="comparison.html#sec-4">🚩 矛盾红旗清单</a></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="assets/app.js?ver=91628a33"></script>
+</body>
+</html>

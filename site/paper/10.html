@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>10 Nonlinear Cooperative Salvo Guidance with Seeker-Limited Interceptors · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gB">多弹协同制导</span> · L. Gopikannan, S. R. Kumar, A. Sinha · 2025 · arXiv · arXiv:2509.15136 · <a href="../pdfs/10_Gopikannan2025_Salvo-Seeker-Limited.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">10 | Nonlinear Cooperative Salvo Guidance with Seeker-Limited Interceptors</h1>
+<blockquote>Gopikannan L., Kumar S.R., Sinha A. | arXiv:2509.15136 (2025) | 期刊/会议出处以文中为准(文中未标注期刊/会议,仅见 arXiv:2509.15136v1 [eess.SY] 18 Sep 2025,IEEE 排版风格)</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>本文的"seeker-limited"不是视场角(FOV)约束,而是<strong>导引头有无的异构感知</strong>:只有部分拦截弹带导引头直接测目标,其余弹在定向通信拓扑上用固定时间分布式观测器估计目标状态(p.1 摘要、p.2 Assumption 1)。相对无约束齐射工作的推进点:(i) 以 deviated pursuit 为基线,对常速目标的 time-to-go 表达式是<strong>精确解析</strong>的(p.2 式(2)引[10]),避免 PN 类方法对 time-to-go 的线性化/小角近似与 PIP 近似(p.1);(ii) 现有协同齐射工作普遍假设所有弹拥有完整目标信息(p.1),本文用分布式观测器+有限时间/固定时间稳定性理论补上"部分弹无导引头"这一现实约束;(iii) 用高阶滑模(super-twisting 型)一致性协议实现 time-to-go 有限时间共识(p.5 Theorem 2)。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li><strong>状态量(原文符号)</strong>:第 i 弹的相对距离 r_i、视线角 θ_i(LOS angle)、弹道倾角 γ_Mi、偏差角 δ_i = γ_Mi − θ_i(p.2, Fig. 1);目标状态 z = [X_T, Y_T, Ẋ_T, Ẏ_T]^T(惯性系位置与速度,p.3 式(4));观测器状态 ẑ_i(p.3)。</li><li><strong>控制量(原文符号)</strong>:第 i 弹横向加速度 a_Mi(p.2)。</li><li><strong>动力学模型(类型与方程)</strong>:二维运动学模型。<ul><li>相对运动方程(p.2 式(1a)(1b)): V_ri = ṙ_i = V_T cos(γ_T − θ_i) − V_Mi cos δ_i; V_θi = r_i θ̇_i = V_T sin(γ_T − θ_i) − V_Mi sin δ_i。</li><li>目标运动学(p.3 式(4)):ż = Az,A = [[0,0,1,0],[0,0,0,1],[0,0,0,0],[0,0,0,0]](常速模型)。</li><li>固定时间分布式观测器(p.3 式(5),沿[14]):ż̂_i = Aż̂_i − k_1 η_i − k_2 sig^α η_i − k_3 sig^β η_i,sig^★(·) = |(·)|^★ sign(·)。</li><li>估计交战变量下的相对运动(p.4 式(33a)(33b))与估计 time-to-go(p.4 式(34))。</li><li>time-to-go 动力学(p.4 式(35),Lemma 5 证明内):ṫ_go,i = −1 + V̂²_θi sec²δ̂_i/(V²_Mi − V̂²_Ti) − [r̂_i V̂_θi sec²δ̂_i/(V_Mi(V²_Mi − V̂²_Ti))] a_Mi。</li></ul></li><li><strong>通信/信息结构</strong>:两张有向图(p.2–p.3)。感知图 G = {V, E},节点 v_0(目标,唯一 leader,只发不收)与 v_1..v_n(拦截弹,follower);每弹需要:邻居估计 ẑ_j 与目标真值 z(仅 a_i0 = 1 的带导引头弹,见 p.3 式(6)中 η_i = a_i0(ẑ_i − z) + Σ_j a_ij(ẑ_i − ẑ_j));执行图 G^a = (V^a, E^a) 仅含拦截弹节点、leaderless、不必与 G 重合(p.3);制导一致性变量 s_i = Σ_{j=1}^n [L_I]_ij e_j(p.5 式(37)),即每弹还需邻居的 time-to-go 误差 e_j。此外每弹需要自身位置 (X_Ii, Y_Ii)(p.4 式(30)(31)反算 r̂_i, θ̂_i)与自身速度 V_Mi。</li><li><strong>目标泛函/终端条件(同时到达如何表述)</strong>:时间误差 e_i = t_go_i − t_go_d(p.5 式(36)),期望 time-to-go t_go_d <strong>不需显式已知</strong>,由各弹在交战中协同收敛到共同值;因 t_go_i − t_go_j = e_i − e_j,共识于 e_i 等价于共识于 t_go(p.5);在有限时间 T_c 内达成 time-to-go 共识后齐射同时命中(Theorem 2,p.5)。终端即 r_i → 0 且各弹命中时刻相同。</li><li><strong>机动目标</strong>:无。目标恒速、非机动(constant-velocity, non-maneuvering target,p.1 摘要、p.2 Problem、p.3 式(4))。</li><li><strong>约束(输入限幅/视场角/加速度)</strong>:执行器约束——仿真中设最大横向加速度 40 g(p.5);<strong>视场角约束未提及</strong>(标题的"seeker-limited"指导引头有无的异构,不是 FOV 角限制);理论设计(式(37))未显式处理饱和。</li><li><strong>噪声/时延</strong>:未提及。仿真中 I1 观测器初值取真值加随机扰动、其余弹初值任意赋值(p.5);p.6 结论把随机扰动、时变拓扑列为未来工作。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li><strong>Assumption 1(p.2)</strong>:仅一部分拦截弹装有导引头,能直接测量目标状态;其余拦截弹依赖有向图 G 上的弹间通信,通过与邻居的局部信息交换估计目标状态。</li><li><strong>Assumption 2(引[13],p.2)</strong>:有向感知图 G 包含以目标 v_0 为根的有向生成树;Laplacian 可分块为 L = [[0, 0_{1×n}],[L_TI, L_II]](式(3)),L_TI ∈ R^{n×1} 为目标对各 follower 的影响,L_II ∈ R^{n×n} 为 follower 子图的约化 Laplacian。</li><li>目标恒速、非机动(p.1 摘要;p.3 式(4));拦截弹速度 V_Mi 恒定(仅横向转向、无轴向加速度,p.2;式(2)的精确性对常速目标成立,引[10])。</li><li>执行图 G^a 为 leaderless、仅含拦截弹、与 G 不必重合(p.3)。</li><li>二维平面拦截(p.2 Fig. 1;p.3 目标状态仅 (X_T, Y_T) 及其速度分量)。</li><li><strong>FOV 约束如何进入设计</strong>:不存在 FOV 角度硬约束,也没有不变集式 FOV 论证;"seeker 限制"完全通过 Assumption 1 的异构感知 + Theorem 1 的固定时间观测器收敛来处理——T_s 之后 ẑ_i ≡ z,后续制导按真值交战变量进行(p.4–p.5)。</li><li>(隐含)估计量 r̂_i, V̂_θi 非零,使式(34)(37)可计算(分母含 V²_Mi − V̂²_Ti、r̂_i V̂_θi;未在文中作为假设列出,见第 8 节)。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制:双层架构。<strong>估计层</strong>——以目标常速运动学(式(4))为被观系统,每弹跑一个含线性项 + 幂次为 α∈(0,1) 和 β&gt;1 两个符号幂次项的固定时间分布式观测器(式(5)),一致性误差 η_i 经感知图 Laplacian 与局部估计误差相连(式(6));Theorem 1 保证估计在固定时间 T_s 内收敛(与初值无关)。<strong>制导层</strong>——带导引头信息经网络融合后,每弹用估计值构造 r̂_i, θ̂_i, γ̂_Ti(式(30)–(32))与估计 time-to-go(式(34),deviated pursuit 精确公式代入估计量);由 Lemma 5,t_go 对 a_Mi 相对阶为 1(式(35)),于是以 e_i 为误差、s_i = Σ[L_I]_ij e_j 为滑动变量,设计 super-twisting 型高阶滑模指令(式(37)):第一项 V_Mi θ̂̇_i 是追踪(pursuit)项,第二项通过 Λ_1|s_i|^{1/2}sign(s_i) − ν_i(ν̇_i = −Λ_2 sign(s_i))在执行图上驱动 time-to-go 有限时间共识;共识后 s_i = 0,a_Mi 退化为纯追踪,δ̂̇_i = 0,偏差角定格(p.5)。t_go_d 由队伍在交战中共商产生,无需预指派(p.5)。</p>
+<p>关键公式:</p>
+<ul><li>精确 time-to-go(deviated pursuit,常速目标,引[10]):t_go_i = r_i(V_ri + 2V_Mi cos δ_i − V_θi tan δ_i)/(V²_Mi − V²_T)(p.2 式(2))。</li><li>图 Laplacian 分块:L = [[0, 0_{1×n}],[L_TI, L_II]](p.2 式(3))。</li><li>观测器及一致性误差:式(5)(6)(p.3)。</li><li>估计交战变量:r̂_i、θ̂_i、γ̂_Ti,式(30)(31)(32)(p.4);估计 time-to-go 式(34)(p.4)。</li><li>t_go 动力学(相对阶 1 的依据):式(35)(p.4,Lemma 5 证明)。</li><li>误差与滑动变量:e_i = t_go_i − t_go_d(p.5 式(36));s_i = Σ_{j=1}^n [L_I]_ij e_j(p.5 式(37))。</li><li>制导律:a_Mi = V_Mi θ̂̇_i + [V_Mi(V²_Mi − V̂²_Ti)cos²δ̂_i/(r̂_i V̂_θi)] × (Λ_1|s_i|^{1/2}sign(s_i) − ν_i(t)),ν̇_i(t) = −Λ_2 sign(s_i)(p.5 式(37))。</li><li>观测器固定时间收敛时间上界:T_s ≤ 4c_α(1+α)/(k(1−α)) + 4c_β(1+β)/(k(β−1))(p.4 式(29))。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<ul><li><strong>Lemma 1(p.2,文中自证性陈述)</strong>:Assumption 2(含生成树)下,L_II 的特征值全为正,0 &lt; Re{λ_1} ≤ … ≤ Re{λ_n}。前提:Assumption 2。</li><li><strong>Lemma 2(引[14],p.2)</strong>:存在正定对角阵 D̄ 使 L_II^T D̄ + D̄ L_II ≻ 0;记其最小特征值 λ_m,取 D̂ = diag(d_1,…,d_n) = 2D̄/λ_m,则 L_II^T D̂ + D̂ L_II ≥ 2I_n。前提:有向图含生成树(经 Assumption 2)。</li><li><strong>Lemma 3(引[15] Polyakov,p.3)</strong>:若 V 正定径向无界、V(x)=0 iff x∈M,且 V̇ ≤ −(aV^m + bV^n)^k(a,b,m,n,k&gt;0,mk&lt;1,nk&gt;1),则 M 全局固定时间稳定,T(x_0) ≤ 1/(a^k(1−mk)) + 1/(b^k(nk−1))。</li><li><strong>Lemma 4(p.3)</strong>:幂平均不等式:0&lt;p≤1 时 (Σ|ρ_i|)^p ≤ Σ|ρ_i|^p ≤ n^{1−p}(Σ|ρ_i|)^p;p&gt;1 时 Σ|ρ_i|^p ≤ (Σ|ρ_i|)^p ≤ n^{p−1}Σ|ρ_i|^p。</li><li><strong>Theorem 1(p.3–p.4)</strong>:交战由式(1)描述、仅部分弹可直接获取目标状态、各弹在感知图 G 上实现观测器(5),则每弹局部估计在固定时间 T_s 内收敛到真目标状态,lim_{t→T_s}(ẑ_i(t) − z(t)) = 0,且 ∀t ≥ T_s 保持为零(式(7))。前提:k_1,k_2,k_3&gt;0,α∈(0,1),β&gt;1,Assumption 2;且由式(16)要求 k = min{(1/2)(k_1² − ‖D̂⊗A‖²), k_2²/2, k_3²/(2(4n)^{β−1})} &gt; 0,即需 k_1² &gt; ‖D̂⊗A‖²(增益条件,依赖图规模 d_max)。证明用 Lyapunov 函数式(11)→式(14)(Young 不等式 + Lemma 2)→式(16)→式(27)(28)→Lemma 3 得式(29),再由 η = (L_II⊗I_4)z̃ 与 L_II 非奇异得 z̃ → 0。</li><li><strong>Lemma 5(p.4)</strong>:基于估计交战变量的 time-to-go(式(34))对横向加速度 a_Mi 的相对阶为 1。前提:可微性,使用式(33)。</li><li><strong>Theorem 2(p.5)</strong>:交战由式(1)描述、仅部分弹可直接获取目标状态、time-to-go 取式(34),在有向执行图 G^a 上各弹交换并执行指令(37)(Λ_1, Λ_2 &gt; 0),则各弹在有限时间 T_c 内就 time-to-go 达成共识,并在交战中共商出的时刻同时命中运动目标。<strong>证明因篇幅省略</strong>(p.5:"We omit the detailed steps due to space constraints"),转引 4(Sinha &amp; Kumar, super-twisting leader–follower)、12(consensus-driven deviated pursuit)的推导。</li><li><strong>FOV 约束在证明中的保证方式</strong>:不适用——全文没有 FOV 不变集或 FOV 初值条件论证;"seeker 限制"的保证路径是 Theorem 1(固定时间估计收敛)+ 估计量替换真值(式(30)–(34)),p.5 说明 t→T_s 后所有估计交战变量趋近真值,故暂态后按精确模型工作。</li></ul>
+<h2 id="sec-6">5. 实验设置</h2>
+<ul><li><strong>场景</strong>:1 目标 + 4 拦截弹(I1–I4),仅 I1 带导引头可直接跟踪目标,其余无导引头(p.5)。感知图 G 与执行图 G^a 见 Fig. 2a/2b(有向图,具体边集仅由图给出,p.5)。</li><li><strong>参数(p.5)</strong>:目标从 (14000, 0) m 发射,航向 120°,速度 500 m/s;拦截弹速度异构 [580, 590, 600, 580] m/s,初始航向 [15°, 20°, 30°, 35°],初始位置 [(4.5,0) (6,0) (7,0) (8,0)]×10³ m;最大横向加速度 40 g;I1 观测器初值 = 真目标状态 + 随机扰动,其余弹初值任意;观测器增益 k_1 = 0.9, k_2 = 4, k_3 = 5,α = 0.93, β = 1.3;控制增益 Λ_1 = 5, Λ_2 = 10。</li><li><strong>场景 2(Fig. 4,p.5–p.6)</strong>:目标航向改为 150°,拦截弹初始航向 [−15°, −10°, 20°, 25°],初始位置 [(6,0.5) (6,1) (6.5,−0.5) (6.5,−1.0)]×10³ m。</li><li><strong>结果</strong>:场景 1 于 17.27 s 同时命中,time-to-go 约 2.2 s 内共识,观测误差几乎同时归零(Fig. 3,p.5);场景 2 于约 12.57 s 同时命中,观测收敛与共识时间变化不大(Fig. 4,p.6)。</li><li><strong>对比基线</strong>:无——仅有本方法在两种几何下的自比较,未与其他齐射制导(如 [4][6][12])数值对比。</li><li><strong>评价指标</strong>:同时命中时刻、time-to-go 共识建立时间、观测器误差 ‖r̃_T‖、‖ṽ_T‖ 的收敛(r̃_T = [X̃_T, Ỹ_T],ṽ_T = [Ẋ̃_T, Ỹ̇_T],p.5 Fig. 3d)、横向加速度 a_Mi 与偏差角 δ 曲线(Fig. 3c/4c)。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li><strong>作者承认的(p.6 第 V 节)</strong>:目标限定为常速、非机动;通信拓扑假设固定;作者明言未来工作为机动目标(不确定动力学)、时变通信拓扑、随机扰动。</li><li><strong>我分析的</strong>(推断依据):<ol><li><strong>Theorem 2 证明缺失</strong>(p.5 明言省略):共识时间 T_c 无显式上界,"有限时间"只是定性陈述;结论对本文异构(估计值驱动)设定是否严格成立需对照 [4][12] 的假设核验——原文引用的 [4][12] 推导针对的是各自模型与拓扑。</li><li><strong>指令奇异风险未讨论</strong>:式(37)第二项含 1/(r̂_i V̂_θi),式(2)/(34) 含 tan δ̂_i;接近迎头(V̂_θi→0)、r̂_i→0(命中前)或 |δ̂_i|→90° 时指令发散。对比文献中已有 nonsingular SMC 处理(其引用的 [8]),本文未给奇异规避或切换逻辑。</li><li><strong>输入饱和只出现在仿真</strong>:40 g 限幅(p.5)未进入式(37)的理论分析,饱和激活时有限时间共识结论不再有保证(Fig. 3c 显示初始 a_Mi 需求接近 400 m/s² ≈ 40 g,处于边界)。</li><li><strong>无 FOV 角约束</strong>:标题的"seeker-limited"仅指导引头有无;若真实导引头视场有限,共识前大偏差角机动(p.5 Fig. 3c 中 δ 变化阶段)可能导致目标出视场,本文框架没有建模或防护。</li><li><strong>噪声/时延/拓扑切换未建模</strong>(p.2 图模型为静态有向图;p.6 列为未来工作),固定时间观测器在测量噪声下的表现未知。</li><li><strong>自身信息理想化</strong>:各弹需精确已知自身位置 (X_Ii, Y_Ii) 与速度 V_Mi(式(30)(31)与(33)中 V_Mi 直接出现),未考虑导航误差。</li><li><strong>命中时刻不可预先指定</strong>:t_go_d 为交战中涌现的共同值(p.5),不同于预设 impact time 的ITC类工作;工程上若要求特定到达时刻,该架构只能事后核查。</li></ol></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li><strong>已给出</strong>:全部仿真参数(弹数、位置、速度、航向、目标参数、增益 k_1,k_2,k_3,α,β,Λ_1,Λ_2、40 g 限幅,p.5);观测器(5)(6)与制导律(37)完整公式;估计变量计算式(30)–(32);两种交战几何的完整初始条件(p.5–p.6);拓扑图 Fig. 2。</li><li><strong>缺失</strong>:Theorem 2 证明细节(T_c 上界无法复算,p.5);无公开代码链接;感知/执行图的边集只画在 Fig. 2 中、正文未列边表;无与既有方法的对比数据;随机扰动的具体分布未说明(p.5)。</li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<p>无法在原文定位出处的推测,逐条列出:</p>
+<ul><li>Fig. 2a/2b 的具体边集(如目标→I1→I2→…的连通细节)只能从图目测,文字未给出;若要复现需按图重建并核对生成树条件。</li><li>"s_i = 0 ⇒ δ̂̇_i = 0"(p.5)的具体机理:因证明省略,该断言只能推测为 deviated pursuit 几何关系下共识锁定后偏角常值,未在原文推导。</li><li>增益条件 k_1² &gt; ‖D̂⊗A‖²(p.4 式(16)中 k&gt;0 的要求)是否在仿真参数 k_1 = 0.9 下满足(需先算出 D̂、A 的具体数值,原文未验证)。</li><li>式(35)推导中是否隐含使用了 V̂_T 恒定(观测器收敛后成立,暂态内式(34)对时间的导数是否严格为式(35)未逐项核对)。</li><li>40 g 饱和激活时段内(尤其暂态初期)滑模面 s_i 的可达性是否仍成立。</li><li>观测器(5)沿[14]时,原文是否有对测量噪声的鲁棒性陈述(本文未讨论)。</li></ul>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>n</td><td>拦截弹数量</td><td>p.2, §II</td></tr>
+<tr><td>V_T, γ_T</td><td>目标速度(常值)、目标弹道倾角</td><td>p.2, §II</td></tr>
+<tr><td>V_Mi</td><td>第 i 弹速度(常值,异构)</td><td>p.2, §II</td></tr>
+<tr><td>r_i, θ_i</td><td>第 i 弹对目标的相对距离、LOS 角</td><td>p.2, §II</td></tr>
+<tr><td>γ_Mi</td><td>第 i 弹弹道倾角</td><td>p.2, §II</td></tr>
+<tr><td>a_Mi</td><td>第 i 弹横向加速度(控制量)</td><td>p.2, §II</td></tr>
+<tr><td>δ_i = γ_Mi − θ_i</td><td>第 i 弹偏差角(deviation angle)</td><td>p.2, §II</td></tr>
+<tr><td>V_ri, V_θi</td><td>沿/横 LOS 的相对速度分量,V_ri = ṙ_i,V_θi = r_iθ̇_i</td><td>p.2, 式(1a)(1b)</td></tr>
+<tr><td>t_go_i</td><td>第 i 弹 time-to-go(deviated pursuit 精确式)</td><td>p.2, 式(2)</td></tr>
+<tr><td>G = {V, E}</td><td>感知通信有向图</td><td>p.2, §II</td></tr>
+<tr><td>v_0</td><td>目标节点(唯一 leader,只发不收)</td><td>p.2, §II</td></tr>
+<tr><td>N_i</td><td>节点 v_i 的入邻居集</td><td>p.2, §II</td></tr>
+<tr><td>A = [a_ij]</td><td>(n+1)×(n+1) 邻接矩阵</td><td>p.2, §II</td></tr>
+<tr><td>D = diag{d_0,…,d_n}</td><td>入度矩阵</td><td>p.2, §II</td></tr>
+<tr><td>L = D − A</td><td>感知图 Laplacian</td><td>p.2, §II</td></tr>
+<tr><td>L_TI, L_II</td><td>Laplacian 的领导影响块 / follower 约化块</td><td>p.2, 式(3)</td></tr>
+<tr><td>λ_1,…,λ_n</td><td>L_II 特征值</td><td>p.2, Lemma 1</td></tr>
+<tr><td>D̄, λ_m</td><td>Lemma 2 中的加权对角阵及加权 Laplacian 最小特征值</td><td>p.2, Lemma 2</td></tr>
+<tr><td>D̂ = 2D̄/λ_m</td><td>缩放对角阵 diag(d_1,…,d_n)</td><td>p.2, Lemma 2</td></tr>
+<tr><td>G^a = (V^a, E^a)</td><td>执行图(仅拦截弹、leaderless,不必与 G 重合)</td><td>p.3, §II末</td></tr>
+<tr><td>L_I</td><td>执行图 Laplacian</td><td>p.3, §II末</td></tr>
+<tr><td>z, A</td><td>目标状态 [X_T,Y_T,Ẋ_T,Ẏ_T]^T 与常速运动学矩阵</td><td>p.3, 式(4)</td></tr>
+<tr><td>ẑ_i</td><td>第 i 弹对 z 的估计</td><td>p.3, §III</td></tr>
+<tr><td>η_i</td><td>弹间相对估计误差 a_i0(ẑ_i−z)+Σa_ij(ẑ_i−ẑ_j)</td><td>p.3, 式(6)</td></tr>
+<tr><td>sig^★(·)</td><td>符号幂函数</td><td>(·)</td><td>^★ sign(·)</td><td>p.3, 式(5)下</td></tr>
+<tr><td>k_1,k_2,k_3,α,β</td><td>观测器增益/幂次参数(k&gt;0,α∈(0,1),β&gt;1)</td><td>p.3, 式(5)</td></tr>
+<tr><td>δ = [δ_1^T,…,δ_n^T]^T</td><td>Theorem 1 证明中的组合校正向量 δ_i = k_1η_i+k_2sig^α η_i+k_3sig^β η_i(注意与偏差角 δ_i 记号冲突)</td><td>p.3, 证明</td></tr>
+<tr><td>z̃_i = ẑ_i − z</td><td>局部估计误差</td><td>p.3, 证明</td></tr>
+<tr><td>d_max</td><td>max{d_1,…,d_n}(follower 最大入度)</td><td>p.4, 式(17)(18)</td></tr>
+<tr><td>k(标量)</td><td>式(16)中的最小系数(增益条件所在)</td><td>p.4, 式(16)</td></tr>
+<tr><td>c_α, c_β</td><td>固定时间收敛时间上界中的常数</td><td>p.4, 式(19)(23)</td></tr>
+<tr><td>T_s</td><td>观测器固定时间收敛上界</td><td>p.3 Theorem 1 / p.4 式(29)</td></tr>
+<tr><td>X_Ii, Y_Ii</td><td>第 i 弹自身惯性系位置</td><td>p.4, 式(30)</td></tr>
+<tr><td>r̂_i, θ̂_i, γ̂_Ti</td><td>估计的相对距离、LOS 角、目标航向角</td><td>p.4, 式(30)(31)(32)</td></tr>
+<tr><td>V̂_ri, V̂_θi, V̂_Ti, δ̂_i</td><td>基于估计的相对速度、目标速度、偏差角</td><td>p.4, 式(33a)(33b)</td></tr>
+<tr><td>t_go_d</td><td>期望共同 time-to-go(不需显式已知,交战中共商)</td><td>p.5, 式(36)</td></tr>
+<tr><td>e_i = t_go_i − t_go_d</td><td>时间误差变量</td><td>p.5, 式(36)</td></tr>
+<tr><td>s_i = Σ_j [L_I]_ij e_j</td><td>制导层滑动变量(一致性误差)</td><td>p.5, 式(37)</td></tr>
+<tr><td>ν_i(t), ν̇_i = −Λ_2 sign(s_i)</td><td>super-twisting 辅助积分项</td><td>p.5, 式(37)</td></tr>
+<tr><td>Λ_1, Λ_2</td><td>制导控制增益(仿真取 5、10)</td><td>p.5, 式(37)/§IV</td></tr>
+<tr><td>T_c</td><td>time-to-go 有限时间共识时间</td><td>p.5, Theorem 2</td></tr>
+<tr><td>r̃_T, ṽ_T</td><td>目标位置/速度估计误差向量(仿真图例)</td><td>p.5, §IV(Fig. 3d)</td></tr>
+</tbody></table></div><div class="pnav"><a href="09.html">← 09 Cooperative Salvo Guidance o…</a><a href="11.html">11 Trajectory Encryption Cooper… →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

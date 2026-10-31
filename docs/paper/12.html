@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>12 Cooperative Guidance of Multiple Missiles: a Hybrid Co-evolutionary Approach · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gB">多弹协同制导</span> · X. Lan, J. Chen, Z. Zhao, T. Zou · 2022 · IEEE TCST 录用稿(页眉) · arXiv:2208.07156 · <a href="../pdfs/12_Lan2022_Hybrid-CoEvolutionary-Cooperative-Guidance.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">12 | Cooperative Guidance of Multiple Missiles: a Hybrid Co-evolutionary Approach</h1>
+<blockquote>Lan X., Chen J., Zhao Z., Zou T. | arXiv:2208.07156 (v2, 2022) | 页眉标注 IEEE Transactions on Control Systems Technology(录用格式稿,卷期页码文中未给出);作者单位:广州大学机电工程学院(p.1)</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>离线优化类协同制导的代表:把多弹"同时到达 + 指定碰撞角"的协同制导描述为分布式多目标协同优化问题(摘要,p.1),每一枚导弹对应一个种群,用改进的自然进化策略 NCES(对邻居样本概率做"置信度重缩放"的自然梯度)在仿真中训练各弹的神经网络一致性控制器,再与比例导引 PNG 跟踪项混合成 HCCGL 执行(p.3-4, p.7)。注意:标题中的"hybrid"指解析 PNG 与学习式 NN 控制器的混合制导律(p.1 摘要、p.3-II.E),并非"遗传/差分进化 + 另一优化器"的混合优化器;与解析法/一致性法的根本区别在于不推导闭式协同控制律,而是在策略参数空间用无值函数的 ES 直接对适应度(一致误差的奖励积分)做协同进化搜索(p.1-2, p.4)。训练闭环发生在并行仿真器内(Algorithm 1 + Fig.5,p.7),属"仿真中优化 + 训练后执行"路线。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li>状态量(原文符号):每弹全状态由三类特征构成(Table I,p.3):个人特征 P_mi=(x_i, y_i)、α_mi、Ξ_mi、V_mi;目标特征 P_T=(x_T, y_T)、V_T、α_T;误差特征 e_t^i、e_a^i、e_Ξ^i。几何量 r_i(相对距离)、t_go^i(剩余时间,Eq.(2))(p.2)。观测按 POMDP 处理:O_i × A_i → O'_i(Eq.(3),p.3)。</li><li>控制量/决策变量:<ul><li>导弹物理控制量:a_li(侧向加速度,垂直于 V_mi)与 a_vi(推力加速度,沿 V_mi 方向)(p.2,Fig.1)。制导输出 u_i = (1−η)u_pi + η u_ei 为二维向量 侧向, 纵向(Eq.(11)(14),p.3-4)。</li><li>优化器决策变量:神经网络权值矩阵 W_1i ∈ R^{3×q1}、W_2i ∈ R^{q1×q2}、W_3i ∈ R^{q2×2},合记 θ_i = W_3i, W_2i, W_1i(Eq.(12),p.4;p.7)。即进化搜索的是 NN 参数,不是直接的加速度序列。</li></ul></li><li>动力学模型(类型与方程):二维质点运动学模型(速度可控,含推力),Eq.(1)(p.2): ṙ_i = −V_mi cos δ_mi + V_T cos δ_Ti;r_i Ξ̇_mi = −V_mi sin δ_mi + V_T sin δ_Ti;α̇_mi = a_li/V_mi;α̇_T = a_T/V_T;V̇_mi = a_vi;δ_mi = α_mi − Ξ_mi;δ_Ti = α_T − Ξ_mi(按原文印刷,δ_Ti 定义疑有笔误)。 时间 t_go^i = −r_i/ṙ_i(Eq.(2),p.2)。</li><li>协同结构(如何把"协同"编码进优化问题):通信拓扑为无向图,节点集 V={v1,...,vn},邻接矩阵 A=[a_ij],邻居集 N_i(II-B,p.3,Fig.2)。协同通过三重机制编码:(1) 每弹适应度中的共识误差项 e_t^i = Σ_{j∈N_i}(t_go^i − t_go^j)(Eq.(4))、e_a^i = Σ_{j∈N_i}(e_Ξ^i − e_Ξ^j)(Eq.(5)),其中 e_Ξ^i = Ξ_mi − Ξ_di,期望碰撞角 Ξ_di = Ξ_d1 + Σ_{j=1}^{i−1} δ_j^d(Eq.(6))(p.3);(2) 种群 i 的适应度依赖邻居参数集 ς_i = {θ_i, θ_j : j∈N_i},即 Fi(ς_i)(Eq.(20),p.5);(3) 所有种群每代同时更新(co-evolution,III-B,p.4),梯度按置信度重缩放以抑制邻居交互偏差(Eq.(23)(24),p.5)。学习率各弹共享(p.6)。</li><li>目标泛函/终端条件:终端奖励 r_T^i = (γa·e^{−ξa|e_Ξ^i|} + γt·e^{−ξt|e_t^i|})·ϵ(k),ϵ(k) 为终端步指示函数(Eq.(7)(8),p.3);飞行奖励 r_F^i = βa(−1+e^{−ka|e_a^i|}) + βt(−1+e^{−kt|e_t^i|}) ≤ 0(Eq.(9),p.3);适应度 F_i = ∫_t (r_F^i + r_T^i)dt,最大化(Eq.(10),p.3)。终端条件:拦截命中(结果以 ZEM 报告,p.11-12)+ 撞击时间一致(e_t)与期望撞击角(e_Ξ)。联合适应度 F_tot 见 Eq.(15)(p.4)。</li><li>机动目标:建模层面含 α̇_T = a_T/V_T(p.2);仿真 Case 2 中目标以 a_T = 5g sin(π t/7) 机动,V_T = 130 m/s,α_T = 162°(p.11)。</li><li>约束(输入/状态/视场):Table III(p.9):最大侧向过载 a_lmax = 50g,最大推力过载 av_max = 5g,速度上/下界 V_max = 900 m/s、V_min = 350 m/s。NN 输出经有界激活约束:ψ(·)=Tanh 且 ||ψ(·)|| ≤ a_lmax(p.4)。视场约束:未提及。</li><li>噪声/时延:未提及。仅假设目标特征"估计误差相对所需制导精度可忽略"、只需相对误差信息(II-C,p.3);训练评估中未提及注入过程/观测噪声或通信时延。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>二维平面拦截几何,惯性系 OXY 为水平面(II-A,p.2,Fig.1)。</li><li>目标特征经弹上设备估计/探测,估计误差可忽略;精确绝对定位需 GPS 支持,本文只需相对误差信息(II-C,p.3)。</li><li>通信拓扑为无向图,邻居间可共享信息(II-B,p.3)。</li><li>问题为部分可观测 MDP(POMDP,Eq.(3),p.3);III-A 的 MDP 讨论中假设"确定性环境转移概率为 1"(p.4)。</li><li>协同进化中 θ'_i 与 θ'_j 独立采样,故 p(ς'_i|ς_i) = p(θ'_i)·Π_{j∈N_i} p(θ'_j)(III-C,p.5)。</li><li>NCES 核心假设:个体适应度 F_i(θ'_i) 虽不可分步获得,但其期望存在,且对邻居参数分布不变("the expectation of the individual fitness does [exist], and is invariant to the parameter distributions of its neighboring agents",p.5)。</li><li>采用与 [20] 同精神的 rank-based 适应度整形,整形后仍记 F_i(·);采样扰动用 mirrored sampling(p.6)。</li><li>"Considering peer pressure, each missile is assigned the same learning rate"——各弹共用同一学习率(p.6)。</li><li>定理 1 证明中的假设:(a) 单隐层神经网络可任意精度逼近多元连续函数(引 [37],p.7);(b) 变换后的适应度 F_i(E_ui^k) 对策略控制完全可微,且 ∂F_i(|E_ui^k|)/∂|E_ui^k| &lt; 0(Eq.(40),p.8);(c) |E_ui^k| 位于 |E_ui^{l−1}| 的微小邻域内,Taylor 一阶展开"相当精确"(p.8);(d) |E_ui^k| 采样自以 |E_ui^{l−1}| 为中心的无偏正态分布,故 B_i^k → 0(m→∞)(Eq.(46),p.8)。</li><li>frameskip 的适当调整"will facilitate the training process without affecting the final results"(经验性设定,case1/2 取 12,case3 取 40)(p.8)。</li><li>优化问题为确定性仿真评估:除 ES 自身的采样扰动外,未提及随机扰动、量测噪声、时延进入适应度评估(全文未见相关内容)。</li><li>协同是"仿真中离线训练 + 在线执行":训练以主从式/全分布式并行仿真完成(Algorithm 1、Fig.5,III-IV 节,p.7);论文未出现"offline training"的明示表述,亦未讨论部署后是否继续更新(该保留意见见第 8 节)。</li><li>目标可以运动(Case 2, p.11),但问题建模与适应度设计均未对目标机动模型做显式可预知性假设说明。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制:HCCGL 由 PNG 跟踪项与 NN 一致性项凸组合而成——u_pi = [β Ξ̇_mi V_mi, 0]^T(仅设计侧向加速度,Eq.(11),p.3),u_ei = W_3i^T ψ(Z_2i),Z_2i = W_2i^T φ(Z_1i),Z_1i = W_1i^T φ(X_i),输入 X_i = [e_a^i, e_t^i, e_Ξ^i]^T(两隐层 + 输出层,φ=Sigmoid,ψ=Tanh,Eq.(12)(13),p.4),u_i = (1−η)u_pi + η u_ei(Eq.(14),p.4)。NN 权值 θ_i 由 NCES 训练:每个导弹一个种群,适应度 Fi(ς_i) 依赖邻居;由于有限采样下联合分布期望的估计偏差随分布维数线性增长(p.5),NCES 只对当前种群 θ_i 的期望建模(Eq.(22)),用邻居样本概率 Π_{c∈N_i} p(θ'_c) 作为"置信度"乘到原适应度上做重缩放(Eq.(23)(24)),使估计偏差保持在单种群水平(p.5-6,Fig.3-4 用 eggholder 变体 Eq.(26) 做了可视化论证);配合 elitist 学习率自适应(Eq.(27)-(29):在 η_α 邻域线性取 l+1 个候选,按 Σ_i G_i 最大者更新,全弹共享)、标称期望碰撞角 Ξ_d1 的自动搜索(Eq.(30)(31):从 U(−π,π) 采 h 个候选,按 H(Ξ_d1^k)=F_tot(θ_init) 择优,p.6)、rank-based 适应度整形与 mirrored sampling(p.6)。训练在主从式并行仿真中按 Algorithm 1 迭代(采样 m 组个体 → 并行评估 → 计算重缩放自然梯度 → 梯度上升;每 ρ 代做一次学习率适配)(p.7,Fig.5);终止条件为"until stopping criterion is met",具体准则未给出(Algorithm 1,p.7)。收敛性由定理 1 给出(见第 4 节)。</p>
+<p>关键公式(标出处):</p>
+<ul><li>Eq.(11):u_pi = [β Ξ̇_mi V_mi, 0]^T,PNG 跟踪项,β 为导航比(p.3)。</li><li>Eq.(12)(13):NN 一致性控制器结构与输入 X_i(p.4)。</li><li>Eq.(14):u_i = (1−η)u_pi + η u_ei,η 为权衡增益(p.4)。</li><li>Eq.(20)(21):邻域联合适应度期望与其梯度 ∇θi E{Fi(ς'_i)} = E(ς'_i){∇θi log p(θ'_i)·Fi(ς'_i)}(p.5)。</li><li>Eq.(23)(24):置信度重缩放后的个体期望与梯度 ∇θi E_θ'i Fi(θ'_i) = E_θ'i(∇θi log p(θ'_i)·Fi(ς'_i)·Π_{c∈N_i} p(θ'_c))(p.5)。</li><li>Eq.(25):φ(θ'_i) = ∫ φ(ς'_i) p(θ'_c) dθ'_c,个体期望与联合期望的关系(p.5)。</li><li>Eq.(26):eggholder 变体演示函数(p.6,Table II)。</li><li>Eq.(27)(28)(29):候选学习率 η_cad = clip((1+0.1k)η_α, η_α^min, η_α^max),k∈Z,−l/2≤k≤l/2;评估函数 G_i;η'_α = argmax_{η_cad^k}(Σ_{i=1}^n G_i)(p.6)。</li><li>Eq.(30)(31):Ξ*_d1 = argmax H(Ξ_d1^k),H(Ξ_d1^k) = F_tot(θ_init)|_{Ξ_d1=Ξ_d1^k}(p.6)。</li><li>Eq.(32):g_θi = (1/(mσ²)) Σ_{k=1}^m Fi(ς'_i) ϵ_i Π_{c∈N_i} p(ϵ_c),单变量零均值高斯 N(0,σ²) 采样扰动(p.7;正文求和指标印为 Σ_{i=1}^m,疑笔误;Algorithm 1 中的写法为 Σ_{k=1}^m Fi(ς_i^k)ϵ_i^k Π_{c∈N_i} p(ϵ_c^k),p.7)。</li><li>Eq.(33)-(50):定理 1 的证明链条(p.7-8)。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<ul><li>Theorem 1(p.7,证明 p.7-8):在控制策略 Eq.(14) 与 Algorithm 1 更新策略下,通过选取合适的学习率、采样方差与种群规模,当迭代数 l→∞ 时,所得控制策略收敛到最优控制策略的一个小邻域。前提/证明要点:NN 可由等效单隐层表示(Eq.(35),引 [37]);策略误差 E_ui^[l] = u_i^[l] − u*_i 满足 E_ui^[l] − E_ui^[l−1] = ηη_α g_θi^l−1(Eq.(38));对变换适应度做 Taylor 一阶展开得对角负定 Jacobian G_i^l−1(Eq.(41)(42));B_i^k→0(m→∞)(Eq.(46));A_i^k&gt;0、P_i^k&gt;0(Eq.(47)(48));于是 Δ|E_ui^[l]| &lt; 0(Eq.(49)),最终 lim_{l→∞}|E_ui^[l]| = δ_e,δ_e→0 as m→∞(Eq.(50))。</li><li>性质如实记录:全文仅此 1 个定理;另有 Remark 1(p.5)为 NCES 的定义性说明(非定理)。证明给出的是"收敛到小邻域"的定性结论,无收敛速率、无全局最优性保证;且依赖第 2 节第 9 条的多条强假设(可微性、单调性、Taylor 有效性、m→∞)。III-C 关于重缩放梯度能把偏差"保持在单种群水平"的论断(p.6)仅由 eggholder 数值演示(Fig.3-4)与经验结果支撑,未形式化为引理;作者同时说明当种群规模很大(如数千)时该方法可能不再带来额外精度提升(p.6)。</li></ul>
+<h2 id="sec-6">5. 实验设置</h2>
+<ul><li>场景与弹数:三个场景。Case 1:4 弹协同攻击静止目标,目标位于 (9500, 9000) m,期望相对碰撞角 δ_d^i = 20°, 60°, 30°(i=1,2,3;M4 的 δ_d 未给出),初值见 Table V(M1(1900,17000)m,−25°,700 m/s;M2(1500,13000)m,0°,650 m/s;M3(1400,4000)m,5°,700 m/s;M4(3000,1300)m,10°,680 m/s)(p.9)。Case 2:4 弹,机动目标 a_T = 5g sin(πt/7),V_T = 130 m/s,α_T = 162°,其余初值同 Case 1(p.11)。Case 3:Monte-Carlo,5 弹位置随机采样(x_i ~ U(2000,2600),y_i ~ U(11000,13000)−2000i),初始弹道倾角 0°,速度均为 600 m/s,δ_d 均为 25°,静止目标 (10000, 9000) m,共 200 episodes(p.12)。</li><li>对比基线:Case 1 与 TASCGL(Lyu et al. [38],时空协同制导律)对比,分有向拓扑版 TASCGLa 与按本文无向拓扑重实现的 TASCGLb;作者承认对比采用了与原方法略有差异的统一初值(因该法"对初值敏感脆弱")(p.9)。Case 2、3 无外部基线,仅报告自身结果(p.11-12)。</li><li>评价指标:共识时间误差 e_t^i(s)、共识角误差 e_a^i(°)、零控脱靶量 ZEM(m)(Table VI-VIII,p.11-12);训练侧指标为平均适应度曲线(Fig.13)与学习率曲线(Fig.14)(p.13-14)。</li><li>运行统计:Case 3 为 200 episodes 的 Monte-Carlo,报告各弹 Mean/Max/Min(Table VIII,p.12):e_a 均值 0.22°~0.93°(均 &lt;1°),e_t 均值 0.45~0.61 s(多数 &lt;1 s),ZEM 均值 3.74E-4~5.89E-3 m;未报告方差/标准差。Case 1、2 为单场景运行,未说明独立重复次数。关键数字:Case 1 中 HCCGL 的 |e_t| ≤ 0.05 s,而 TASCGLa/b 最大达 5.54 s / 4.82 s;TASCGL 因设计未考虑速度边界导致撞击时间失同步(p.11,Table VI)。Case 2:e_a 全部 &lt;1°,|e_t| ≤ 0.455 s,ZEM ≤ 0.928 m(Table VII,p.11)。</li><li>参数:约束 Table III(50g / 5g / 900 / 350 m/s)与超参 Table IV(p.9):τ=5 ms,η=0.3,η_α=0.015,σ=0.2,l=20,m=140,ρ=50,β=4,k_a=1,k_t=0.2,ξ_a=10,ξ_t=1,λ_a=4000,λ_t=2000,β_a=10,β_t=2;frameskip=12(case1/2)、40(case3)(p.8)。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li>作者承认的:<ol><li>重缩放梯度仅在种群规模有限、邻居较多时有优势;种群规模很大(如数千)时可能不再带来额外精度提升(p.6)。</li><li>随机初值(Case 3)下学习率"不易稳定",若无学习率自适应,适应度曲线末期会抖动而非收敛("regardless of the types of optimizer")(p.13)。</li><li>对比实验采用了与原方法"略有不同"的统一初值,理由是 TASCGL 对初值敏感脆弱(p.9)——即对比公平性有折扣。</li><li>未处理执行机构故障与系统不确定性,增量制导增益留作未来工作(p.13,结论)。</li></ol></li><li>我分析的(附推断依据):<ol><li>定理 1 是启发式论证:假设变换适应度对策略完全可微且 ∂F_i/∂|E|&lt;0(Eq.(40)(42),p.8)、Taylor 一阶有效(p.8)、需 m→∞ 才能保证 B_i^k→0(Eq.(46)),结论仅为收敛到小邻域(Eq.(50)),无速率与最优性;且 F_i(E_ui^k): R^p→R^p 的维度表述(p.8)本身可疑(适应度应为标量)。</li><li>计算成本未报告:无训练时长、收敛迭代数、总评估次数;学习率适配每次需额外评估候选(p.6 Eq.(27)-(28)),真实评估开销被低估,而制导类在线应用恰对此敏感。</li><li>鲁棒性链条薄弱:假设目标估计误差可忽略(p.3),无噪声/时延/模型失配实验;Case 2 只测了单一正弦机动(p.11),且未说明仿真中目标机动规律对训练器是否已知。</li><li>泛化性存疑:NN 输入只有 e_a, e_t, e_Ξ(Eq.(13),p.4),不含 r_i、V_mi 等;三个 case 各自有训练收敛曲线(Fig.13,p.13),未验证单一策略跨场景/跨弹数迁移。</li><li>速度/推力约束的执行机制不明:p.4 只约束了侧向输出(||ψ||≤a_lmax),而 V∈[350,900]、a_v≤5g(Table III,p.9)如何在学习/执行中强制保证未给出;对比法正因速度边界处理不当而失同步(p.11),本文对应机制缺叙述。</li><li>协同维度仅时间+碰撞角一致,无避碰、视场、多目标/交战顺序等约束(全文未涉及)。</li><li>Case 1 中 4 弹只给了 3 个 δ_d^i(p.9),M4 期望角缺失,复现对比存在缺口。</li></ol></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li>已给出:Algorithm 1 完整伪代码(p.7);全部算法超参(Table IV,p.9,见第 5 节);弹体约束(Table III,p.9);frameskip 取值(p.8);Case 1 初值(Table V,p.9)与 Case 3 随机采样区间、episode 数(p.12);学习率适配与 Ξ_d1 搜索公式(Eq.(27)-(31),p.6);NN 拓扑骨架(输入 3 维、输出 2 维、两隐层、Tanh/Sigmoid,p.4);并行 master-slave 实现方式(p.7)。</li><li>缺失:隐层神经元数 q1、q2 的具体取值(p.4 仅给符号);θ_init 初始化方式;Ξ_d1 候选数 h(p.6-7);停止准则的具体内容(Algorithm 1,p.7);rank-based 整形的具体实现(p.6);训练迭代数/时长/算力;Case 1 中 TASCGL 基线的参数设置;结果无方差/置信区间;未提供任何代码或数据链接(全文无)。</li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<ol><li>Case 3 的 200 episodes 是"每次随机初值独立重训练"还是"训练好的同一策略在 200 个随机初值上测试":p.12 只写 "Simulations with randomly sampled conditions are conducted in 200 episodes",而 Fig.13(c) 又给出 case3 的适应度收敛曲线(p.13),两种读法均通。</li><li>Table IV 中的 λ_a=4000、λ_t=2000(p.9)与 Eq.(7) 中的 γa、γt(p.3)是否同一系数(符号不一致,正文未解释)。</li><li>Case 1 中 M4 的期望相对碰撞角 δ_d^4 未给出(p.9 只列 i=1,2,3 的 20°,60°,30°)。</li><li>部署后是否仍有在线更新:Ξ_d1 在 p.3 称 "determined online",而 Eq.(30) 的搜索发生在 "during the training process"(p.6);在线执行阶段是否重训/微调未明说。</li><li>Eq.(32) 求和指标印为 Σ_{i=1}^m(应为 k)(p.7);Eq.(27) 候选集维度印为 η_cad ∈ R^{m+1}(候选数由 l 决定,应为 R^{l+1})(p.6);两处疑为排版笔误,不影响方法理解但影响公式转录。</li><li>仿真中机动目标的运动模型(正弦机动)对训练评估器是否完全已知(p.11)。</li><li>Theorem 1 中的 l 为迭代计数(p.7),与 Eq.(27) 中 l(学习率候选列表规模,p.6)符号重载,阅读时需区分。</li></ol>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>n</td><td>导弹数量</td><td>p.2, II-A</td></tr>
+<tr><td>M_i / T</td><td>第 i 枚导弹 / 目标</td><td>p.2, II-A</td></tr>
+<tr><td>V_mi</td><td>第 i 弹速度</td><td>p.2</td></tr>
+<tr><td>Ξ_mi</td><td>第 i 弹视线(LOS)角</td><td>p.2</td></tr>
+<tr><td>α_mi</td><td>第 i 弹弹道倾角(flight-path angle)</td><td>p.2</td></tr>
+<tr><td>δ_mi</td><td>第 i 弹航向角,δ_mi = α_mi − Ξ_mi</td><td>p.2, Eq.(1)</td></tr>
+<tr><td>a_li / a_vi</td><td>第 i 弹侧向加速度 / 推力加速度</td><td>p.2</td></tr>
+<tr><td>V_T, Ξ_T, α_T, δ_T</td><td>目标速度 / LOS 角 / 弹道倾角 / 航向角</td><td>p.2</td></tr>
+<tr><td>a_T</td><td>目标侧向加速度</td><td>p.2</td></tr>
+<tr><td>r_i</td><td>第 i 弹-目标相对距离</td><td>p.2</td></tr>
+<tr><td>t_go^i</td><td>第 i 弹剩余时间,t_go^i = −r_i/ṙ_i</td><td>p.2, Eq.(2)</td></tr>
+<tr><td>V, ξ(边集), A=[a_ij], N_i</td><td>通信拓扑节点/边/邻接矩阵/邻居集</td><td>p.3, II-B</td></tr>
+<tr><td>O_i, A_i, O'_i</td><td>第 i 弹 POMDP 观测/动作/下一时刻观测</td><td>p.3, Eq.(3)</td></tr>
+<tr><td>P_mi, P_T</td><td>弹 i / 目标二维位置</td><td>p.3, Table I</td></tr>
+<tr><td>e_t^i</td><td>时间共识误差,Σ_{j∈N_i}(t_go^i − t_go^j)</td><td>p.3, Eq.(4)</td></tr>
+<tr><td>e_a^i</td><td>LOS 角共识误差,Σ_{j∈N_i}(e_Ξ^i − e_Ξ^j)</td><td>p.3, Eq.(5)</td></tr>
+<tr><td>e_Ξ^i</td><td>LOS 角误差,Ξ_mi − Ξ_di</td><td>p.3</td></tr>
+<tr><td>Ξ_di, δ_d^i, Ξ_d1</td><td>期望碰撞角 / 相对期望角 / 首弹标称期望角</td><td>p.3, Eq.(6)</td></tr>
+<tr><td>r_T^i, r_F^i, F_i</td><td>终端奖励 / 飞行奖励 / 适应度</td><td>p.3, Eq.(7)(9)(10)</td></tr>
+<tr><td>γa, γt, ξa, ξt, βa, βt, ka, kt</td><td>奖励函数常数系数(Table IV 中以 λa, λt 出现)</td><td>p.3;Table IV p.9</td></tr>
+<tr><td>ϵ(k)</td><td>终端步指示函数</td><td>p.3, Eq.(8)</td></tr>
+<tr><td>u_pi, β</td><td>PNG 跟踪控制项 / 导航比</td><td>p.3, Eq.(11)</td></tr>
+<tr><td>u_ei, W_1i, W_2i, W_3i, Z_1i, Z_2i</td><td>NN 一致性控制器及其层输出</td><td>p.4, Eq.(12)</td></tr>
+<tr><td>φ(·), ψ(·)</td><td>Sigmoid / Tanh(有界,</td><td></td><td>ψ</td><td></td><td>≤a_lmax)激活</td><td>p.4</td></tr>
+<tr><td>q1, q2</td><td>两个隐层神经元数(具体值未给出)</td><td>p.4</td></tr>
+<tr><td>X_i</td><td>NN 输入 [e_a^i, e_t^i, e_Ξ^i]^T</td><td>p.4, Eq.(13)</td></tr>
+<tr><td>u_i, η</td><td>混合制导律 / 指导增益</td><td>p.4, Eq.(14)</td></tr>
+<tr><td>u*_tot, F_tot</td><td>联合最优策略 / 联合适应度</td><td>p.4, Eq.(15)</td></tr>
+<tr><td>θ, θ', p_ψ(θ'\</td><td>θ)</td><td>进化策略参数 / 下一代参数 / 转移分布</td><td>p.4, III-C</td></tr>
+<tr><td>ς_i</td><td>种群 i 及其邻居的参数集 {θ_i, θ_j: j∈N_i}</td><td>p.5, Eq.(20)</td></tr>
+<tr><td>θ'_c, Π_{c∈N_i} p(θ'_c)</td><td>邻居伴随样本及其"置信度"</td><td>p.5, Eq.(23)</td></tr>
+<tr><td>φ(ς'_i), φ(θ'_i)</td><td>联合 / 个体目标期望</td><td>p.5, Eq.(25)</td></tr>
+<tr><td>η_α, η_cad, η_α^min, η_α^max, l</td><td>学习率 / 候选集 / 上下界 / 候选规模</td><td>p.6, Eq.(27)</td></tr>
+<tr><td>G_i(·)</td><td>候选学习率评估函数</td><td>p.6, Eq.(28)</td></tr>
+<tr><td>Ξ*_d1, H(·), h, θ_init</td><td>搜索得到的首弹期望角 / 其适应度 / 候选数 / 初始权值</td><td>p.6, Eq.(30)(31)</td></tr>
+<tr><td>g_θi</td><td>重缩放自然梯度</td><td>p.7, Eq.(32)</td></tr>
+<tr><td>σ, m</td><td>采样标准差 / 种群规模</td><td>p.7;p.9 Table IV</td></tr>
+<tr><td>ϵ_i, ϵ_c</td><td>当前/邻居种群的参数扰动样本</td><td>p.5, p.7</td></tr>
+<tr><td>E_ui^[l], u*_i</td><td>第 l 代策略逼近误差 / 最优策略</td><td>p.7, Eq.(33)</td></tr>
+<tr><td>W_i^[l]</td><td>等效单隐层网络权值(证明用)</td><td>p.7, Eq.(35)</td></tr>
+<tr><td>G_i^[l−1]</td><td>适应度对策略误差的对角 Jacobian(负定)</td><td>p.8, Eq.(42)</td></tr>
+<tr><td>A_i^k, P_i^k, B_i^k</td><td>证明简写量(Hadamard 乘积/置信度/中心化项)</td><td>p.8, Eq.(44)</td></tr>
+<tr><td>δ_e</td><td>策略误差终端界限(→0 as m→∞)</td><td>p.8, Eq.(50)</td></tr>
+<tr><td>τ, ρ</td><td>仿真步长(5 ms)/ 适配周期(50)</td><td>p.9, Table IV</td></tr>
+<tr><td>a_lmax, av_max, V_max, V_min</td><td>弹体约束(50g / 5g / 900 / 350 m/s)</td><td>p.4;p.9 Table III</td></tr>
+<tr><td>frameskip</td><td>训练跳帧数(12 或 40)</td><td>p.8</td></tr>
+<tr><td>ZEM</td><td>零控脱靶量(评价指标)</td><td>p.11</td></tr>
+<tr><td>TASCGLa / TASCGLb</td><td>基线 [38] 的有向 / 无向拓扑版本</td><td>p.9</td></tr>
+</tbody></table></div><div class="pnav"><a href="11.html">← 11 Trajectory Encryption Cooper…</a><a href="13.html">13 Reinforcement Learning for A… →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

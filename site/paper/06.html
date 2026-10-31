@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>06 Cooperative Nonlinear Guidance Strategies for Guaranteed Pursuit-Evasion · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gA">微分博弈与目标防御</span> · S. Kumar, S. R. Kumar, A. Sinha · 2024 · arXiv v3 · arXiv:2402.06176 · <a href="../pdfs/06_Kumar2024_Cooperative-Guidance-Guaranteed-PE.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">06 | Cooperative Nonlinear Guidance Strategies for Guaranteed Pursuit-Evasion</h1>
+<blockquote>Kumar S., Kumar S.R., Sinha A. | arXiv:2402.06176 (v3, 2024) | 期刊/会议出处以文中为准 注:PDF 页脚仅为 arXiv 标记 "arXiv:2402.06176v3 [eess.SY] 15 Sep 2025"(p.1),全文未见期刊/会议排版信息,按 arXiv v3 预印本处理。PDF 页码 = 论文印刷页码(1–13)。</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>三体(单追者 P + 逃逸者 E + 防御者 D)主动防护问题:E–D 团队协同保证 D 在 P 捕获 E 之前拦截 P。论文明确自称与启发式方法、最优控制、微分博弈公式化以及时域约束制导不同,提出纯几何(圆内接三角形+弦性质)解法,不依赖博弈框架、不需要知道追者策略(p.1 摘要、p.2 贡献列表)。属于"保证回避/保证防护"一类,而非保证捕获逃逸方。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li>状态量(原文符号):每个 agent ℓ∈{P,E,D} 的位置 [xℓ, yℓ]ᵀ∈ℝ²、速度 vℓ∈ℝ⁺、航迹角 γℓ∈(−π, π];相对量:视线距 rℓ(rEP, rDP, rED)、视线角 λℓ(λEP, λDP, λED)(p.2)。</li><li>控制量(原文符号):aℓ,横向加速度(steering control / lateral acceleration),|aℓ| ≤ a^{max}_ℓ ∈ ℝ⁺(p.2)。</li><li>动力学模型(类型与方程):二维非完整运动学(质点、常速度、横向加速度改变航向角),式 (1)(p.2): ẋℓ = vℓ cos γℓ, ẏℓ = vℓ sin γℓ, γ̇ℓ = aℓ/vℓ, ∀ℓ∈{P,E,D}。 相对运动极坐标运动学 (2a)–(2f)(p.2–3),例如 ṙEP = vP cos δPE − vE cos δEP = v_{r,EP},r_EP λ̇_EP = vP sin δPE − vE sin δEP = v_{λ,EP};D–P 对 (2c)–(2d),E–D 对 (2e)–(2f) 同理。</li><li>参与者数量与团队结构:3 个 agent;E 与 D 结盟(cooperative allies)对抗 P;P 追 E,D 在 P 到达 E 附近之前消灭 P(p.1 摘要、p.2 Sec. II)。</li><li>目标泛函/终端条件:无轨迹最优泛函;目标集 𝒯 = {𝒮 | r_DP(t_f) = 0},𝒮 为相关状态集合(位置、速度、航向、距离、LOS 等),t_f 为 D 捕获 P 的时刻(p.3)。设计目标是使角度误差 β→0 于预设时刻 t★(p.4)。唯一出现的"代价"是控制分配的瞬时代价 C(p.5,式 (25)),非终端型最优控制问题。</li><li>机动目标(逃逸方是否最优机动/任意机动):P 的制导律未知且任意——团队"没有关于追者制导律的知识"(p.3);理论只需 |a_P| ≤ a^{max}_P(增益条件,p.5/p.7/p.8);仿真中 P 分别用 PNG、PPG、DPG、BPNG(p.8–9, p.11–12)。E 在机动级协同中主动参与,在信息级协同中独立机动并用精确时间 LOS 速率归零把自己变成"诱饵"(p.4, p.7)。</li><li>约束(输入/状态/视场):输入约束 |aℓ| ≤ a^{max}_ℓ(p.2);能力设定 v_P ≈ v_D &gt; v_E、a^{max}_P ≈ a^{max}_D &gt; a^{max}_E(p.2)。视场/传感器约束:未提及。状态约束:未提及(除 r&gt;0 隐含)。</li><li>噪声/时延:未提及。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>平面(2D)交战(p.2 Sec. II,"Such a scenario leads to a planar (2D) engagement")。</li><li>各 agent 为非完整质点,速度恒定(式 (1) 中无速度动态,vℓ 为常参数),控制为有界横向加速度 |aℓ| ≤ a^{max}_ℓ(p.2)。</li><li>速度/机动能力关系:v_P ≈ v_D &gt; v_E 且 a^{max}_P ≈ a^{max}_D &gt; a^{max}_E,即 P 与 D 能力相当、且都快于 E(p.2)。</li><li>E–D 联盟不知道 P 的制导律,但每个 agent 可测量其他所有 agent 的相对信息(p.3:"the evader-defender alliance has no knowledge of the pursuer's guidance law. However, each agent can measure the relative information of every other agent")。</li><li>命题 1 的前提:D 相对 P 保持正接近速度(文中写作 ṙ_DP &lt; 0),并达到 χ ∈ π/2, 3π/2(p.3–4)。</li><li>滑模增益条件:K &gt; sup_{t≥0} a^{max}_P/r_DP(Theorem 2,p.5;Theorem 5,p.8);K₁ &gt; sup_{t≥0} a^{max}_P/r_EP(Theorem 4,p.7)。即只需要知道 P 的机动能力上界 a^{max}_P,不需要其策略。</li><li>滑模参数 k₁, k₂, k₃ ∈ ℕ(正整数)(p.4–5, p.7)。</li><li>信息级协同下,E 将自身机动信息(a_E)共享给 D(Remark 2,p.8;p.4 的两层协同定义)。</li><li>排除病态构型:P 距 E 太近而 D 距二者太远的情形被作者以工程不实际为由排除(p.2:"such cases are impractical to consider")。</li><li>隐含假设:式 (9)–(11)、(13)、(26)–(27)、(31)、(40) 中 r_DP, r_EP, r_ED &gt; 0 且相应 cos δ、分母 (cos δ_DE r_DP − cos δ_DP r_ED) 非退化(原文未显式声明,由公式结构推得)。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制一句话:把三体构型写成 E–D 视线与 D–P 视线在 D 处张角 χ 的几何条件——只要 D 保持对 P 正接近速度且 χ∈[π/2, 3π/2],以外接圆弦性质可知 E–P 弦恒为最长边,三角形按比例缩小时 r_DP 先于 r_EP 退化到 0,从而捕获次序得到保证(Proposition 1,p.3–4);再将角度误差 β = χ − χ★ 的镇定问题化为对 P 控制项(仅知其界 a^{max}_P)具有鲁棒性的双层滑模精确时间调节问题,并给出两种协同层级(机动级/信息级)的显式制导律。</p>
+<p>关键公式:</p>
+<ul><li>几何量定义(p.4):χ = π + λ_DP − λ_ED (3);误差变量 β = χ − χ★ = π + λ_DP − λ_ED − χ★ (4),目标 χ★∈[π/2, 3π/2]。</li><li>β 动态(Lemma 1,p.4):β̈ = λ̈_DP − λ̈_ED (5);代入 λ̈ 表达式 (9)(10) 得 β̈ = 2ṙ_ED λ̇_ED/r_ED − 2ṙ_DP λ̇_DP/r_DP + (cos δ_ED/r_ED)a_E + (cos δ_PD/r_DP)a_P − (cos δ_DE/r_ED + cos δ_DP/r_DP)a_D (11), 对 (a_E, a_D) 仿射、含未知项 (cos δ_PD/r_DP)a_P。相对 a_E, a_D 相对阶为 2。</li><li>联合协同机动(p.4):β̈ = 2ṙ_ED λ̇_ED/r_ED − 2ṙ_DP λ̇_DP/r_DP + (cos δ_PD/r_DP)a_P + U (12),U = (cos δ_ED/r_ED)a_E − (cos δ_DE/r_ED + cos δ_DP/r_DP)a_D (13)。</li><li>双层滑模(p.4–5):内层 S̄ = β̇ − g (14),g(t) = −k₁β(t)/(t★−t)(0≤t&lt;t★;t≥t★ 时为 0)(15);外层 S̿ = S̄ + h (16),h(t) = h(0)·t^{k₂}/(t₁−t)^{k₂}(0≤t&lt;t₁;之后为 0)(17),h(0) = −S̄(0) 使外层滑模变量初始为零、消除到达段,实现全局精确时间收敛(p.5)。</li><li>机动级制导律(Theorem 2,p.5):U = 2ṙ_DP λ̇_DP/r_DP − 2ṙ_ED λ̇_ED/r_ED + ḡ(t) − ḣ(t) − K sign(S̿) (18),K &gt; sup_{t≥0} a^{max}_P/r_DP;Lyapunov V₁ = ½S̿²,V̇₁ ≤ −(K − a^{max}_P/r_DP)|S̿| ≤ 0 (20);内层滑模上 β̇ + k₁β/(t★−t) = 0 (21) 积分得 β(t) = β(0)((t★−t)/t★)^{k₁} (24),即 t=t★ 时 β≡0,与初始几何无关。</li><li>最小 effort 控制分配(p.5–6):代价 C := √[(a_E/Σ_E)² + (a_D/Σ_D)²] (25)(Σ_E=Σ_D=1 时等价于瞬时最小化 net control effort 的 L2 范数);令 U = 𝔅₁a_E − 𝔅₂a_D(28),𝔅₁ = cos δ_ED/r_ED,𝔅₂ = cos δ_DE/r_ED + cos δ_DP/r_DP,极小化得 Theorem 3 的闭式 a_E (26)、a_D (27),二阶导 (30) = U²/(𝔅₁²Σ_E²Σ_D²[·]^{3/2}) &gt; 0 (U≠0) 保证为极小(p.7)。</li><li>信息级——E 的诱饵律(Theorem 4,p.7):a_E = (r_EP/cos δ_EP)(−2ṙ_EP λ̇_EP/r_EP + ḣ_E + K₁ sign(S_E)) (31),S_E = λ̇_EP + h_E (32),h_E(t) = h_E(0)·t^{k₃}/(t₂−t)^{k₃}(33),h_E(0) = −λ̇_EP(0),K₁ &gt; sup_{t≥0} a^{max}_P/r_EP ⟹ λ̇_EP 在预设时刻 t₂ 精确归零(E 相对 P 非机动,充当诱饵;作者强调 P 变为非机动并非捕获必要条件,p.7)。</li><li>信息级——D 的制导律(Theorem 5,p.8):a_D = [−2ṙ_DP λ̇_DP/r_DP + 2ṙ_DE λ̇_DE/r_ED + (cos δ_ED/r_ED)a_E − ḡ(t) + ḣ(t) + K sign(S̿)] × r_ED r_DP/(cos δ_DE r_DP − cos δ_DP r_ED) (40),同样在 t★ 精确达到 χ★。</li><li>"不需要知道 P 策略"的实现方式:切换增益 K(或 K₁)仅用 |a_P| ≤ a^{max}_P 压制未知项 (cos δ_PD/r_DP)a_P(p.5 式 (20)、p.8 式 (42))。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<ul><li>Proposition 1(p.3–4):D 保持对 P 正接近速度(ṙ_DP&lt;0)且 χ∈[π/2, 3π/2] ⟹ P 在捕获 E 之前先被 D 捕获。前提即上述两条件;证明为几何论证(相似三角形按比例收缩,r_DP→0 而 r_EP&gt;0;χ=π/2 时 E₁P₁ 为斜边仍最长;χ=π 时 D 恒在 P–E 视线正中)。捕获为有限时间发生(收缩过程),但论文未给出捕获时刻 t_f 的解析上界。</li><li>Lemma 1(p.4):β 的动态相对 a_E、a_D 的相对阶为 2(β̈ 中显含 a_E, a_D)。</li><li>Theorem 2(机动级协同,p.5):在式 (14)(16) 双层滑模下取 U (18),K &gt; sup_{t≥0} a^{max}_P/r_DP ⟹ D 在交战前预设的时刻 t★ 精确达到 χ★∈[π/2, 3π/2],与三体初始几何无关。这是有限时间结论且时间可精确预定(t₁:内层滑模建立时刻,t₁&lt;t★;t★:β 归零时刻)。</li><li>Theorem 3(p.6):在约束 (13) 下最小化 C (25) 得最小横向加速度分配 a_E (26)、a_D (27),保证拦截(承接 Theorem 2 的收敛结论)。</li><li>Theorem 4(p.7):E 采用 (31)–(33),K₁ &gt; sup_{t≥0} a^{max}_P/r_EP ⟹ λ̇_EP 在可预先指定的时刻 t₂ 精确归零,与初始几何无关(有限时间、精确预定)。</li><li>Theorem 5(信息级协同,p.8):D 采用 (40),K &gt; sup_{t≥0} a^{max}_P/r_DP ⟹ D 在预设 t★ 精确达到 χ★,与初始几何无关。</li><li>备注:文中 p.8 出现"by the virtue of Theorem 1"的引用,但全文陈述的编号结果是 Proposition 1 + Theorem 2–5,无"Theorem 1",应为对 Proposition 1 的引用笔误。</li><li>保证链说明:定理 2/5 只证明角度误差 β 在 t★ 归零;随后捕获结论依赖 Proposition 1,后者还要求 ṙ_DP&lt;0(见第 6 节分析)。</li></ul>
+<h2 id="sec-6">5. 实验设置</h2>
+<ul><li>通用参数(p.8):v_P = v_D = 200 m/s,v_E = 100 m/s;E 初始位于原点;P 轨迹/输入红色、E 蓝色、D 绿色;P、D 机动能力 ±20 g,E 为 ±10 g(g=9.81 m/s²);P 与 D 速度、加速能力完全对等。</li><li>A 机动级协同(p.8–9):设计参数 t₁ = 3 s,t★ = 6 s,k₁ = 6,k₂ = 3,Σ_E = Σ_D = 1,K = 5。<ul><li>Fig. 3(p.8–9):P 用 PNG,a_P = −𝒩ṙ_EP λ̇_EP,𝒩=3;D 距 E 400 m(LOS −45°),P 距 E 5000 m(LOS 0°);γ_E=45°, γ_D=0°, γ_P=180°;初始 χ=228°;对不同 χ★ 均在捕获 E 前拦截 P;S̄ 3 s 内收敛、β 6 s 内归零。</li><li>Fig. 4(p.9):P 分别用 PNG、PPG(a_P = v_P λ̇_EP − 0.1(γ_P−λ_EP))、DPG(a_P = v_P λ̇_EP − 0.1(γ_P−λ_EP−δ), δ=20°);χ★=180°,其余初始条件同上;D 均中途拦截 P。</li><li>Fig. 5(p.9):E 静止;P 5000 m、LOS 2°;D 三种初始位置(400/1500/2000 m,LOS −45°/−10°/10°),χ★=180°;E 不机动时 D 单独满足几何条件保证防护。</li><li>Fig. 6(p.9):D 固定(r_DE=400 m, λ_DE=−45°),P 在 r_EP=5000 m、LOS −5°/0°/2° 三种位置;χ★ 均在 t★=6 s 达到并保持。</li><li>Fig. 7(p.9–11):能力下调:P、D ±8 g,E ±4 g,其余同 χ★=180° 情形;D 仍拦截 P。</li></ul></li><li>B 信息级协同(p.9–12):设计参数 K₁ = 1,t₂ = 4 s,k₃ = 3,t₁ = 5 s,t★ = 9 s,k₁ = k₂ = 3,K = 1。<ul><li>Fig. 8(p.9):χ★∈{150°,180°,200°};E 在原点、γ_E=0°;D 距 E 500 m、LOS 45°、γ_D=45°;P 5000 m、γ_P=180°(直指 E);E 在 t₂=4 s 精确归零 λ̇_EP 且此后 a_E=0,P 随之停止机动;D 在 t★=9 s 对准期望航向并捕获 P。</li><li>Fig. 9(p.10–11):t₂∈{4,6,8 s};t₂ 越小 E 初始控制需求越大;各情形 D 均捕获 P。</li><li>Fig. 10(p.11–12):P 分别用 PNG、BPNG(假设 P 能获取 E 机动信息并加入偏置项以反制,E 的偏置量未给数值)、PPG;χ★=180°,t₂=4 s;D 均拦截 P。</li></ul></li><li>逃逸方/追方策略:追方策略多样(PNG/PPG/DPG/BPNG + 直线冲向静止目标);E 在机动级为协同参与者、在信息级为先诱惑后停控的诱饵。对比基线:无同类制导律对比,只有 P 采用不同策略的鲁棒性展示。评价指标:定性(轨迹图、滑模变量/误差收敛时刻、控制曲线、是否拦截),无脱靶量等定量统计,无 Monte Carlo。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li>作者承认的:<ul><li>病态构型(P 距 E 很近而 D 距离太远)无法防护,作者以"三体飞行器防御场景下不实际"为由排除(p.2)。</li><li>方法限于二维平面;三维几何分析留作未来工作(p.12 Conclusions)。</li><li>P–D 能力对等假设(v_P ≈ v_D、a^{max}_P ≈ a^{max}_D)是框架成立的能力前提(p.2)。</li></ul></li><li>我分析的(附推断依据):<ol><li>增益条件在终端附近不可满足:K &gt; sup_{t≥0} a^{max}_P/r_DP(p.5 式 (18) 上方),而目标集要求 r_DP(t_f)=0(p.3),r_DP→0 时该 sup 为无穷,有限 K 严格意义上无法全程满足逐点压制条件 (20);K₁ 对 r_EP 同理(p.7)。理论与仿真(K=5、K=1 为常数)之间存在该缝隙。</li><li>捕获保证链不闭合:Theorem 2/5 仅证 β 在 t★ 归零(p.5, p.8),而 Proposition 1 还需要 ṙ_DP&lt;0(p.3);制导律 (18)(40) 并未显式设计或证明正接近速度这一前提,t★ 之前的过渡段(t&lt;t★,χ 尚未到位)与 t★ 之后 ṙ_DP 的符号均无论证。</li><li>无输入饱和综合:a^{max}_E、a^{max}_D 只作为能力设定出现(p.2),定理不保证 |a_E|、|a_D| 不越界时仍成立;Fig. 7 降能力仿真可行不代表一般性证明。</li><li>奇异性未讨论:律 (31) 含 1/cos δ_EP、(40) 含分母 cos δ_DE r_DP − cos δ_DP r_ED、分配律 (13)(26)(27) 含 cos δ_ED/cos δ_DE,这些量趋零时律失效,原文未给出可行域或规避机制。</li><li>t★ 的可行性无判据:t₁&lt;t★ 需在 P 抵达 E 之前完成角度调整,但论文未给出联系初始几何、速度差与 (t₁, t★, t₂) 的可行动条件,"任意初始几何"仅指角度收敛与初始几何无关,不等于任意几何下捕获时间都来得及。</li><li>sign(·) 切换带来抖振,原文未用边界层或讨论抖振处理(p.5 式 (18)、p.7 式 (31)、p.8 式 (40))。</li><li>记号不一致(细节):式 (14) 下方写 β̇ = λ̇_DP − λ̇_DE(前文 Lemma 1 为 λ̇_ED)(p.4);Theorem 5 式 (40) 中 2ṙ_DE λ̇_DE/r_ED 混用 DE/ED 下标(p.8);式 (25) 权重写 ℓ∈{E,P}(应为 {E,D})(p.5)。复现时需自行勘误。</li></ol></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li>已给出:完整动力学与运动学方程 (1)(2)(p.2–3);全部制导律闭式解 (18)(26)(27)(31)(40) 与滑模函数 g、h、h_E 定义 (15)(17)(33)(p.4–5, p.7);增益条件;两组协同的全部设计参数(机动级:t₁=3 s, t★=6 s, k₁=6, k₂=3, Σ=1, K=5,p.8;信息级:K₁=1, t₂=4 s, k₃=3, t₁=5 s, t★=9 s, k₁=k₂=3, K=1,p.9);各图场景的完整初始条件(距离、LOS 角、航向角、初始 χ=228° 等,p.8–9);追方四种制导律的显式公式与参数(𝒩=3, δ=20°,PPG/DPG 系数 0.1,p.8–9)。</li><li>缺失:无开源代码;积分方法与步长未说明;BPNG 的偏置项大小未给数值(p.12 仅说"incorporates a bias term");仿真终止条件、拦截判定阈值未写明;无定量误差/脱靶量数据表;奇异构型下的处理未说明。</li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<ul><li>推测 p.8 的"Theorem 1"在期刊正式版中对应 Proposition 1(或正式版重编号),arXiv v3 中无该编号。</li><li>推测仿真中 sign 函数可能做了平滑/边界层处理,否则控制曲线难以如此干净(Fig. 3c–d、8c–d),原文未提。</li><li>推测 t★ 之后 D 对 P 的接近速度自动为负由 v_P ≈ v_D 与几何位置共同保证,但论文未证明;若 P 比 D 快,链条是否仍闭合未知。</li><li>推测信息级方案中 E 在 t₂ 之后 a_E≡0 意味着 E 沿固定航向飞行、与 P 构成碰撞航线,若 D 拦截失败 E 将无自保能力(原文未讨论失败分支)。</li><li>权重 Σ_E≠Σ_D 时分配律的数值行为与控制上限满足性未验证(原文只用 Σ_E=Σ_D=1)。</li></ul>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>ℓ ∈ {P, E, D}</td><td>追者 P、逃逸者 E、防御者 D 的下标</td><td>p.2, 式 (1)</td></tr>
+<tr><td>xℓ, yℓ</td><td>agent 的惯性系位置坐标</td><td>p.2, 式 (1)</td></tr>
+<tr><td>vℓ</td><td>agent 速度(常值)</td><td>p.2, 式 (1)</td></tr>
+<tr><td>γℓ</td><td>航迹角/航向角,γℓ∈(−π, π]</td><td>p.2, 式 (1)</td></tr>
+<tr><td>aℓ</td><td>转向控制(横向加速度)</td><td>p.2, 式 (1)</td></tr>
+<tr><td>a^{max}_ℓ</td><td>横向加速度界,\</td><td>aℓ\</td><td>≤ a^{max}_ℓ</td><td>p.2</td></tr>
+<tr><td>r_ℓ (r_EP, r_DP, r_ED)</td><td>两两相对距离(LOS 距离)</td><td>p.2, Fig. 1</td></tr>
+<tr><td>λ_ℓ (λ_EP, λ_DP, λ_ED)</td><td>两两视线角(LOS 角)</td><td>p.2, Fig. 1</td></tr>
+<tr><td>v_{r,EP}, v_{λ,EP} 等</td><td>沿/垂直对应 LOS 的相对速度分量</td><td>p.2–3, 式 (2)</td></tr>
+<tr><td>δ_PE, δ_EP, δ_PD, δ_DP, δ_ED, δ_DE</td><td>各对的前置角(lead angle),如 δ_PE = γ_P − λ_EP</td><td>p.3</td></tr>
+<tr><td>𝒯, 𝒮, t_f</td><td>目标集 {𝒮 \</td><td>r_DP(t_f)=0}、相关状态集合、D 捕获 P 时刻</td><td>p.3</td></tr>
+<tr><td>χ</td><td>E–D 视线与 D–P 视线在 D 处张角(逆时针为正),χ = π + λ_DP − λ_ED</td><td>p.3 定义、p.4 式 (3)</td></tr>
+<tr><td>χ★</td><td>期望固定角,χ★∈[π/2, 3π/2]</td><td>p.4</td></tr>
+<tr><td>β</td><td>角度误差变量,β = χ − χ★</td><td>p.4, 式 (4)</td></tr>
+<tr><td>U</td><td>E–D 联合协同机动(net control effort)</td><td>p.4, 式 (13)</td></tr>
+<tr><td>S̄(内层)</td><td>内层滑模流形,β̇ − g</td><td>p.4, 式 (14)</td></tr>
+<tr><td>g(t)</td><td>−k₁β(t)/(t★−t)(0≤t&lt;t★)</td><td>p.4–5, 式 (15)</td></tr>
+<tr><td>S̿(外层,PDF 提取为 ¯S)</td><td>外层滑模流形,S̄ + h</td><td>p.5, 式 (16)</td></tr>
+<tr><td>h(t)</td><td>h(0)t^{k₂}/(t₁−t)^{k₂}(0≤t&lt;t₁)</td><td>p.5, 式 (17)</td></tr>
+<tr><td>t★</td><td>β 归零(χ 达到 χ★)的预定时刻</td><td>p.5</td></tr>
+<tr><td>t₁</td><td>内层滑模建立时刻(t₁ &lt; t★)</td><td>p.5, 式 (17)</td></tr>
+<tr><td>k₁, k₂</td><td>滑模设计参数,k₁,k₂∈ℕ</td><td>p.4–5, 式 (15)(17)</td></tr>
+<tr><td>K</td><td>切换增益,K &gt; sup_{t≥0} a^{max}_P/r_DP</td><td>p.5, 式 (18)</td></tr>
+<tr><td>V₁, V₂, V₃</td><td>Lyapunov 函数 ½S̿²、½S_E²、½S̿²</td><td>p.5, p.7, p.8</td></tr>
+<tr><td>C</td><td>控制分配代价 √[(a_E/Σ_E)²+(a_D/Σ_D)²]</td><td>p.5, 式 (25)</td></tr>
+<tr><td>Σ_E, Σ_D</td><td>控制分配权重(文中误写 ℓ∈{E,P})</td><td>p.5, 式 (25)</td></tr>
+<tr><td>𝔅₁, 𝔅₂</td><td>cos δ_ED/r_ED;cos δ_DE/r_ED + cos δ_DP/r_DP</td><td>p.6, 式 (28)</td></tr>
+<tr><td>S_E</td><td>E 的滑模变量,λ̇_EP + h_E</td><td>p.7, 式 (32)</td></tr>
+<tr><td>h_E(t)</td><td>h_E(0)t^{k₃}/(t₂−t)^{k₃}(0≤t&lt;t₂)</td><td>p.7, 式 (33)</td></tr>
+<tr><td>t₂</td><td>λ̇_EP 归零的预定时刻</td><td>p.7, 式 (33)</td></tr>
+<tr><td>k₃</td><td>E 侧滑模设计参数,k₃∈ℕ</td><td>p.7, 式 (33)</td></tr>
+<tr><td>K₁</td><td>E 侧切换增益,K₁ &gt; sup_{t≥0} a^{max}_P/r_EP</td><td>p.7, 式 (31)</td></tr>
+<tr><td>𝒩</td><td>追方 PNG 导航比(仿真取 3)</td><td>p.8</td></tr>
+<tr><td>g</td><td>重力加速度 9.81 m/s²(仿真单位)</td><td>p.8</td></tr>
+</tbody></table></div><div class="pnav"><a href="05.html">← 05 Optimal Strategies for Guard…</a><a href="07.html">07 Fixed-time Cooperative Guida… →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

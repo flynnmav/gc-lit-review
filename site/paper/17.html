@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>17 Learning-Based Multi-Stage Strategy for a Fixed-Wing Aircraft to Evade a Missile Detected at a Short Distance · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gC">强化学习制导</span> · Z. Niu, X. Zhou, H. Xiong · 2025 · arXiv(版权行指向 IEEE TAES) · arXiv:2511.05828 · <a href="../pdfs/17_Niu2025_RL-Evade-Missile-Short-Distance.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">17 | Learning-Based Multi-Stage Strategy for a Fixed-Wing Aircraft to Evade a Missile Detected at a Short Distance</h1>
+<blockquote>Niu Z., Zhou X., Xiong H. | arXiv:2511.05828 (2025) | 期刊/会议出处以文中为准 出处线索:p.1 页脚版权行 "0018-9251 © 2025 IEEE"(该 ISSN 为 IEEE TAES)、"VOL. XX, No. XX XXXXX 2025",即 IEEE Transactions on Aerospace and Electronic Systems 的 early access 版。单位:哈尔滨工业大学(深圳)。</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>逃逸方(evader)视角的 RL 样本:固定翼飞机被近距离锁定的导弹追击时,如何用学习策略完成"最后一道防线"。核心机制是把规避拆成三个由<strong>距离 + 方位角</strong>触发的阶段——远距大方位转弯策略、远距小方位直线加速策略、8000 m 内短距离激进机动策略——三个策略各自用 vanilla PPO 独立训练,部署时按规则切换(Fig. 2/4,p.3/p.7),灵感来自 gazelle–cheetah 追逃博弈(p.1 摘要)。导弹是经典 PN/APN 制导律的脚本对手(非学习方)。在攻防博弈谱系中,本文站在<strong>被攻击方机动设计</strong>一侧,与前 16 篇多为进攻方制导/拦截设计互补;其"对抗强度"完全由所假设的导弹模型(恒速、过载受限、全信息可观)决定。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li><strong>参与者</strong>:1 架固定翼飞机(JSBSim F-16 模型,逃逸方)+ 1 枚导弹(PN/APN 追踪),1v1(p.2 II-A,Fig. 1 p.3)。全文无多方扩展。</li><li><strong>状态量/观测量</strong>(p.7):s = [ẋa, ẏa, ża, θ, ϕ, ψ, Δxm, Δym, Δzm, Δẋm, Δẏm, Δẑm],12 维。即飞机自身速度三分量 + 姿态(pitch θ / roll ϕ / heading ψ)+ 导弹<strong>相对</strong>飞机的位置 Δxm 与相对速度 Δẋm。飞机"知道导弹什么信息":假设可借助先进设备观测/估计导弹相对位置与速度(p.2)——距离、视线角(方位 Ψ、高低角 Θ 由 Δxm 定义,p.3)全部可知,是<strong>全信息</strong>假设。无视线角率显式输入(LOS 角率 λ̇s 在奖励中内部计算,式(6) p.4)。</li><li><strong>动作空间</strong>(p.7,Table II):a = [δe, δa, δr, δt],elevator/aileron/rudder 归一化 [-1,1]、throttle [0,1],直接作用于舵面与油门("unleash maximum maneuver capability without being limited by a flight controller",p.6)。不是过载指令,也不是滚转/俯仰指令。</li><li><strong>动力学模型</strong>:<ul><li>飞机:JSBSim F-16 全量模型(含气动、飞控系统、推进),仿真频率 200 Hz(p.6,Fig. 3 p.6)。</li><li>导弹:三维运动学点模型。水平导航律 + 垂直导航律(PN,式(25) a_m = N·V_c·λ̇,p.6),离散更新 yaw/pitch(inspired by [35] 三平面法);若所需过载超过最大过载,则 yaw/pitch 变化按比例截断;再按 yaw/pitch/恒定速度更新位置(inspired by [36])(p.6)。恒速 800–1400 m/s(p.6)。</li></ul></li><li><strong>多阶段划分</strong>(实现版 Fig. 4,p.7):<ol><li><strong>短距离阶段</strong>(short distance stage):触发条件 ‖Δxm‖ &lt; 8000 m(p.7)。目标:大过载机动迫使导弹因最大过载限制而脱靶(p.3 III;验证见 p.9,Fig. 15 导弹过载急剧增大)。</li><li><strong>远距+小方位阶段</strong>:‖Δxm‖ &gt; 8000 m 且 |Ψ| &lt; 30°(p.12 IV-E)。目标:方位保持小、姿态/高度受控、朝导弹反方向远离("wear out the effective time of the missile",p.5 III-C)、加速(p.12)。</li><li><strong>远距+大方位阶段</strong>:‖Δxm‖ &gt; 8000 m 且 |Ψ| ≥ 30°(p.14 IV-F)。目标:转向减小 |Ψ|(原文表述 "turn to the opposite direction from the missile",p.5 III-D;由其奖励目标滚转 sgn(·)·85° 可知是朝导弹一侧转向把导弹甩向机尾);当 |Ψ| &lt; 15° 转入小方位策略(训练终止条件,p.15);距离进入 8500 m 内把滚转压回约 0°(p.14,式(39)-(41))。</li><li><strong>切换依据</strong>(Remark 1,p.12):短距离策略统计表明初始距离 8000–9000 m 成功率最高、飞机初速越高成功率越高、初始滚转 0° 显著优于 ±85°(p.11 Fig. 17、p.12 Fig. 19)→ 以 8000 m 为切换距离,"加速 + 滚转归零"作为两个远距策略的训练目标。</li></ol></li><li><strong>奖励函数</strong>(通用形式 + 实现值):<ul><li>steep turn 预训练策略:式(1)-(3)(p.3-4);实现式(26)(p.8):r_turn = 0.5·e^(−|ϕ−sgn((Δxm×ẋa)·u_up)·85|/0.2) + 0.5·e^(−|θ|/0.2)。</li><li>short distance 策略:式(4)-(6)(p.4);实现式(27)(p.8)= 式(26) + 0.6·tanh(sgn((Δxm×ẋa)·u_up)·λ̇s/0.1);λ̇s = sgn((um(t−1)×um(t))·u_up)·‖um(t)−um(t−1)‖/Δt(式(6),p.4);λ̇s 一阶平滑:λ̇s(t) = 0.25λ̇s_raw(t) + 0.75λ̇s(t−1)(式(28),p.9)。</li><li>small azimuth 策略:式(7)-(15)(p.4-5);实现式(29)-(37)(p.12):r = 0.5e^(−|ϕ|/0.2) + 0.5e^(−|θ|/0.2) + 1.0e^(−|Ψ|/0.2) + 0.2·tanh((‖ẋa‖−350)/80) + 四个约束项;约束项各 −20:|ϕ|&gt;135°、|θ|&gt;22.5°、|Ψ|&gt;30°、‖ẋa‖&lt;240 m/s 或 &gt;510 m/s。</li><li>large azimuth 策略:式(16)-(24)(p.5);实现式(38)-(46)(p.14):滚转奖励按距离分段——‖Δxm‖&gt;8500 m 时 0.5e^(−|ϕ−sgn(·)·85|/0.2);‖Δxm‖≤8500 m 时 |ϕ|&gt;30° 罚 −20、否则奖 +0.5;另 + 0.5e^(−|θ|/0.2) + 0.3·tanh((‖ẋa‖−350)/60) + 三个约束项(−20,同上,无方位项)。</li><li>基线 RL 策略(复现 [1]):式(47)-(53)(p.16):终端距离奖励(式(48):命中 ‖Δxm(T)‖&lt;10 m 时 −200(min_T1‖Δxm‖−10)²;未命中时 400(min_T1‖Δxm‖−10)+4000)+ 2.4·ln|λ̇|(式(49))− 0.01·n_m²(式(51))+ 0.5e^(−|θ|/0.2)(式(52))+ 滚转约束 |ϕ|&gt;135° 罚 −20(式(53))。其中(48)(49)(51)来自 [1],(52)(53)为本文补的三维化项。</li></ul></li><li><strong>约束</strong>:飞机最低高度 1000 m(p.6);速度软约束 240–510 m/s(式(37)/(46));|ϕ|≤135°、|θ|≤22.5° 软约束;场景最长 25 s(p.6 Table I);导弹过载上限 40–50 g(截断实现,p.6)。飞机过载无显式约束(仅由 JSBSim 气动/机体特性隐含)。</li><li><strong>噪声/时延</strong>:未提及传感器噪声、时延、漏检或观测丢失。唯一的"滤波"是对 λ̇ 的低通平滑(式(28),p.9),原因是 200 Hz 下 LOS 角率波动,属数值平滑而非传感器噪声建模。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>导弹按主流制导律(PN 或 APN)追踪飞机(p.2 II-A);实验默认 PN,N∈[3,5] 随机(p.6,引 [41]);泛化测试用 APN,N∈[3,5]、N′∈0.5N, N(p.19)。</li><li>导弹速度恒定,800–1400 m/s;设为常速是为了覆盖"双脉冲(dual pulse)技术的难缠导弹"场景(p.6)。</li><li>导弹最大过载 40–50 g,"considerably larger than that of the aircraft"(p.2, p.6);超出按比例截断 yaw/pitch 变化(p.6)。</li><li>导弹杀伤区为半径 10 m 的球形区(p.6,引 [1][40]);导弹工作时间上限 25 s(p.6,引 [36])。</li><li>导弹可在近距离之前保持静默(难探测、抗干扰),策略仅在检测到来袭导弹时激活;探测距离不确定,设定 5000–15000 m(p.2, p.6 Table I,引 [40]-[43])。</li><li>飞机可观测自身速度与姿态;可"observe or estimate"导弹相对位置与速度(p.2)——即相对距离、相对速度全知。</li><li>飞机初速 280–470 m/s(引 [37][38])、初始高度 3000–9000 m(引 [39])、初始航向 0–360°、最低高度 1000 m(p.6)。</li><li>导弹初始方位 −180°~180° 随机、初始高低角 −15°~15°(p.6);导弹从任意水平方向来袭(p.6)。</li><li>训练/测试初始条件:飞机初始 roll = pitch = 0°、初始位置 0,0,za(p.8)。</li><li>LOS 奖励的设计前提:俯仰奖励能使飞机大致在水平面机动,从而 Δxm 近似水平(p.4 III-A.2)。</li><li>经验假设(preliminary tests):距离 &gt;12000 m 时飞机激进机动效果差,故短距离策略只对 5000–12000 m 训练(p.8)。</li><li>单枚导弹、无机载对抗手段(箔条/曳光/干扰/诱饵)参与博弈;文中把"依赖 decoy 等额外生存技术"列为他人的局限(p.2),自身不含。</li><li>基线选择假设:其余 RL 规避方法因缺实现细节、含 decoy 等额外问题、奖励过简或过时而不适合作基线,仅 [1] 合适(p.15-16)。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制概括:三个策略<strong>分别独立训练、规则切换</strong>,不修改 vanilla PPO、不做端到端分层训练("without requiring modification of an easy-to-use vanilla RL algorithm",p.2)。流程(Fig. 2,p.3):先课程学习(curriculum learning,引 [30])训练 steep turn 预训练策略(目标滚转 85°、目标俯仰 0°),再在其基础上加 LOS 奖励项微调出 short distance 策略(式(26)→(27),p.8);然后对 short distance 策略做分区间统计,找到其成功率最优的初始条件(8000 m 距离、高速度、零滚转,p.11-12),把这些条件反过来定为 small/large azimuth 策略的奖励目标并确定切换阈值;部署时按 Fig. 4(p.7)的距离/方位规则调用。核心洞察(p.2):导弹在远距对逃逸机动不敏感、近距敏感 → 远距阶段"拖延 + 制造有利条件"(把导弹甩到机尾、加速、滚转归零,耗掉导弹 25 s 工作时间),近距阶段用<strong>带符号 LOS 角率</strong>奖励(λ̇s,式(5)(6),p.4)最大化对己方有利的视线旋转方向,迫使 PN 导弹过载饱和脱靶——注意与 [1][32] 的"最大化 |λ̇| 幅值"不同,本文强调符号方向("rather than maximizing the magnitude of the LOS rate",p.4)。</p>
+<p>关键公式:</p>
+<ul><li>带符号 LOS 角率:式(6),λ̇s = sgn((um(t−1)×um(t))·u_up)·‖um(t)−um(t−1)‖/Δt(p.4);奖励式(5) r_short_LOS = tanh(sgn((Δxm×ẋa)·u_up)·λ̇s/τ)(p.4)。</li><li>LOS 平滑:式(28)(p.9)。</li><li>large azimuth 的距离分段滚转奖励:式(17)-(19),分段临界距离 d_c(实现 8500 m,p.14),近距小滚转给正常数奖励 R_large_roll(p.5)。</li><li>导弹 PN:式(25) a_m = N·V_c·λ̇(p.6);APN:式(54) a_m = N·V_c·λ̇ + N′·a_a⊥(p.19,引 [47])。</li><li>基线终端奖励:式(48)(p.16),以全程最小距离 min_T1‖Δxm‖ 与 10 m 阈值的关系给奖惩。</li><li>训练:PPO,actor/critic 各两层 256 单元隐藏层,Tanh 激活(含输出层),Adam;γ=0.99,lr 3×10⁻⁴,max steps 7500,batch 1024(p.7,Table III p.8)。收敛轮数:steep turn 3000(p.8)、short distance 4000(p.9)、small azimuth 6000(p.13)、large azimuth 14000(p.15)、基线 4500(p.16)。训练采样用分区间按比例抽样:飞机初速 5 区间比例 16:8:4:2:1(偏低速)、初始距离 5 区间比例 1:2:4:8:16(偏远距)、大方位策略的方位 10 区间比例 1:2:4:8:16:16:8:4:2:1(偏 |Ψ|=30° 附近)(p.12, p.14-15)。训练终止:短距离/steep turn 被导弹捕获即终止(p.8);small azimuth 在距离 &lt;5000 m 终止(p.12-13);large azimuth 在距离 &lt;5000 m 或 |Ψ|&lt;15° 终止(p.15);基线在距离 &lt;10 m 时<strong>不</strong>终止以便记录最小距离(p.16)。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<p>无定理、命题或引理。仅有经验性 <strong>Remark 1</strong>(p.12):短距离策略的切换条件为 8000 m;两个远距策略的目标为加速飞机与切换前滚转归零。全文结论均由仿真统计支撑,无收敛性/可解性等理论分析。</p>
+<h2 id="sec-6">5. 实验设置</h2>
+<ul><li>平台:JSBSim F-16 + 数值导弹,200 Hz;PC(3.7 GHz CPU、32 GB 内存、RTX 3080 Ti)(p.6)。仿真框架见 Fig. 3(p.6)。</li><li>场景参数(Table I,p.6):飞机初始高度 3000–9000 m、初速 280–470 m/s、航向 0–360°;导弹方位 −180°~180°、高低角 −15°~15°、初始距离 5000–15000 m、恒速 800–1400 m/s、最大过载 40–50 g、杀伤半径 10 m、最长 25 s。PN 导航比随机 3–5(p.6)。</li><li>对比基线(p.15-16 IV-G/IV-H):(a) 复现 [1] 的 RL 规避策略(同状态/动作空间,导弹距离 5000–15000 m 训练,4500 episodes 收敛;p.16-17);(b) steep turn 经典规避机动(即预训练策略,p.15)。文中说明不选 [4][5] 等的原因:缺实现细节、含 decoy 等额外因素、奖励过简、过时(p.15-16)。</li><li>评价指标:成功(生存)率(主指标,Table VI p.19);逼出的导弹最大过载(平均:本文 44.92 g、基线 RL 27.46 g、steep turn 16.27 g,Fig. 39 p.19);roll/pitch/velocity/azimuth 越界次数(Table IV p.13、Table V p.15);末段方位角(小方位策略压到 −3.5°~3.5°,p.13 Fig. 23)、速度增幅(小方位策略 Fig. 24 p.14;大方位策略约 10%,p.15 Fig. 29);最小脱靶量(基线示例 20.37 m,p.17 Fig. 33)。</li><li>Monte Carlo 规模:分区间统计。Fig. 17 分析:每区间组合 40 次(p.11);策略对比:每区间组合 20 次,且三策略共用同一组 20 个场景以保证公平(p.18);滚转影响分析各 5 次(p.11-12);小方位策略验证中"每区间 1 次"与"从 30 次中随机选 1 个代表"两种表述并存(p.13)。<strong>总试验次数未给出</strong>,无置信区间/方差报告。</li><li>对导弹泛化测试:仅一组——APN 导弹(训练中未见过):成功率 75.63%(PN 为 80.89%),N′∈0.5N, N(p.19 IV-I,Fig. 40 p.20)。作者解释:APN 初段指令加速度高但末段需求下降、剩余过载更多可用于对抗(p.19,引 [48])。</li><li>主要结果:本文策略平均成功率 80.89%(探测距离 5000–15000 m 全域)、探测距离 &gt;8000 m 时 85.06%;基线 RL 34.14%、steep turn 3.34%(p.1 摘要、p.18-19 Table VI/Fig. 38)。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li><strong>作者承认的</strong>:<ul><li>面对未训练过的 APN 导弹成功率降至 75.63%(仍承认低于 PN 情形,p.19)。</li><li>短距离策略在长初始距离(如 12000 m)下表现反而不如 8000 m 初始距离——作者自称该结果 "not reasonable",并追查到原因是到达 8000 m 时滚转已达约 ±85°(p.11-12,Fig. 18/19)。</li><li>p.2 承诺 Section V 会给出未来方向,但结论(p.20)实际未含局限性讨论或未来工作条目。</li></ul></li><li><strong>我分析的</strong>(依据见括号):<ol><li><strong>全信息假设过强</strong>:状态含导弹相对速度三分量 Δẋm(式 s,p.7;假设 p.2)。实战中导弹告警设备通常只给 LOS 角/角率,距离尤其是距离率的估计误差大;策略对 Δẋm 的依赖程度及在真实传感器下的退化未评估。</li><li><strong>导弹模型理想化</strong>:恒速(忽略阻力与双脉冲发动机的实际能量变化)、无导引头视场/失锁、无制导回路动力学与量测噪声、过载截断为简单比例截断(p.6)。恒速假设恰好去掉了"机动耗竭导弹速度"这一真实末段杀伤机制,80.89% 的绝对数值未必能外推到真实导弹。</li><li><strong>基线可能被削弱</strong>:基线奖励照搬 [1] 的 −0.01·n_m²,式(51) 明确 n_m 是<strong>导弹</strong>过载(p.16),但 p.17 又解释该奖励"tends to attenuate the overload of the aircraft"——两处矛盾;基线飞机过载 &lt;6 g(p.17 Fig. 35),而本文策略的价值恰在逼导弹至 44.92 g 最大过载(p.19)。若该项在逃逸语境下方向反了(抑制对抗性机动),34.14% 的基线成功率存在被低估的可能。</li><li><strong>切换阈值为硬编码</strong>:8000 m / 30° / 15° / 8500 m 均由特定场景分布的统计调出(p.7, p.11-12, p.14-15),无滞回设计,对其他高度/速度/几何分布的普适性未验证;阈值附近可能发生阶段抖动(原文未讨论)。</li><li><strong>无鲁棒性测试</strong>:无噪声、时延、漏检、导弹机动策略变化(仅换导引律)以外的扰动(全文未提及)。</li><li><strong>统计报告粗糙</strong>:各成功率无方差/置信区间;小方位策略验证的每格样本量表述不一(p.13);总试验次数未报告。</li><li><strong>工程落地缺口</strong>:直接舵面指令绕过飞控(p.6),真机需底层控制适配;无 sim2real;未讨论飞行员过载耐受/结构限制;单导弹单机,无多威胁与协同。</li></ol></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li><strong>已给出</strong>:状态/动作空间及边界(Table II p.7);全部奖励函数含权重与阈值(式(26)-(28) p.8-9、(29)-(37) p.12、(38)-(46) p.14、(47)-(53) p.16);切换阈值 8000 m/30°/15°/8500 m(p.7/12/14/15);场景参数(Table I p.6);PPO 结构与超参(2×256 Tanh、Adam、γ=0.99、lr 3e-4、batch 1024、max steps 7500,Table III p.8);训练采样区间比例(p.12/14-15);各策略终止条件(p.8/13/15/16);仿真频率 200 Hz 与硬件(p.6);收敛轮数(p.8/9/13/15/16);JSBSim F-16 为公开模型 [33];测试协议(区间划分、共用场景集)。</li><li><strong>缺失</strong>:代码与训练权重(全文无任何开源/数据声明);PPO 细节(clip 参数、熵系数、GAE λ、rollout 长度、更新轮数、并行环境数、随机种子);决策频率(200 Hz 是仿真频率,策略推理频率未明说)与状态归一化方式;导弹离散导引/位置更新实现细节(仅引 [35][36]);"成功/被捕获"的精确判定式(需从式(48)与 10 m 杀伤半径自行推断);最低高度 1000 m 如何强制(终止?惩罚?未说明);训练 episode 上限 7500 步(37.5 s)与场景 25 s(5000 步)不一致的解释;角度量的环绕处理(roll ±180°)。</li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<ol><li>训练与部署的衔接:small/large azimuth 策略训练在距离 &lt;5000 m 才终止(p.13/15),而部署中 8000 m 即切换到短距离策略(p.7)——训练时 8000–5000 m 段学到的行为与部署是否一致,原文未说明。</li><li>式(51) 的 n_m 到底是导弹过载还是飞机过载:式(51) 处写 missile(p.16),p.17 解释为抑制飞机过载;需回查 [1] 原文的奖励语义才能判断基线是否被公平实现。</li><li>训练 episode 上限 7500 步超出 25 s 场景时长的原因(单位是步还是别的粒度)。</li><li>p.13 "one test" 与 "selected from the 30 tests" 的矛盾:小方位策略验证的实际每格样本量。</li><li>最终发表卷期:依版权行推断为 IEEE TAES early access(0018-9251,p.1),卷期页码待正式版确认。</li><li>λ̇s 符号化 LOS 奖励在 Δxm 不近似水平(导弹初始高低角达 ±15°,p.6)时的退化程度——式(5) 的水平面假设(p.4)在此偏差下的影响原文未量化。</li></ol>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>xa = [xa, ya, za]</td><td>飞机位置(ENU 世界系,原点位于飞机初始位置下方海平面)</td><td>p.3 II-B</td></tr>
+<tr><td>ẋa = [ẋa, ẏa, ża]</td><td>飞机速度</td><td>p.3 II-B</td></tr>
+<tr><td>[θ, ϕ, ψ]</td><td>飞机姿态(θ 俯仰、ϕ 滚转、ψ 航向;范围见 Table II)</td><td>p.3 II-B(分量角色见 p.7 Table II)</td></tr>
+<tr><td>Δxm = [Δxm, Δym, Δzm]</td><td>导弹相对飞机的位置</td><td>p.3 II-B</td></tr>
+<tr><td>Δẋm = [Δẋm, Δẏm, Δẑm]</td><td>导弹相对飞机的速度</td><td>p.3 II-B</td></tr>
+<tr><td>Ψ</td><td>导弹相对飞机的方位角(基于航向反方向定义,导弹在右侧为正)</td><td>p.3 II-B</td></tr>
+<tr><td>Θ</td><td>导弹相对飞机的高低角(水平面之上为正)</td><td>p.3 II-B</td></tr>
+<tr><td>um = Δxm/‖Δxm‖</td><td>导弹相对位置的单位向量</td><td>p.4 式(6)</td></tr>
+<tr><td>u_up</td><td>竖直向上单位向量</td><td>p.4 式(2)</td></tr>
+<tr><td>λ̇s</td><td>带符号 LOS 角率(本文核心奖励量)</td><td>p.4 式(6)</td></tr>
+<tr><td>λ̇</td><td>(一般)LOS 角率,用于导弹 PN 与基线奖励</td><td>p.6 式(25)</td></tr>
+<tr><td>ϕ*</td><td>目标滚转(实现中 85°)</td><td>p.4 式(2)</td></tr>
+<tr><td>θ*</td><td>保持高度的目标俯仰(实现中 0°)</td><td>p.4 式(3)</td></tr>
+<tr><td>τ_turn_roll, τ_short_LOS 等</td><td>各奖励项可调参数</td><td>p.4 式(2)(5)</td></tr>
+<tr><td>P_small_roll 等</td><td>负常数惩罚</td><td>p.4 式(9)</td></tr>
+<tr><td>R_large_roll</td><td>正常数奖励(近距小滚转时给)</td><td>p.5 式(19)</td></tr>
+<tr><td>ϕ_small_max / θ_small_max / Ψ_small_max</td><td>小方位策略滚转/俯仰/方位上界(实现 135°/22.5°/30°)</td><td>p.4-5 式(9)(11)(13)</td></tr>
+<tr><td>ϕ_large_max / θ_large_max</td><td>大方位策略滚转/俯仰上界(实现 135°/22.5°)</td><td>p.5 式(20)(22)</td></tr>
+<tr><td>ϕ_large_short</td><td>大方位策略近距段滚转界(实现 30°)</td><td>p.5 式(19)</td></tr>
+<tr><td>d_c</td><td>大方位策略滚转奖励的临界切换距离(实现 8500 m)</td><td>p.5 式(17)</td></tr>
+<tr><td>ẋ_a_ref</td><td>速度奖励参考速度(实现 350 m/s)</td><td>p.5 式(14)</td></tr>
+<tr><td>ẋ_a_max / ẋ_a_min</td><td>飞机速度上/下界(实现 510/240 m/s)</td><td>p.5 式(15)</td></tr>
+<tr><td>a_m</td><td>导弹指令加速度</td><td>p.6 式(25)</td></tr>
+<tr><td>N</td><td>导航比(3–5)</td><td>p.6 式(25)</td></tr>
+<tr><td>V_c</td><td>导弹-飞机接近速度</td><td>p.6 式(25)</td></tr>
+<tr><td>δe, δa, δr, δt</td><td>升降舵/副翼/方向舵/油门归一化控制输入</td><td>p.6-7(Table II p.7)</td></tr>
+<tr><td>s</td><td>策略状态向量(12 维)</td><td>p.7</td></tr>
+<tr><td>a</td><td>策略动作向量(4 维)</td><td>p.7</td></tr>
+<tr><td>T</td><td>一个 episode 的步数</td><td>p.16 式(48)</td></tr>
+<tr><td>T1</td><td>达到全程最小距离的步索引(min_T1‖Δxm(t)‖)</td><td>p.16 式(48)</td></tr>
+<tr><td>n_m</td><td>导弹过载</td><td>p.16 式(51)</td></tr>
+<tr><td>a_a⊥</td><td>飞机加速度相对视线的垂直分量</td><td>p.19 式(54)</td></tr>
+<tr><td>N′</td><td>APN 的飞机加速度修正系数(0.5N–N)</td><td>p.19 式(54)</td></tr>
+</tbody></table></div><div class="pnav"><a href="16.html">← 16 Cooperative Guidance Strateg…</a><span></span></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>

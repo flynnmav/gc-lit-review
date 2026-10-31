@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>05 Optimal Strategies for Guarding a Compact and Convex Target Set: A Differential Game Approach · 协同制导 × 微分博弈 × RL 文献综述</title>
+<link rel="stylesheet" href="../assets/style.css?ver=91628a33">
+</head>
+<body>
+<div class="bgfx" aria-hidden="true"></div>
+<header class="top"><div class="topin">
+  <a class="brand" href="../index.html"><span>制导·博弈·学习</span><i class="dotb"></i><span class="sub">文献综述</span></a>
+  <nav class="menu">
+    <a href="../index.html">首页</a>
+    <a href="../papers.html" class="on">论文精读</a>
+    <a href="../comparison.html">对比总表</a>
+    <a href="../gaps.html">研究空白</a>
+  </nav>
+  <button id="themeBtn">🌙 深色</button>
+</div></header>
+<main>
+<div class="two"><nav><aside class="toc"><b>本页目录</b><a href="#sec-0">0. 一句话定位</a><a href="#sec-1">1. 问题建模</a><a href="#sec-2">2. 假设条件</a><a href="#sec-3">3. 方法核心</a><a href="#sec-4">4. 理论结果</a><a href="#sec-5">5. 实验设置</a><a href="#sec-6">6. 局限性</a><a href="#sec-7">7. 可复现性</a><a href="#sec-8">8. 待验证</a><a href="#sec-9">9. 记号表</a></aside></nav><article class="doc"><p class="tag"><span class="badge gA">微分博弈与目标防御</span> · Y. Lee, E. Bakolas · 2021 · arXiv · arXiv:2104.00717 · <a href="../pdfs/05_Lee2021_Guarding-Convex-Target-Set-Diff-Game.pdf" target="_blank">📄 原文 PDF</a></p><h1 id="sec-0">05 | Optimal Strategies for Guarding a Compact and Convex Target Set: A Differential Game Approach</h1>
+<blockquote>Lee Y., Bakolas E. | arXiv 预印本 | arXiv:2104.00717 (v2, eess.SY, 2021-09-16) | UT Austin | PDF 共 6 页,页码引用均指 PDF 页 p1–p6</blockquote>
+<h2 id="sec-1">0. 一句话定位</h2>
+<p>将 Isaacs 经典"守卫目标集"博弈从点/直线/圆等简单目标形状(p1, Sec. I)推广到<strong>任意紧致凸、光滑边界的目标集 Ω</strong>:给出统一的屏障函数(game of kind)与捕获/攻击两个 game of degree 的状态反馈鞍点解,是 Garcia–Casbeer–Pachter 圆形区域结果 [7] 的推广(p1;Prop 3 明言推广 [7] 的 Theorem 2,p3)。相对"点目标防御"的推进点:攻击者只需到达<strong>扩展集合</strong> Ω 内/边界上任意一点即可获胜,赢集判据由"Apollonius 圆与 Ω 是否相交"给出,屏障构造依赖"圆心到 Ω 的正交投影"。</p>
+<h2 id="sec-2">1. 问题建模</h2>
+<ul><li>状态量(原文符号):追逐者位置 xP = (xP, yP) ∈ R²,逃逸者(攻击者)位置 xE = (xE, yE) ∈ R²;联合博弈状态 x = (xP, xE) ∈ R⁴(p2, 式(2)(3)(4))。</li><li>控制量(原文符号):uP = (uP,x, uP,y) ∈ U,uE = (uE,x, uE,y) ∈ U,公共输入集 U = {u ∈ R² : ∥u∥ = 1}(单位向量,速度饱和型)(p2)。</li><li>动力学模型(类型与方程):<strong>简单运动(simple motion)</strong>,速度大小固定、方向可控(p2):<ul><li>ẋP = vP·uP, xP(0) = xP,0(式(2),p2);</li><li>ẋE = vE·uE, xE(0) = xE,0(式(3),p2);</li><li>联合:ẋ = f(x, uP, uE) = (vP·uP, vE·uE),x(0) = x0(式(4),p2)。</li></ul></li><li>参与者与支付/终端流形:双玩家——追逐者 P(防御者)vs 逃逸者 E(攻击者)。两个终端流形(p2):<ul><li>捕获流形 Tc := {x ∈ R⁴ : (xP = xE) ∧ (xE ∉ Ω)}(注意捕获只在 Ω 外有效);</li><li>攻击流形 Ta := {x ∈ R⁴ : xE ∈ Ω}(<strong>终端集是扩展集合 Ω 整体</strong>,非单点);</li><li>tf := min(tc, ta),tc/ta 为首次进入 Tc/Ta 的时刻(p2)。</li><li>捕获博弈(预期被捕获时)支付:Jc(x0, uP(·), uE(·)) = dist(xE(tc), Ω),P 最大化 / E 最小化"捕获点到目标集 Ω 的最小距离"(式(5),p2);值函数 Vc(x0) = min_{uE(·)} max_{uP(·)} Jc(式(7),p2),鞍点不等式(式(6),p2)。</li><li>攻击博弈(预期被攻击时)支付:Ja(x0, uP(·), uE(·)) = ∥xE(ta) − xP(ta)∥,P 最小化 / E 最大化" pursuer 终端位置与攻击点的距离"(式(8),p2);值函数 Va(x0) = min_{uP(·)} max_{uE(·)} Ja(式(10),p2),鞍点不等式(式(9),p2)。</li></ul></li><li>机动目标:未提及(目标集 Ω 为静态紧致凸区域,h 不依赖时间,p2 式(1);攻击者仅按简单运动建模,无机动动力学/机动能力讨论)。</li><li>约束(输入/状态/视场):输入约束 U(单位模长,即速度大小恒定);xE,0 ∈ R²\Ω(攻击者初始在目标集外,p2);无视场/探测约束——未提及。</li><li>噪声/时延:未提及(确定性模型;明确假设双方在每个时刻对彼此状态与动力学有完全信息,p2)。</li></ul>
+<h2 id="sec-3">2. 假设条件</h2>
+<ol><li>博弈域为欧氏 2-D 平面 R²(p2, Sec. II 开头)——二维平面假设。</li><li>Ω ⊂ R² 为紧致凸集,定义为 Ω := {z = (x, y) ∈ R² : h(z) ≤ 0},其中 h : R² → R 为<strong>凸且光滑</strong>函数;边界 ∂Ω 上 h(z) = 0(p2, 式(1))——目标集形状假设(凸 + 紧致 + 光滑边界)。</li><li>双方在每个时刻对彼此状态与动力学具有<strong>完全信息(complete information)</strong>(p2)——即需要知道攻击者当前(含初始)位置;屏障曲线 B0、值函数、反馈策略都是当前联合状态 x = (xP, xE) 的函数(p3–5)。</li><li>Ω 是<strong>可透的(permeable)</strong>:追逐者可自由进出 Ω(p2)。</li><li>双方均为简单运动(p2, 式(2)(3))。</li><li>速度比 γ := vE/vP,仅考虑<strong>慢逃逸者</strong>情形 0 &lt; γ &lt; 1(p2);(15)(16) 在 γ → 1 时分母退化,γ = 1 未处理(p3)。</li><li>Ω 的紧致凸性保证正交投影 ProjΩ(x) := arg min_{z∈Ω} ∥z − x∥ 对所有 x 存在且唯一(p3, Prop 2 与 Prop 3 之间)。</li><li>攻击博弈中,约束优化问题 (35) 存在<strong>唯一全局最小化子</strong> x†(p5, Prop 5 陈述中直接断言,未给证明)。</li></ol>
+<h2 id="sec-4">3. 方法核心</h2>
+<p>机制:先解 <strong>game of kind</strong>(判定谁必胜),再解<strong>两个 game of degree</strong>(各自赢集内的最优反馈策略与值函数),后者采用"由开环最优解构造候选状态反馈 → 代入 HJI 方程验证"的路线(同 [7] 的解法,p4)。game of kind 用几何方法:慢逃逸者情形下,Apollonius 圆把平面分为追逐者/逃逸者主导区域 DP、DE(p3);若 DE ∩ Ω = ∅ 则 P 必胜,若 DE ∩ Ω ≠ ∅ 则 E 必胜(Prop 2,p3)。屏障函数比较"Apollonius 圆心 C(x) 到 Ω 的投影距离"与圆的半径:B(x; Ω, γ) = ∥ProjΩ(C(x)) − C(x)∥ − R(x),B &gt; 0 为捕获集 Rc,B ≤ 0 为攻击集 Ra(Prop 3,p3);屏障曲面是半透的(Remark 2,p4)。game of degree:Prop 1 经 Hamiltonian 分析证明最优输入为常值、轨迹为直线(p3);据此构造候选反馈(指向最优捕获点 x* / 最优攻击点 x†),再验证其与值函数满足 HJI 方程 −∂V/∂t = ∇xV · f(x, uP*, uE*)(式(32)(33)(37)(38),p5),从而构成鞍点解。</p>
+<p>关键公式:</p>
+<ul><li>目标集定义:Ω := {z ∈ R² : h(z) ≤ 0}(式(1),p2)。</li><li>Hamiltonian:H(λP, λE, uP, uE) = vP·λPᵀuP + vE·λEᵀuE;最优常值控制 uP*(t) ≡ λ̄P/∥λ̄P∥,uE*(t) ≡ −λ̄E/∥λ̄E∥(式(11)(12)(13),p3)。</li><li>最优 play 下路程比:∥xE(t) − xE,0∥ = γ∥xP(t) − xP,0∥,∀t ∈ 0, tf(Remark 1,p3)。</li><li>Apollonius 圆:A(x; γ) = {z ∈ R² : ∥z − C(x; γ)∥ = R(x; γ)};圆心 C(x; γ) = ((xE − γ²xP)/(1−γ²), (yE − γ²yP)/(1−γ²)),半径 R(x; γ) = γ/(1−γ²)·√((xE−xP)² + (yE−yP)²)(式(14)(15)(16),p3;此处 xE、xP 指分量)。</li><li>几何性质(Fact 1,p3):最优 play 下 ∥C(x) − xE∥ = γR(x),∥C(x) − xP∥ = R(x)/γ,故 ∥C(x) − xE∥ = γ²∥C(x) − xP∥;捕获点 x*:∥x* − xE,0∥ = γ∥x* − xP,0∥ 且 x* ∈ A;攻击点 x† ∈ ∂Ω:∥x† − xE,0∥ = γ∥xP(ta) − xP,0∥。</li><li>主导区域:DP(x; γ) := {z : ∥z − C(x)∥ &gt; R(x)},DE(x; γ) := {z : ∥z − C(x)∥ ≤ R(x)}(式(17)(18),p3;圆 A 本身属于 DE,p3)。</li><li><strong>屏障函数(核心结果)</strong>:B(x; Ω, γ) := ∥ProjΩ(C(x)) − C(x)∥ − R(x);Rc := {z ∈ R⁴ : B &gt; 0},Ra := {z ∈ R⁴ : B ≤ 0}(式(19)(20)(21),p3)。</li><li>捕获博弈:值函数 Vc(x) = ∥ProjΩ(C(x)) − C(x)∥ − R(x)(式(22)=式(25),p4);最优反馈 uP* = (x*−xP)/∥x*−xP∥,uE* = (x*−xE)/∥x*−xE∥(式(23),p4);最优捕获点 x* = (Cx + R(x)·(Px−Cx)/√((Px−Cx)²+(Py−Cy)²), Cy + R(x)·(Py−Cy)/√(·))(式(24),p4,C(x)=(Cx,Cy),ProjΩ(C(x))=(Px,Py));梯度 ∇xVc 见式(29),p4。</li><li>攻击博弈:值函数 Va(x) = ∥x† − xP∥ − (1/γ)∥x† − xE∥(式(34),p5);x† 是约束优化问题的唯一全局最小化子:minimize_{z∈R²} −∥z − xP∥ + (1/γ)∥z − xE∥,s.t. h(z) = 0 且 ∥z − xE∥ ≤ γ∥z − xP∥(式(35),p5);最优反馈 uP* = (x†−xP)/∥x†−xP∥,uE* = (x†−xE)/∥x†−xE∥(式(36),p5);梯度 ∇xVa 见式(37),p5。</li><li>HJI 验证:−∂Vc/∂t = ∇xVc·f(x, uP*, uE*)(式(32),p5;验证展开式(33),p5);攻击侧同(式(38),p5)。</li></ul>
+<h2 id="sec-5">4. 理论结果</h2>
+<p>(本文无独立编号的"定理/引理",共 <strong>5 个命题 + 1 个定义 + 1 个事实 + 4 个注记</strong>)</p>
+<ul><li><strong>Proposition 1</strong>(p2 末陈述,p3 证明):对运动学 (2)(3)、支付为 (5) 或 (8) 的玩家,最优控制输入随时间为常值,最优轨迹为直线。前提:简单运动、捕获博弈分析(mutatis mutandis 推攻击博弈)。</li><li><strong>Remark 1</strong>(p3):最优 play 下 ∥xE(t) − xE,0∥ = γ∥xP(t) − xP,0∥,∀t ∈ 0, tf(路程比为常数 γ)。</li><li><strong>Definition 1(Apollonius Circle)</strong>(p3):双方同时到达的点的轨迹 A(x; γ),圆心/半径由 (15)(16) 给出。</li><li><strong>Fact 1</strong>(p3):最优 play 的几何性质(见上节);给出 x* ∈ A、x† ∈ ∂Ω 的距离刻画。</li><li><strong>Proposition 2</strong>(p3):最优 play 下,若 DE ∩ Ω = ∅ 则追逐者必胜;若 DE ∩ Ω ≠ ∅ 则逃逸者必胜(同时到达的点属 A ⊂ DE,按 Tc 定义判 E 胜)。前提:Sec. II 的 TPTDG 与 (17)(18)。</li><li><strong>Proposition 3</strong>(p3–p4):屏障函数 B(x; Ω, γ) = ∥ProjΩ(C(x)) − C(x)∥ − R(x) 将 R⁴ 分为赢集 Rc(B&gt;0,P 必胜)与 Ra(B≤0,E 必胜)。前提:Prop 2 + Ω 紧凸保证 ProjΩ 存在唯一;是 [7] Theorem 2 的推广(p3)。</li><li><strong>Remark 2</strong>(p4):屏障曲面 B 半透(semipermeable)——最优 play 下状态不穿越 B;一方偏离最优则可能穿越(仿真见图 1(b)、2(b),p6)。</li><li><strong>Proposition 4</strong>(p4–p5):捕获博弈的值函数 Vc(式(22))在 Rc 上连续可微,最优状态反馈为式(23)(24);与 Vc 一起经 HJI 方程(式(32)(33))验证构成鞍点解。前提:x ∈ Rc、0 &lt; γ &lt; 1、∥xP − xE∥ ≠ 0(保证 φ、θ 可定,p4)。</li><li><strong>Remark 3</strong>(p5):Vc 在 Rc 上 C¹ ⇒ Rc 内无 dispersal surface,双方最优策略唯一。</li><li><strong>Proposition 5</strong>(p5):攻击博弈的值函数 Va(式(34))在 Ra 上连续可微,最优攻击点 x† 由约束优化 (35) 唯一给出,最优状态反馈为式(36);经 HJI(式(37)(38))验证构成鞍点解。前提:x ∈ Ra。</li><li><strong>Remark 4</strong>(p5):Va 在 Ra 上 C¹ ⇒ Ra 内无 dispersal surface,策略唯一。</li></ul>
+<h2 id="sec-6">5. 实验设置</h2>
+<p>有数值仿真(纯轨迹可视化,无定量指标),p5–p6, Sec. V:</p>
+<ul><li>场景参数(p5):xP,0 = (1, −0.5),xE,0 = (3, 1)(原文写作 xE = (3, 1)),vP = 1,vE = 0.7 ⇒ γ = 0.7;目标边界隐函数 h(x, y) = x⁴ + x²y² − 2xy² − 2y³ + y⁴(Fig. 1、2 中黑色曲线);初始屏障曲线 B0 数值计算(方法未说明)后画为红色曲线。</li><li>两个场景 × 两个初始区域:Fig. 1(x0 ∈ Rc):(a) 双方最优(策略 (23))→ 直线轨迹、追逐者胜;(b) 追逐者改用纯追踪(pure pursuit)→ 状态在 ts ∈ [t0, tf] 穿越 B,博弈转入攻击博弈,逃逸者到达 ∂Ω 获胜。Fig. 2(x0 ∈ Ra):(a) 双方最优(策略 (36))→ 逃逸者胜,最优攻击点由求解 (35) 得到(红方块),追逐者终端停在离 x†(t0) 最近的可达点;(b) 逃逸者走任意直线(非最优)→ 博弈退回捕获博弈,逃逸者被捕获(p5–p6)。</li><li>对比基线:无(仅"最优 vs 单方非最优"的自对照,无其他算法/文献方法比较)。</li><li>评价指标:无定量指标(无胜率/时间/代价统计);穿越时刻 ts 的分析"为简洁起见省略"(p6)。</li></ul>
+<h2 id="sec-7">6. 局限性</h2>
+<ul><li>作者承认的:<ul><li>仅平面 2-D、双玩家、单追逐者简单运动设定;高维多人目标防御博弈的屏障与最优策略留作未来工作(p6, Sec. VI)。</li><li>非最优 play 下状态穿越屏障的时刻 ts 未做理论讨论("omitted for brevity",p6)。</li><li>仅处理慢逃逸者 0 &lt; γ &lt; 1(p2, Sec. II),等速/快逃逸者超出本文范围。</li></ul></li><li>我分析的(依据见括号):<ol><li>式 (35) 被称作"约束凸优化问题"(p5),但其目标 −∥z−xP∥ + (1/γ)∥z−xE∥ 含凹项 −∥z−xP∥,可行集 {h(z)=0} ∩ {∥z−xE∥ ≤ γ∥z−xP∥} = ∂Ω ∩ DE 是曲线段、一般非凸;"唯一全局最小化子"的断言未给证明(直接考察目标与可行集的数学结构)。</li><li>仿真所用 h(x,y) = x⁴+x²y²−2xy²−2y³+y⁴ 不满足 Sec. II 对 h 的凸性假设(p2 vs p5):其 Hessian 在 (1,1)(h(1,1) = −1 &lt; 0,属于 Ω)处特征值为 {−2, 14}(本人数值计算);而数值中点抽样显示子水平集 {h ≤ 0} 仍近似凸——说明方法真正依赖的是 Ω 凸(Proj 唯一)而非 h 凸,但例子与论文字面假设不一致。</li><li>式 (30)(31) 的印刷形式与定义 (23) 数值不一致:以仿真参数(γ=0.7, θ=0)数值核验,(30) 分子第二项应为 γR(x)cosθ 而非 γcosθ,(31) 分子第二项缺 R(x)、分母应为 γ∥x⋆−xP∥(本人数值计算);而 (33) 的 HJI 展开与 (23) 完全自洽——判断为排版笔误,不影响结论但照抄公式会得到非单位向量。</li><li>屏障半透性(Remark 2,p4)只有几何论证与仿真图示,无正式证明;值函数仅在赢集内部验证 C¹ 与 HJI(p4–5),在屏障 B 上(赢集边界)的连续性/粘性解意义未讨论。</li><li>γ = 1(等速)时 (15)(16) 分母 1−γ² 退化为零(p3),本文框架直接失效,等速情形需另行处理;快逃逸者 γ &gt; 1 完全未涉及。</li><li>支付函数的工程动机未论证:为何"最大化捕获点到 Ω 的距离"(式(5))与"最小化终端间距"(式(8))是合理的防御/攻击效用(p2),与实际防御效能的关系靠读者接受。</li><li>完全信息、无噪声、无时延、无输入动态的理想化设定(p2),抗扰性无从谈起。</li></ol></li></ul>
+<h2 id="sec-8">7. 可复现性</h2>
+<ul><li>已给出:<ul><li>全部闭式公式 (1)–(38):屏障函数、值函数、最优反馈、梯度推导 (26)–(29)(37);</li><li>仿真参数完整:初值、速度、γ、h 表达式(p5);</li><li>HJI 验证的完整代数过程(式(33)(38),p5),可逐步复算。</li></ul></li><li>缺失:<ul><li>无公开代码或仓库链接;</li><li>B0 屏障曲线的数值计算方法未说明(p5);</li><li>优化问题 (35) 的求解器/容差/算法未说明(p5);</li><li>无定量实验数据(表格/统计);ts 分析省略(p6);</li><li>(30)(31) 存在印刷错误(见第 6 节第 3 条),照抄会得到错误策略,需按 (23) 重新推导。</li></ul></li></ul>
+<h2 id="sec-9">8. 待验证</h2>
+<p>(以下为无法在原文定位出处的推测)</p>
+<ul><li>推测:(35) 实际可等价化为一维几何问题(∂Ω 与某条 Apollonius 型曲线的交点/切点),从而绕开"凸优化"表述;原文未给出任何算法。</li><li>推测:若 xE,0 ∈ Ω(攻击者初始已在集内),则 ta = 0、攻击者立即获胜;原文仅默认 xE,0 ∈ R²\Ω(p2),未显式讨论该退化情形。</li><li>推测:推广到 3-D/高维时 ProjΩ 唯一性仍由紧凸性保证,但屏障函数在 ∂Ω 特殊点(如投影不唯一附近的测度零集已被凸性排除;更可能的issue是值函数在 B 上不可微)处的行为需要粘性解框架;原文未展开(仅列未来工作,p6)。</li><li>推测:B0 的数值实现大概率是在 ∂Ω 参数化后逐点计算 (19) 的符号;复现者需自行选择离散化方案。</li><li>推测:(30)(31) 的笔误在后续版本/期刊版中可能已修正(本 PDF 为 arXiv v2),引用公式时应以 (23) 为准。</li></ul>
+<h2 id="sec-10">9. 记号表</h2>
+<div class="tblwrap"><table class="tbl"><thead><tr>
+<th>原文符号</th>
+<th>含义</th>
+<th>首次出现位置</th>
+</tr></thead><tbody>
+<tr><td>Ω</td><td>紧致凸目标集,Ω := {z = (x, y) ∈ R² : h(z) ≤ 0}</td><td>p2, 式(1)</td></tr>
+<tr><td>h</td><td>定义 Ω 的凸光滑函数 h : R² → R</td><td>p2, 式(1)</td></tr>
+<tr><td>∂Ω</td><td>Ω 的边界(h(z) = 0)</td><td>p2</td></tr>
+<tr><td>xP = (xP, yP), xE = (xE, yE)</td><td>追逐者/逃逸者位置</td><td>p2, 式(2)(3)</td></tr>
+<tr><td>xP,0, xE,0</td><td>双方初始位置(xE,0 ∈ R²\Ω)</td><td>p2</td></tr>
+<tr><td>vP, vE</td><td>追逐者/逃逸者最大允许速度</td><td>p2</td></tr>
+<tr><td>uP = (uP,x, uP,y), uE = (uE,x, uE,y)</td><td>双方控制输入</td><td>p2</td></tr>
+<tr><td>U = {u ∈ R² : ∥u∥ = 1}</td><td>公共输入集</td><td>p2</td></tr>
+<tr><td>γ := vE/vP</td><td>速度比(慢逃逸者:0 &lt; γ &lt; 1)</td><td>p2</td></tr>
+<tr><td>x = (xP, xE) ∈ R⁴</td><td>联合博弈状态</td><td>p2</td></tr>
+<tr><td>f(x, uP, uE) = (vP·uP, vE·uE)</td><td>博弈动力学向量场</td><td>p2, 式(4)</td></tr>
+<tr><td>Tc</td><td>捕获流形 {x : xP = xE ∧ xE ∉ Ω}</td><td>p2</td></tr>
+<tr><td>Ta</td><td>攻击流形 {x : xE ∈ Ω}</td><td>p2</td></tr>
+<tr><td>tf = min(tc, ta)</td><td>博弈终止时刻</td><td>p2</td></tr>
+<tr><td>Jc, Ja</td><td>捕获/攻击博弈支付泛函</td><td>p2, 式(5)(8)</td></tr>
+<tr><td>dist(x, S)</td><td>点到集距离 inf_{y∈S} ∥x − y∥</td><td>p2, 式(5)后</td></tr>
+<tr><td>P(Ω)</td><td>Ω 的幂集</td><td>p2</td></tr>
+<tr><td>Vc, Va</td><td>捕获/攻击博弈值函数</td><td>p2, 式(7)(10)</td></tr>
+<tr><td>λP, λE</td><td>协态(costate)向量</td><td>p3, 式(11)</td></tr>
+<tr><td>H</td><td>Hamiltonian 函数</td><td>p3, 式(11)</td></tr>
+<tr><td>A(x; γ)</td><td>Apollonius 圆</td><td>p3, 式(14)</td></tr>
+<tr><td>C(x; γ)</td><td>Apollonius 圆心</td><td>p3, 式(15)</td></tr>
+<tr><td>R(x; γ)</td><td>Apollonius 半径</td><td>p3, 式(16)</td></tr>
+<tr><td>x⋆</td><td>最优捕获点(捕获博弈)</td><td>p3, Fact 1;式(24)</td></tr>
+<tr><td>x†</td><td>最优攻击点(攻击博弈,x† ∈ ∂Ω)</td><td>p3, Fact 1;式(34)(35)</td></tr>
+<tr><td>DP, DE</td><td>追逐者/逃逸者主导区域</td><td>p3, 式(17)(18)</td></tr>
+<tr><td>ProjΩ(x)</td><td>x 到 Ω 的正交投影</td><td>p3(Prop 2 与 Prop 3 之间)</td></tr>
+<tr><td>B(x; Ω, γ)</td><td>屏障函数 ∥ProjΩ(C(x)) − C(x)∥ − R(x)</td><td>p3, 式(19)</td></tr>
+<tr><td>B / B</td><td>屏障曲面 {z ∈ R⁴ : B = 0} / 屏障曲线(固定 xP 在 R² 上的截面;B0 为 t0 时刻)</td><td>p3; p4; B0 在 p5</td></tr>
+<tr><td>Rc, Ra</td><td>捕获集(B &gt; 0)/ 攻击集(B ≤ 0)</td><td>p3, 式(20)(21)</td></tr>
+<tr><td>φ, θ</td><td>捕获博弈证明中的方位角:xE(即 C(x))相对 xP;x⋆ 相对 C(x)</td><td>p4</td></tr>
+<tr><td>ψ, ϕ</td><td>攻击博弈证明中的方位角:x† 相对 xP / 相对 xE</td><td>p5</td></tr>
+<tr><td>(Px, Py)</td><td>ProjΩ(C(x)) 的坐标</td><td>p4, 式(24)</td></tr>
+</tbody></table></div><div class="pnav"><a href="04.html">← 04 Multiple Pursuer Multiple Ev…</a><a href="06.html">06 Cooperative Nonlinear Guidan… →</a></div></article></div>
+</main>
+<footer>17 篇论文 · 结构化精读(论断带页码)· 生成于 2026-10-31 · 静态站点,可托管于 GitHub Pages / Netlify / 任意 Web 服务器</footer>
+<button id="topBtn" title="回到顶部">↑</button>
+<script src="../assets/app.js?ver=91628a33"></script>
+</body>
+</html>
